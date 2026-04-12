@@ -1,0 +1,900 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.uiMathStormPrivate.PrivateBattleMathStormActivity">
+
+    <!-- OFFLINE BANNER -->
+    <LinearLayout
+        android:id="@+id/internetConnection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/gray_3"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/internet_lost" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="YOU ARE OFFLINE"
+            android:textColor="@color/black_3"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/offlineContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/internetConnection">
+
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/internet_mr_square"
+            android:layout_width="260dp"
+            android:layout_height="180dp"
+            app:riveAutoPlay="true"
+            app:riveResource="@raw/no_internet_mr_square"
+            app:riveStateMachine="State Machine 1" />
+
+        <TextView
+            android:id="@+id/offlineTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/inter_semibold"
+            android:text="App is currently unavailable."
+            android:textColor="@color/black_3"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/offlineSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:text="Check your connection or try again later!"
+            android:textAlignment="center"
+            android:textColor="@color/gray_1"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- MAIN CONTENT -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/internetConnection">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true">
+
+
+                <!-- TOP BAR + SCORES + TIMER -->
+                <ImageView
+                    android:id="@+id/signFlag"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="10dp"
+                    android:contentDescription="Score circle"
+                    android:src="@drawable/sign_flag"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer" />
+
+                <FrameLayout
+                    android:id="@+id/topBarContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:background="@drawable/top_bar_background"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp">
+
+                        <!-- Vertical line -->
+                        <View
+                            android:id="@+id/view"
+                            android:layout_width="2dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="#E5E5E5"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <!-- TIMER -->
+                        <FrameLayout
+                            android:id="@+id/timerCircleContainer"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/circle_background"
+                            android:clipChildren="false"
+                            android:clipToPadding="false"
+                            android:padding="5dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/rightPlayerContainer"
+                            app:layout_constraintStart_toEndOf="@+id/leftPlayerContainer"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:id="@+id/game_timer"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:fontFamily="@font/inter_semibold"
+                                android:gravity="center"
+                                android:text="3:00"
+                                android:textColor="#f0565d"
+                                android:textSize="20sp" />
+                        </FrameLayout>
+
+                        <!-- LEFT PLAYER -->
+                        <LinearLayout
+                            android:id="@+id/leftPlayerContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:src="@drawable/player_icon" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="12dp"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:paddingBottom="5dp">
+
+                                <TextView
+                                    android:id="@+id/game_your_score"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter_semibold"
+                                    android:text="0"
+                                    android:textColor="#64748b"
+                                    android:textSize="30sp" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:id="@+id/your_mistake1"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_marginEnd="4dp"
+                                        android:src="@drawable/circle_empty" />
+
+                                    <ImageView
+                                        android:id="@+id/your_mistake2"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_marginEnd="4dp"
+                                        android:src="@drawable/circle_empty" />
+
+                                    <ImageView
+                                        android:id="@+id/your_mistake3"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/circle_empty" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- RIGHT PLAYER -->
+                        <LinearLayout
+                            android:id="@+id/rightPlayerContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginEnd="12dp"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:paddingBottom="5dp">
+
+                                <TextView
+                                    android:id="@+id/game_opponent_score"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter_semibold"
+                                    android:text="0"
+                                    android:textColor="#64748b"
+                                    android:textSize="30sp" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:id="@+id/opponent_mistake1"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_marginEnd="4dp"
+                                        android:src="@drawable/circle_empty" />
+
+                                    <ImageView
+                                        android:id="@+id/opponent_mistake2"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_marginEnd="4dp"
+                                        android:src="@drawable/circle_empty" />
+
+                                    <ImageView
+                                        android:id="@+id/opponent_mistake3"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/circle_empty" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Player Icon -->
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:src="@drawable/player_icon" />
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </FrameLayout>
+
+                <!-- GENERATED PROBLEM ROW -->
+                <LinearLayout
+                    android:id="@+id/problemRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toTopOf="@+id/inputContainer"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer">
+
+                    <TextView
+                        android:id="@+id/problemText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:text="2+2="
+                        android:textColor="#64748b"
+                        android:textSize="44sp" />
+
+                    <ImageView
+                        android:id="@+id/problemImage"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="12dp"
+                        android:contentDescription="problem image"
+                        android:src="@drawable/answer_blue_box" />
+                </LinearLayout>
+
+                <!-- INPUT CONTAINER -->
+                <LinearLayout
+                    android:id="@+id/inputContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/input_container"
+                    android:orientation="vertical"
+                    android:padding="2dp"
+                    app:layout_constraintBottom_toTopOf="@id/row1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <EditText
+                        android:id="@+id/answer_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@android:color/transparent"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:fontFamily="@font/inter_semibold"
+                        android:hint="@string/example_10"
+                        android:inputType="number"
+                        android:paddingHorizontal="25dp"
+                        android:textColor="#64748b"
+                        android:textColorHint="#CECECE"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <!-- FIRST ROW -->
+                <LinearLayout
+                    android:id="@+id/row1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="6dp"
+                    android:weightSum="4"
+                    app:layout_constraintBottom_toTopOf="@id/row2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <!-- Button 1 -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingRight="6dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn1"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="1"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <!-- Button 2 -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="3dp"
+                        android:paddingRight="3dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="2"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <!-- Button 3 -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="3dp"
+                        android:paddingRight="3dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn3"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="3"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <!-- Delete Button -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="6dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btnDel"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/delete_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="⌫"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- SECOND ROW -->
+                <LinearLayout
+                    android:id="@+id/row2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="6dp"
+                    android:weightSum="4"
+                    app:layout_constraintBottom_toTopOf="@id/row3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <!-- Buttons 4,5,6,- same as row1 -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingRight="6dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn4"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="4"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="3dp"
+                        android:paddingRight="3dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn5"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="5"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="3dp"
+                        android:paddingRight="3dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn6"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="6"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="6dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#0060e2"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btnMinus"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/main_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="-"
+                            android:textColor="#FFFFFF"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- THIRD ROW -->
+                <LinearLayout
+                    android:id="@+id/row3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="6dp"
+                    android:weightSum="4"
+                    app:layout_constraintBottom_toTopOf="@id/check_button_container"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <!-- Buttons 7,8,9,0 -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingRight="6dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn7"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="7"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="3dp"
+                        android:paddingRight="3dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn8"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="8"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="3dp"
+                        android:paddingRight="3dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn9"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="9"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:paddingLeft="6dp">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/number_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/btn0"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@drawable/number_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:padding="0dp"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="0"
+                            android:textColor="#64748b"
+                            android:textSize="30sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- CHECK BUTTON CONTAINER -->
+                <FrameLayout
+                    android:id="@+id/check_button_container"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingBottom="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <!-- ENABLED BUTTON -->
+                    <FrameLayout
+                        android:id="@+id/check_btn_frame"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone">
+
+                        <!-- shadow -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/custom_button"
+                            android:backgroundTint="#0060e2"
+                            android:translationY="5dp" />
+
+                        <!-- button -->
+                        <Button
+                            android:id="@+id/check_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/main_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:letterSpacing="0"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="@string/check"
+                            android:textColor="#FFFFFF"
+                            android:textSize="17sp"
+                            app:backgroundTint="@null" />
+                    </FrameLayout>
+
+                    <!-- DISABLED BUTTON -->
+                    <FrameLayout
+                        android:id="@+id/check_btn_disabled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible">
+
+                        <!-- shadow -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/custom_button"
+                            android:backgroundTint="#E5E5E5"
+                            android:translationY="5dp" />
+
+                        <!-- text over shadow -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:fontFamily="@font/inter_semibold"
+                            android:gravity="center"
+                            android:text="@string/check"
+                            android:textColor="#A5A5A5"
+                            android:textSize="17sp"
+                            android:translationY="5dp" />
+                    </FrameLayout>
+
+                </FrameLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- FULLSCREEN COUNTDOWN OVERLAY -->
+        <FrameLayout
+            android:id="@+id/countdownOverlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#5C404040"
+            android:padding="0dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/countdownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/inter_semibold"
+                android:text="3"
+                android:textColor="#FFFFFF"
+                android:textSize="100sp" />
+
+            <!-- Image to show after countdown -->
+            <ImageView
+                android:id="@+id/afterCountdownImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="After countdown image"
+                android:src="@drawable/go_online"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

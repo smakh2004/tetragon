@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.uiCashStorm.UiCashStormActivity">
+
+    <!-- OFFLINE BANNER -->
+    <LinearLayout
+        android:id="@+id/internetConnection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/gray_3"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/internet_lost" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="YOU ARE OFFLINE"
+            android:textColor="@color/black_3"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/offlineContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/internetConnection">
+
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/internet_mr_square"
+            android:layout_width="260dp"
+            android:layout_height="180dp"
+            app:riveAutoPlay="true"
+            app:riveResource="@raw/no_internet_mr_square"
+            app:riveStateMachine="State Machine 1" />
+
+        <TextView
+            android:id="@+id/offlineTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/inter_semibold"
+            android:text="App is currently unavailable."
+            android:textColor="@color/black_3"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/offlineSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:text="Check your connection or try again later!"
+            android:textAlignment="center"
+            android:textColor="@color/gray_1"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- MAIN CONTENT -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/internetConnection">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/signFlag"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:contentDescription="Score circle"
+                    android:src="@drawable/sign_flag"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer" />
+
+                <!-- TOP BAR + SCORE CIRCLE -->
+                <FrameLayout
+                    android:id="@+id/topBarContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <!-- TOP BAR BACKGROUND -->
+                    <LinearLayout
+                        android:id="@+id/timerMistakeBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/top_bar_background"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <!-- TIMER -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/clockIcon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_clock" />
+
+                            <TextView
+                                android:id="@+id/timerText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:fontFamily="@font/inter_semibold"
+                                android:text="3:00"
+                                android:textColor="#f0565d"
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <!-- MISTAKES -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="end|center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingRight="10dp">
+
+                            <ImageView
+                                android:id="@+id/mistake1"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="5dp"
+                                android:src="@drawable/circle_empty" />
+
+                            <ImageView
+                                android:id="@+id/mistake2"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="5dp"
+                                android:src="@drawable/circle_empty" />
+
+                            <ImageView
+                                android:id="@+id/mistake3"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/circle_empty" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- SCORE CIRCLE -->
+                    <FrameLayout
+                        android:id="@+id/scoreCircleContainer"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_gravity="center"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:translationY="0dp">
+
+                        <ImageView
+                            android:id="@+id/scoreCircle"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Score circle"
+                            android:src="@drawable/circle_background" />
+
+                        <TextView
+                            android:id="@+id/scoreText"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="@font/inter_semibold"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="#64748b"
+                            android:textSize="30sp" />
+                    </FrameLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/game_content_area"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/enabledButtonFrame"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/signFlag"
+                    app:layout_constraintVertical_bias="0.3">
+
+                    <TextView
+                        android:id="@+id/instructionText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:text="Select the better option."
+                        android:textColor="@color/text_color"
+                        android:textSize="21sp" />
+
+                    <TextView
+                        android:id="@+id/total_balance_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_bold"
+                        android:text=""
+                        android:textColor="@color/text_color"
+                        android:textSize="48sp" />
+
+                    <ImageView
+                        android:id="@+id/mainCashIcon"
+                        android:layout_width="140dp"
+                        android:layout_height="140dp"
+                        android:layout_marginTop="-10dp"
+                        android:src="@drawable/two_cash" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/option_card_1"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_margin="20dp"
+                            android:background="@drawable/custom_background_two"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_bold"
+                                android:text=""
+                                android:textColor="@color/text_color"
+                                android:textSize="28sp" />
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="60dp"
+                                android:src="@drawable/one_cash" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/option_card_2"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_margin="20dp"
+                            android:background="@drawable/custom_background_two"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_bold"
+                                android:text=""
+                                android:textColor="@color/text_color"
+                                android:textSize="28sp" />
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="60dp"
+                                android:src="@drawable/one_cash" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/enabledButtonFrame"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingBottom="5dp"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <!-- shadow -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/blue_1"
+                        android:translationY="5dp" />
+
+                    <!-- button -->
+                    <Button
+                        android:id="@+id/enabledButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/main_button"
+                        android:backgroundTint="@null"
+                        android:fontFamily="@font/inter_semibold"
+                        android:letterSpacing="0"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="@string/continue_text"
+                        android:textColor="#FFFFFF"
+                        android:textSize="17sp"
+                        app:backgroundTint="@color/blue_2" />
+                </FrameLayout>
+
+                <!-- DISABLED BUTTON (shadow + text only, not clickable) -->
+                <FrameLayout
+                    android:id="@+id/disabledButtonFrame"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingBottom="5dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <!-- shadow -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="#E5E5E5"
+                        android:translationY="5dp" />
+
+                    <!-- text over shadow -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="@string/continue_text"
+                        android:textColor="#A5A5A5"
+                        android:textSize="17sp"
+                        android:translationY="5dp" />
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <!-- FULLSCREEN COUNTDOWN OVERLAY -->
+            <FrameLayout
+                android:id="@+id/countdownOverlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#5C404040"
+                android:padding="0dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/countdownText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="3"
+                    android:textColor="#FFFFFF"
+                    android:textSize="100sp" />
+
+                <!-- Image to show after countdown -->
+                <ImageView
+                    android:id="@+id/afterCountdownImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="After countdown image"
+                    android:src="@drawable/cash_go"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

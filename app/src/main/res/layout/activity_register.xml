@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.RegisterActivity">
+
+    <!-- OFFLINE BANNER -->
+    <LinearLayout
+        android:id="@+id/internetConnection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/gray_3"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/internet_lost" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="YOU ARE OFFLINE"
+            android:textColor="@color/black_3"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- MAIN CONTENT -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/internetConnection">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- Exit Button -->
+                <ImageView
+                    android:id="@+id/exit_btn"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="14dp"
+                    android:src="@drawable/exit_btn"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!-- STEP PROGRESS CONTAINER -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/stepProgressContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="12dp"
+                    app:layout_constraintBottom_toBottomOf="@id/exit_btn"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/exit_btn"
+                    app:layout_constraintTop_toTopOf="@id/exit_btn">
+
+                    <View
+                        android:id="@+id/progressBackground"
+                        android:layout_width="0dp"
+                        android:layout_height="14dp"
+                        android:background="@drawable/line_bg"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/progressActive"
+                        android:layout_width="0dp"
+                        android:layout_height="14dp"
+                        android:background="@drawable/line_active"
+                        app:layout_constraintBottom_toBottomOf="@id/progressBackground"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/progressBackground"
+                        app:layout_constraintWidth_percent="0.20" />
+
+                    <View
+                        android:id="@+id/step1"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle_active"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/step2"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/step2"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle_inactive"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/step3"
+                        app:layout_constraintStart_toEndOf="@id/step1"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/step3"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle_inactive"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/step4"
+                        app:layout_constraintStart_toEndOf="@id/step2"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/step4"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle_inactive"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/step5"
+                        app:layout_constraintStart_toEndOf="@id/step3"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/step5"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle_inactive"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/step4"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- FRAGMENT CONTAINER -->
+            <FrameLayout
+                android:id="@+id/questionFragmentContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+            <LinearLayout
+                android:id="@+id/offlineContainer"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/internet_mr_square"
+                    android:layout_width="260dp"
+                    android:layout_height="180dp"
+                    app:riveAutoPlay="true"
+                    app:riveResource="@raw/no_internet_mr_square"
+                    app:riveStateMachine="State Machine 1" />
+
+                <TextView
+                    android:id="@+id/offlineTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="App is currently unavailable."
+                    android:textColor="@color/black_3"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/offlineSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/inter_medium"
+                    android:gravity="center"
+                    android:text="Check your connection or try again later!"
+                    android:textAlignment="center"
+                    android:textColor="@color/gray_1"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- CONTINUE BUTTON -->
+            <FrameLayout
+                android:id="@+id/continue_btn_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingBottom="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <!-- ENABLED CONTINUE BUTTON -->
+                <FrameLayout
+                    android:id="@+id/continue_enabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/black_2"
+                        android:translationY="5dp" />
+
+                    <Button
+                        android:id="@+id/continue_enabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:fontFamily="@font/inter_semibold"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="@string/continue_text"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        app:backgroundTint="@color/black_3" />
+                </FrameLayout>
+
+                <!-- DISABLED CONTINUE BUTTON -->
+                <FrameLayout
+                    android:id="@+id/continue_disabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <!-- shadow -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/gray_2"
+                        android:translationY="5dp" />
+
+                    <!-- text over shadow -->
+                    <TextView
+                        android:id="@+id/continue_disabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="@string/continue_text"
+                        android:textColor="@color/gray_1"
+                        android:textSize="17sp"
+                        android:translationY="5dp" />
+                </FrameLayout>
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

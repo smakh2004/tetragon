@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.uiMathStormOnline.OnlineResultBattleMathStormActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/player_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/timerMistakeBar" />
+            <!-- CENTER STATUS TEXT -->
+            <TextView
+                android:id="@+id/opponent_name"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="@string/opponent"
+                android:textColor="#64748b"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/opponent_status"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="@string/loser"
+                android:textColor="@color/red_1"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/opponent_result_text"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="..."
+                android:textColor="@color/red_1"
+                android:textSize="40sp"
+                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </LinearLayout>
+
+        <!-- VS LINE WITH TEXT -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/vs_line_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Horizontal line -->
+            <View
+                android:id="@+id/horizontal_line"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="#e5e5e5"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Text on top of line -->
+            <TextView
+                android:id="@+id/line_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_vs_text"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="10dp"
+                android:text="VS"
+                android:textColor="#64748b"
+                android:textSize="28sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- CANCEL BUTTON AT BOTTOM -->
+        <FrameLayout
+            android:id="@+id/exit_btn_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- ENABLED BUTTON -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+
+                <!-- shadow -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_2"
+                    android:translationY="5dp" />
+
+                <!-- button -->
+                <Button
+                    android:id="@+id/exit_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/custom_button"
+                    android:fontFamily="@font/inter_semibold"
+                    android:letterSpacing="0"
+                    android:stateListAnimator="@drawable/button_animator"
+                    android:text="@string/continue_text"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    app:backgroundTint="@color/black_3" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/exit_btn_container"
+            app:layout_constraintTop_toBottomOf="@+id/vs_line_container">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/player_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/timerMistakeBar" />
+            <!-- CENTER STATUS TEXT -->
+            <TextView
+                android:id="@+id/your_name"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="@string/you"
+                android:textColor="#64748b"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/your_status"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="@string/winner"
+                android:textColor="@color/green_1"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/your_result_text"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="..."
+                android:textColor="@color/green_1"
+                android:textSize="40sp"
+                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

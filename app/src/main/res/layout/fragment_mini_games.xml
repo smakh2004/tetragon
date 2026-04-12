@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- TITLE -->
+        <TextView
+            android:id="@+id/mini_games_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
+            android:text="Math Games"
+            android:textColor="@color/text_color"
+            android:textSize="26sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linearLayout4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mini_games_title">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/attempts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="5"
+                    android:textColor="@color/text_color"
+                    android:textSize="26sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text=" / 5 attempts left"
+                    android:textColor="@color/text_color"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/timerContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/ivClockIcon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveAutoPlay="true"
+                    app:riveResource="@raw/timer_math_storm"
+                    app:riveStateMachine="State Machine 1" />
+
+                <TextView
+                    android:id="@+id/reset_timer_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:textColor="@color/red_1"
+                    android:textSize="18sp" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/stepProgressContainer"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
+
+            <!-- Full background line -->
+            <View
+                android:id="@+id/progressBackground"
+                android:layout_width="0dp"
+                android:layout_height="14dp"
+                android:background="@drawable/line_bg"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Active progress line -->
+            <View
+                android:id="@+id/progressActive"
+                android:layout_width="0dp"
+                android:layout_height="14dp"
+                android:background="@drawable/line_active_red"
+                app:layout_constraintBottom_toBottomOf="@id/progressBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/progressBackground"
+                app:layout_constraintWidth_percent="0" />
+
+            <!-- Circles using chain -->
+
+            <!-- STEP 1 -->
+            <View
+                android:id="@+id/step1"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_inactive"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/step2"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- STEP 2 -->
+            <View
+                android:id="@+id/step2"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_inactive"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/step3"
+                app:layout_constraintStart_toEndOf="@id/step1"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- STEP 3 -->
+            <View
+                android:id="@+id/step3"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_inactive"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/step4"
+                app:layout_constraintStart_toEndOf="@id/step2"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- STEP 4 -->
+            <View
+                android:id="@+id/step4"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_inactive"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/step5"
+                app:layout_constraintStart_toEndOf="@id/step3"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- STEP 5 -->
+            <View
+                android:id="@+id/step5"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_inactive"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/step4"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- MATH STORM CARD -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/math_storm_card_container"
+            android:layout_width="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/stepProgressContainer">
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@+id/start_math_storm_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- IMAGE ICON -->
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/mathstormicon" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- SCORE -->
+                    <TextView
+                        android:id="@+id/math_storm_score_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="@string/loading"
+                        android:textColor="@color/text_color"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/math_storm_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="start"
+                        android:text="@string/math_storm"
+                        android:textColor="@color/gray_1"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- START BUTTON -->
+            <FrameLayout
+                android:id="@+id/start_math_storm_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <!-- ENABLED BUTTON -->
+                <FrameLayout
+                    android:id="@+id/start_math_storm_enabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <!-- SHADOW -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="#e72529"
+                        android:translationY="5dp" />
+
+                    <!-- BUTTON -->
+                    <Button
+                        android:id="@+id/start_math_storm_enabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:fontFamily="@font/inter_semibold"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="START +10XP"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        app:backgroundTint="#FF4B4D" />
+                </FrameLayout>
+
+                <!-- DISABLED BUTTON -->
+                <FrameLayout
+                    android:id="@+id/start_math_storm_disabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible">
+
+                    <!-- SHADOW -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/gray_2"
+                        android:translationY="5dp" />
+
+                    <!-- TEXT -->
+                    <TextView
+                        android:id="@+id/start_math_storm_disabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="START +10XP"
+                        android:textColor="@color/gray_1"
+                        android:textSize="17sp"
+                        android:translationY="5dp" />
+                </FrameLayout>
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- DIVIDER -->
+        <View
+            android:id="@+id/storm_divider"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/gray_2"
+            app:layout_constraintTop_toBottomOf="@id/math_storm_card_container"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- ONLINE GAME CARD -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/online_game_card_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/storm_divider">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@+id/create_online_game_btn_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- IMAGE ICON -->
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/battlestormicon" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/play_online_score_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="@string/loading"
+                        android:textColor="@color/text_color"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/online_math_storm_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="start"
+                        android:text="@string/battle_storm"
+                        android:textColor="@color/gray_1"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/player_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/profile_online" />
+
+                        <TextView
+                            android:id="@+id/online_players"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:fontFamily="@font/inter_tight"
+                            android:text="@string/loading"
+                            android:textColor="@color/blue_1" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- PLAY ONLINE BUTTON -->
+            <FrameLayout
+                android:id="@+id/create_online_game_btn_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingBottom="5dp"
+                app:layout_constraintBottom_toTopOf="@+id/private_game_btn_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <!-- ENABLED PLAY ONLINE BUTTON -->
+                <FrameLayout
+                    android:id="@+id/play_online_bton_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="#e72529"
+                        android:translationY="5dp" />
+
+                    <Button
+                        android:id="@+id/play_online_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:fontFamily="@font/inter_semibold"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="PLAY ONLINE +30XP"
+                        android:textColor="#FFFFFF"
+                        android:textSize="17sp"
+                        app:backgroundTint="#FF4B4D" />
+                </FrameLayout>
+
+                <!-- DISABLED PLAY ONLINE BUTTON -->
+                <FrameLayout
+                    android:id="@+id/play_online_disabled_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="#E5E5E5"
+                        android:translationY="5dp" />
+
+                    <TextView
+                        android:id="@+id/play_online_disabled_container_txt"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="PLAY ONLINE +30XP"
+                        android:textColor="#A5A5A5"
+                        android:textSize="17sp"
+                        android:translationY="5dp" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- PRIVATE GAME BUTTON -->
+            <FrameLayout
+                android:id="@+id/private_game_btn_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingBottom="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <!-- ENABLED PRIVATE GAME BUTTON -->
+                <FrameLayout
+                    android:id="@+id/private_game_enabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/orange_1"
+                        android:translationY="5dp" />
+
+                    <Button
+                        android:id="@+id/private_game_enabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:fontFamily="@font/inter_semibold"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="@string/private_game"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        app:backgroundTint="@color/yellow_1" />
+                </FrameLayout>
+
+                <!-- DISABLED PRIVATE GAME BUTTON -->
+                <FrameLayout
+                    android:id="@+id/private_game_disabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="#E5E5E5"
+                        android:translationY="5dp" />
+
+                    <TextView
+                        android:id="@+id/private_game_disabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="@string/private_game"
+                        android:textColor="#A5A5A5"
+                        android:textSize="17sp"
+                        android:translationY="5dp" />
+                </FrameLayout>
+            </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/cash_storm_divider"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/gray_2"
+            app:layout_constraintTop_toBottomOf="@id/online_game_card_container"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cash_storm_card_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:layout_marginTop="16dp"
+            android:paddingBottom="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cash_storm_divider">
+
+            <LinearLayout
+                android:id="@+id/cash_storm_info_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:id="@+id/cash_storm_icon"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/cash_storm" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/cash_storm_balance_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:text="@string/loading"
+                        android:textColor="@color/text_color"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/cash_storm_title_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:text="CASH STORM"
+                        android:textColor="@color/gray_1"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/start_cash_storm_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                app:layout_constraintTop_toBottomOf="@id/cash_storm_info_layout"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <FrameLayout
+                    android:id="@+id/cash_storm_enabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/red_2"
+                        android:translationY="5dp" />
+
+                    <Button
+                        android:id="@+id/start_cash_storm_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:fontFamily="@font/inter_semibold"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="START +10XP"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        app:backgroundTint="@color/red_1" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/cash_storm_disabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/gray_2"
+                        android:translationY="5dp" />
+
+                    <TextView
+                        android:id="@+id/start_cash_storm_disabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="START +10XP"
+                        android:textColor="@color/gray_1"
+                        android:textSize="17sp"
+                        android:translationY="5dp" />
+                </FrameLayout>
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.uiSettings.DeleteAccountActivity">
+
+    <!-- MAIN CONTENT -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
+
+            <!-- TOP BAR -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/topBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/back_btn"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="14dp"
+                    android:src="@drawable/back_btn"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textViewTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="@string/delete_account"
+                    android:textColor="@color/red_1"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/currentPlan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="start"
+                android:text="@string/deleting_your_account_will_permanently_remove_your_profile_settings_and_all_your_data_this_action_cannot_be_undone"
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/topBar" />
+
+            <!-- PASSWORD INPUT CONTAINER -->
+            <LinearLayout
+                android:id="@+id/passwordInputContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/input_container"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp"
+                android:padding="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/currentPlan">
+
+                <EditText
+                    android:id="@+id/passwordEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:drawableEnd="@drawable/ic_eye_open"
+                    android:drawablePadding="12dp"
+                    android:fontFamily="@font/inter_medium"
+                    android:hint="@string/confirm_password"
+                    android:inputType="textPassword"
+                    android:paddingStart="25dp"
+                    android:paddingEnd="14dp"
+                    android:textColor="@color/text_color"
+                    android:textColorHint="@color/hint_color"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+
+            <!-- DELETE BUTTON -->
+            <FrameLayout
+                android:id="@+id/delete_btn_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:layout_marginBottom="10dp"
+                android:paddingBottom="5dp"
+                app:layout_constraintBottom_toTopOf="@+id/cancelButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <!-- ENABLED DELETE BUTTON -->
+                <FrameLayout
+                    android:id="@+id/delete_enabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/red_2"
+                        android:translationY="5dp" />
+
+                    <Button
+                        android:id="@+id/delete_enabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:fontFamily="@font/inter_semibold"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="@string/delete"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        app:backgroundTint="@color/red_1" />
+                </FrameLayout>
+
+                <!-- DISABLED DELETE BUTTON -->
+                <FrameLayout
+                    android:id="@+id/delete_disabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <!-- shadow -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/gray_2"
+                        android:translationY="5dp" />
+
+                    <!-- text over shadow -->
+                    <TextView
+                        android:id="@+id/delete_disabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="@string/delete"
+                        android:textColor="@color/gray_1"
+                        android:textSize="17sp"
+                        android:translationY="5dp" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/cancel"
+                android:textColor="@color/blue_1"
+                android:textSize="17sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

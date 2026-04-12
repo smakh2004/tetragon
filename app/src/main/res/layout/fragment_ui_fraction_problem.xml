@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".questions.questionMathSecondGrade.UiFractionProblemFragment">
+
+    <TextView
+        android:id="@+id/questionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Show 3/5."
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/fraction"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.55"
+        app:layout_constraintBottom_toTopOf="@id/bottomButtonContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/questionText"
+        app:layout_constraintWidth_max="420dp"
+        app:riveAlignment="CENTER"
+        app:riveFit="CONTAIN"
+        app:riveResource="@raw/fraction"
+        app:riveStateMachine="State Machine 1" />
+
+    <View
+        android:id="@+id/animationOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/fraction"
+        app:layout_constraintBottom_toBottomOf="@id/fraction"
+        app:layout_constraintStart_toStartOf="@id/fraction"
+        app:layout_constraintEnd_toEndOf="@id/fraction" />
+
+    <LinearLayout
+        android:id="@+id/bottomButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
+        android:weightSum="2"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <FrameLayout
+                android:id="@+id/minus_enabled_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+                <View
+                    android:id="@+id/minus_btn_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_2"
+                    android:translationY="5dp" />
+                <LinearLayout
+                    android:id="@+id/minus_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_3"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:stateListAnimator="@drawable/button_animator">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_minus_icon"/>
+
+                    <TextView
+                        android:id="@+id/minus_btn_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PIECE"
+                        android:fontFamily="@font/inter_semibold"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:layout_marginStart="10dp"/>
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/minus_disabled_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:translationY="5dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:translationY="5dp">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_disabled_minus_icon"/>
+                    <TextView
+                        android:id="@+id/minus_btn_disabled_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:textColor="@color/gray_1"
+                        android:textSize="20sp"
+                        android:text="PIECE"
+                        android:layout_marginStart="10dp"/>
+                </LinearLayout>
+            </FrameLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <FrameLayout
+                android:id="@+id/add_enabled_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <View
+                    android:id="@+id/add_btn_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_2"
+                    android:translationY="5dp" />
+                <LinearLayout
+                    android:id="@+id/add_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_3"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:stateListAnimator="@drawable/button_animator">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_add_icon"/>
+
+                    <TextView
+                        android:id="@+id/add_btn_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PIECE"
+                        android:fontFamily="@font/inter_semibold"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:layout_marginStart="10dp"/>
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/add_disabled_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:translationY="5dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:translationY="5dp">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_disabled_add_icon"/>
+                    <TextView
+                        android:id="@+id/add_btn_disabled_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:textColor="@color/gray_1"
+                        android:textSize="20sp"
+                        android:text="PIECE"
+                        android:layout_marginStart="10dp"/>
+                </LinearLayout>
+            </FrameLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

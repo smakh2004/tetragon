@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/gradient_border.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Outer gradient border -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#FF9C58"
+                android:centerColor="#F1FF75"
+                android:endColor="#8E16F0"
+                android:angle="0"/>
+            <corners android:radius="37dp"/>
+        </shape>
+    </item>
+
+    <!-- Inner gradient background -->
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#E1F7FF"
+                android:centerColor="#FAFCFF"
+                android:endColor="#FFD7D7"
+                android:angle="45"/>
+            <corners android:radius="35dp"/> <!-- slightly smaller to match border thickness -->
+        </shape>
+    </item>
+
+</layer-list>

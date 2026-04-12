@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tetragon</string>
+    <string name="login_text">ВОЙТИ</string>
+    <string name="start_text">НАЧАТЬ</string>
+    <string name="enter_your_details">Введите ваши данные</string>
+    <string name="continue_text">ПРОДОЛЖИТЬ</string>
+    <string name="email_text">Электронная почта</string>
+    <string name="password_text">Пароль</string>
+    <string name="age_text">Возраст</string>
+    <string name="hello_blank_fragment">Привет, пустой фрагмент</string>
+    <string name="name_text">Имя</string>
+    <string name="first_name_text">Имя</string>
+    <string name="last_name_text">Фамилия</string>
+    <string name="loading">ЗАГРУЗКА...</string>
+    <string name="create_a_password">Создайте пароль</string>
+    <string name="password">Пароль</string>
+    <string name="mini_games">Мини-игры</string>
+    <string name="math_storm">МАТЕМАТИЧЕСКИЙ ШТОРМ</string>
+    <string name="battle_storm">БОЕВОЙ ШТОРМ</string>
+    <string name="play_online">ИГРАТЬ ОНЛАЙН</string>
+    <string name="private_game">БЕСПЛАТНАЯ ЧАСТНАЯ ИГРА</string>
+    <string name="what_s_your_full_name">Как вас зовут полностью?</string>
+    <string name="what_s_your_email">Какой у вас email?</string>
+    <string name="email">Электронная почта</string>
+    <string name="what_s_your_age">Сколько вам лет?</string>
+    <string name="are_you_sure">Вы уверены?</string>
+    <string name="you_have_time_to_keep_going">У вас есть время продолжить.</string>
+    <string name="continue_storm">ПРОДОЛЖИТЬ ШТОРМ</string>
+    <string name="finish">ЗАВЕРШИТЬ</string>
+    <string name="you_are_offline">ВЫ НЕ В СЕТИ</string>
+    <string name="tetragon">TETRAGON</string>
+    <string name="settings">Настройки</string>
+    <string name="account">Аккаунт</string>
+    <string name="premium">Премиум</string>
+    <string name="notifications">Уведомления</string>
+    <string name="sounds">Звуки</string>
+    <string name="language">Язык</string>
+    <string name="log_out">Выйти</string>
+    <string name="friendly_game">Дружеская игра</string>
+    <string name="enter_room_id">Введите ID комнаты</string>
+    <string name="join_room">ПРИСОЕДИНИТЬСЯ</string>
+    <string name="create_room">СОЗДАТЬ КОМНАТУ</string>
+    <string name="waiting_for_an_opponent">Ожидание соперника...</string>
+    <string name="you">Вы</string>
+    <string name="cancel">ОТМЕНА</string>
+    <string name="opponent">Соперник</string>
+    <string name="loser">ПРОИГРАВШИЙ</string>
+    <string name="winner">ПОБЕДИТЕЛЬ</string>
+    <string name="example_10">Пример: -10</string>
+    <string name="check">ПРОВЕРИТЬ</string>
+    <string name="current_password">Текущий пароль</string>
+    <string name="new_password">Новый пароль</string>
+    <string name="save">СОХРАНИТЬ</string>
+    <string name="name">Имя</string>
+    <string name="english">Английский</string>
+    <string name="russian">Русский</string>
+    <string name="uzbek">Узбекский</string>
+    <string name="delete_account">Удалить аккаунт</string>
+    <string name="deleting_your_account_will_permanently_remove_your_profile_settings_and_all_your_data_this_action_cannot_be_undone">
+        Удаление аккаунта навсегда удалит ваш профиль, настройки и все данные. Это действие нельзя отменить.
+    </string>
+    <string name="confirm_password">Подтвердите пароль</string>
+    <string name="delete">УДАЛИТЬ</string>
+    <string name="age">Возраст</string>
+</resources>

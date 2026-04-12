@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".questions.questionPhysicsSevenGrade.Physics7GradeFragment">
+
+    <!-- SCROLL LEARNING PATH -->
+    <ScrollView
+        android:id="@+id/level_scroll_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="150dp" />
+
+            <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/topic2"
+                android:layout_width="match_parent"
+                android:layout_height="530dp"
+                app:riveResource="@raw/progress_path_even"
+                app:riveStateMachine="State Machine 1" />
+
+            <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/topic1"
+                android:layout_width="match_parent"
+                android:layout_height="530dp"
+                app:riveResource="@raw/progress_path_odd"
+                app:riveStateMachine="State Machine 1" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/start_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@android:color/transparent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_background"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/start_lesson_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="Topic 1: Counting"
+                android:textColor="@color/text_color"
+                android:textSize="18sp"/>
+
+            <FrameLayout
+                android:id="@+id/start_btn_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <FrameLayout
+                    android:id="@+id/start_enabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_marginBottom="5dp">
+
+                    <View
+                        android:id="@+id/continue_enabled_btn_back"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/black_2"
+                        android:translationY="5dp" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/continue_enabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/black_3"
+                        android:fontFamily="@font/inter_bold"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="START"
+                        android:textColor="@color/white"
+                        android:textSize="17sp" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/start_disabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_marginBottom="5dp">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/gray_2"
+                        android:translationY="5dp" />
+
+                    <TextView
+                        android:id="@+id/start_disabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="START"
+                        android:textColor="@color/gray_1"
+                        android:textSize="17sp"
+                        android:translationY="5dp" />
+                </FrameLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/scroll_to_target_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/transparent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/start_container"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <ImageView
+                android:id="@+id/scroll_arrow_icon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/arrow_up"
+                app:tint="@color/text_color" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tetragon</string>
+    <string name="login_text">KIRISH</string>
+    <string name="start_text">BOSHLASH</string>
+    <string name="enter_your_details">Ma\'lumotlaringizni kiriting</string>
+    <string name="continue_text">DAVOM ETISH</string>
+    <string name="email_text">Email</string>
+    <string name="password_text">Parol</string>
+    <string name="age_text">Yosh</string>
+    <string name="hello_blank_fragment">Salom, bo\'sh fragment</string>
+    <string name="name_text">Ism</string>
+    <string name="first_name_text">Ism</string>
+    <string name="last_name_text">Familiya</string>
+    <string name="loading">YUKLANMOQDA...</string>
+    <string name="create_a_password">Parol yarating</string>
+    <string name="password">Parol</string>
+    <string name="mini_games">Mini o\'yinlar</string>
+    <string name="math_storm">MATEMATIK BO\'RON</string>
+    <string name="battle_storm">JANG BO\'RONI</string>
+    <string name="play_online">ONLAYN O\'YNASH</string>
+    <string name="private_game">BEPUL SHAXSIY O\'YIN</string>
+    <string name="what_s_your_full_name">To\'liq ismingiz nima?</string>
+    <string name="what_s_your_email">Email manzilingiz nima?</string>
+    <string name="email">Email</string>
+    <string name="what_s_your_age">Yoshingiz nechida?</string>
+    <string name="are_you_sure">Ishonchingiz komilmi?</string>
+    <string name="you_have_time_to_keep_going">Davom etish uchun vaqtingiz bor.</string>
+    <string name="continue_storm">BO\'RONNI DAVOM ETTIRISH</string>
+    <string name="finish">YAKUNLASH</string>
+    <string name="you_are_offline">SIZ OFFLAYNSIZ</string>
+    <string name="tetragon">TETRAGON</string>
+    <string name="settings">Sozlamalar</string>
+    <string name="account">Akkaunt</string>
+    <string name="premium">Premium</string>
+    <string name="notifications">Bildirishnomalar</string>
+    <string name="sounds">Tovushlar</string>
+    <string name="language">Til</string>
+    <string name="log_out">Chiqish</string>
+    <string name="friendly_game">Do\'stona o\'yin</string>
+    <string name="enter_room_id">Xona ID sini kiriting</string>
+    <string name="join_room">XONAGA QO\'SHILISH</string>
+    <string name="create_room">XONA YARATISH</string>
+    <string name="waiting_for_an_opponent">Raqib kutilmoqda...</string>
+    <string name="you">Siz</string>
+    <string name="cancel">BEKOR QILISH</string>
+    <string name="opponent">Raqib</string>
+    <string name="loser">YUTQAZGAN</string>
+    <string name="winner">G\'OLIB</string>
+    <string name="example_10">Misol: -10</string>
+    <string name="check">TEKSHIRISH</string>
+    <string name="current_password">Joriy parol</string>
+    <string name="new_password">Yangi parol</string>
+    <string name="save">SAQLASH</string>
+    <string name="name">Ism</string>
+    <string name="english">Inglizcha</string>
+    <string name="russian">Ruscha</string>
+    <string name="uzbek">O\'zbekcha</string>
+    <string name="delete_account">Akkauntni o\'chirish</string>
+    <string name="deleting_your_account_will_permanently_remove_your_profile_settings_and_all_your_data_this_action_cannot_be_undone">
+        Akkauntingiz o\'chirilsa, profilingiz, sozlamalaringiz va barcha ma\'lumotlaringiz butunlay o\'chiriladi. Bu amalni bekor qilib bo\'lmaydi.
+    </string>
+    <string name="confirm_password">Parolni tasdiqlang</string>
+    <string name="delete">O\'CHIRISH</string>
+    <string name="age">Yosh</string>
+</resources>

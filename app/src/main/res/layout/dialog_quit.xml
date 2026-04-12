@@ -1,0 +1,86 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_background_question"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="8dp"
+    android:paddingTop="8dp"
+    android:clipToPadding="false">
+
+    <!-- DRAG HANDLE -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/drag_handle" />
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/are_you_sure"
+        android:textSize="24sp"
+        android:textColor="#64748b"
+        android:gravity="center"
+        android:fontFamily="@font/inter_semibold"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/messageText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/you_have_time_to_keep_going"
+        android:textSize="16sp"
+        android:textColor="#64748b"
+        android:gravity="center"
+        android:fontFamily="@font/inter_semibold"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- NO BUTTON -->
+    <FrameLayout
+        android:id="@+id/noButtonFrame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingBottom="6dp"
+        android:layout_marginBottom="6dp">
+
+        <!-- shadow -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/main_button"
+            android:backgroundTint="@color/blue_1"
+            android:translationY="5dp"/>
+
+        <!-- button -->
+        <Button
+            android:id="@+id/noButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:background="@drawable/main_button"
+            android:backgroundTint="@color/blue_2"
+            android:fontFamily="@font/inter_semibold"
+            android:text="@string/continue_storm"
+            android:stateListAnimator="@drawable/button_animator"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:backgroundTint="@null" />
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/finishButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/finish"
+        android:textColor="#ff4b4d"
+        android:background="@android:color/transparent"
+        android:fontFamily="@font/inter_semibold"
+        android:textSize="17sp"/>
+</LinearLayout>
