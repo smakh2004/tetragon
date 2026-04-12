@@ -12,6 +12,7 @@ Android educational math app.
 - Kotlin
 - Android Studio
 - Firebase
+- Rive
 
 ## Author
 Sirojiddin
