@@ -22,6 +22,7 @@ import com.example.tetragon.questions.SubjectConstants
 import com.example.tetragon.questions.XpGainedActivity
 import com.example.tetragon.questions.questionMathSecondGrade.firstTopic.UiAdditionInteractiveFragment
 import com.example.tetragon.questions.questionMathSecondGrade.firstTopic.UiArithmeticsBasicsFragment
+import com.example.tetragon.questions.questionMathSecondGrade.secondTopic.UiColumnMethodFragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -129,7 +130,8 @@ class Math2GradeQuestionActivity : AppCompatActivity() {
             )
 
             MathGrade2Topic.COLUMN_METHOD -> listOf(
-
+                MathGrade2Type.COLUMN_METHOD_ADDITION,
+                MathGrade2Type.ADDITION_INTERACTIVE
             )
         }
     }
@@ -161,6 +163,7 @@ class Math2GradeQuestionActivity : AppCompatActivity() {
             MathGrade2Type.ARITHMETICS_BASICS -> UiArithmeticsBasicsFragment()
             MathGrade2Type.ADDITION_INTERACTIVE -> UiAdditionInteractiveFragment()
 
+            MathGrade2Type.COLUMN_METHOD_ADDITION -> UiColumnMethodFragment()
 
             MathGrade2Type.SET_TIME -> UiSetTimeFragment()
             MathGrade2Type.SET_ANGLE -> UiSetAngleInProtractorFragment()

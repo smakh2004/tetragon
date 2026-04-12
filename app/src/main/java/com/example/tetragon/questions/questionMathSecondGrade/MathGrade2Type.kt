@@ -4,6 +4,8 @@ enum class MathGrade2Type(val xp: Int) {
     ARITHMETICS_BASICS(2),
     ADDITION_INTERACTIVE(2),
 
+    COLUMN_METHOD_ADDITION(2),
+
     SET_TIME(2),
     SET_ANGLE(2),
     FRACTION(2),
