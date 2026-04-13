@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -212,11 +213,29 @@ class Math2GradeQuestionActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        view.findViewById<Button>(R.id.noButton).setOnClickListener { dialog.dismiss() }
-        view.findViewById<Button>(R.id.finishButton).setOnClickListener {
+        // 1. Find the TextViews and Buttons by ID
+        val titleText = view.findViewById<TextView>(R.id.titleText)
+        val messageText = view.findViewById<TextView>(R.id.messageText)
+        val continueButton = view.findViewById<Button>(R.id.noButton)
+        val finishButton = view.findViewById<Button>(R.id.finishButton)
+
+        // 2. Set the custom text
+        titleText.text = "Are you sure?"
+        messageText.text = "If you exit, you will lose all the points you gained in this lesson."
+
+        continueButton.text = "CONTINUE LESSON"
+        finishButton.text = "EXIT"
+
+        // 3. Set the Click Listeners
+        continueButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        finishButton.setOnClickListener {
             finish()
             dialog.dismiss()
         }
+
         dialog.show()
     }
 
