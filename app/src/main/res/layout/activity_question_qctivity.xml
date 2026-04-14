@@ -189,7 +189,7 @@
                         android:text="Answer: 2"
                         android:textColor="@color/text_color"
                         android:textSize="14sp"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:layout_constraintStart_toEndOf="@+id/imageView2"
                         tools:layout_editor_absoluteY="16dp" />
 

@@ -5,6 +5,7 @@ enum class MathGrade2Type(val xp: Int) {
     ADDITION_INTERACTIVE(2),
 
     COLUMN_METHOD_ADDITION(2),
+    COLUMN_METHOD_ADDITION_MATCH(3),
 
     SET_TIME(2),
     SET_ANGLE(2),

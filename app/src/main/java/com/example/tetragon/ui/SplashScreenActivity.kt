@@ -40,40 +40,58 @@ class SplashScreenActivity : BaseActivity() {
 
             if (currentUser == null) {
                 navigateTo(WelcomeActivity::class.java)
-            } else {
-                // Check the server for the latest status
-                currentUser.reload().addOnCompleteListener { reloadTask ->
-                    if (reloadTask.isSuccessful && currentUser.isEmailVerified) {
+                return@launch
+            }
 
-                        // CRITICAL: Check if the Firestore profile exists
-                        db.collection("users").document(currentUser.uid).get()
-                            .addOnSuccessListener { document ->
-                                if (document.exists()) {
-                                    // 1. User is verified AND has a profile -> Success
-                                    navigateTo(MainActivity::class.java)
-                                } else {
-                                    // 2. User is verified BUT has no profile (closed app early)
-                                    // We delete the Auth account so they can try again fresh
-                                    currentUser.delete().addOnCompleteListener {
-                                        auth.signOut()
-                                        Toast.makeText(this@SplashScreenActivity, "Registration incomplete. Please try again.", Toast.LENGTH_LONG).show()
-                                        navigateTo(WelcomeActivity::class.java)
-                                    }
-                                }
-                            }
-                            .addOnFailureListener {
-                                // Network error or Firestore down
-                                auth.signOut()
-                                navigateTo(WelcomeActivity::class.java)
-                            }
+            // Try to refresh user status
+            currentUser.reload().addOnCompleteListener { reloadTask ->
+                if (reloadTask.isSuccessful) {
+                    // Network is available and reload worked
+                    if (currentUser.isEmailVerified) {
+                        checkFirestoreProfile(currentUser)
                     } else {
-                        // 3. Not verified -> Back to Welcome
+                        auth.signOut()
+                        navigateTo(WelcomeActivity::class.java)
+                    }
+                } else {
+                    val exception = reloadTask.exception
+                    if (exception is FirebaseNetworkException) {
+                        // OFFLINE CASE: We can't verify status, but the user has a local
+                        // session. Let them in; MainActivity will handle offline state.
+                        navigateTo(MainActivity::class.java)
+                    } else {
+                        // OTHER ERROR: Session might be truly revoked (e.g., user deleted)
                         auth.signOut()
                         navigateTo(WelcomeActivity::class.java)
                     }
                 }
             }
         }
+    }
+
+    // Helper to keep code clean
+    private fun checkFirestoreProfile(user: com.google.firebase.auth.FirebaseUser) {
+        db.collection("users").document(user.uid).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    navigateTo(MainActivity::class.java)
+                } else {
+                    user.delete().addOnCompleteListener {
+                        auth.signOut()
+                        Toast.makeText(this@SplashScreenActivity, "Registration incomplete.", Toast.LENGTH_LONG).show()
+                        navigateTo(WelcomeActivity::class.java)
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                if (e is FirebaseNetworkException) {
+                    // Network error fetching profile? Let them in for offline mode.
+                    navigateTo(MainActivity::class.java)
+                } else {
+                    auth.signOut()
+                    navigateTo(WelcomeActivity::class.java)
+                }
+            }
     }
 
     private fun navigateTo(destination: Class<*>) {

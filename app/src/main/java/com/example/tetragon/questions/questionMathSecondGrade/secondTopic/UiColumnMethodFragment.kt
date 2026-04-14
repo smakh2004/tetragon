@@ -42,17 +42,23 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     private var activeCursor: View? = null
     private var cursorAnimator: ObjectAnimator? = null
 
+    private var fullNum1 = 0
+    private var fullNum2 = 0
     private var correctCarry = 0
     private var correctSecondDigit = 0
+
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
+    private var isSolutionShown = false // TRACKS IF USER CLICKED "SEE SOLUTION"
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize Views
+        val activity = requireActivity() as Math2GradeQuestionActivity
+
+        // Initialize Fragment Views
         tvTopNumber = view.findViewById(R.id.tvTopNumber)
         tvStaticSecondNum = view.findViewById(R.id.tvStaticSecondNum)
         tvResultTens = view.findViewById(R.id.tvResultTens)
@@ -67,13 +73,13 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
         cursorSecond = view.findViewById(R.id.cursorSecond)
 
         // Activity UI components
-        checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
-        checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
-        btnBack = requireActivity().findViewById(R.id.btnBackground)
-        seeBtn = requireActivity().findViewById(R.id.see_btn_container)
-        seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
-        stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
-        answer = requireActivity().findViewById(R.id.answer)
+        checkBtn = activity.findViewById(R.id.check_enabled_btn)
+        checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
+        btnBack = activity.findViewById(R.id.btnBackground)
+        seeBtn = activity.findViewById(R.id.see_btn_container)
+        seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
+        stateAnswer = activity.findViewById(R.id.stateAnswer)
+        answer = activity.findViewById(R.id.answer)
 
         setupFocusLogic()
         setupKeyboard(view)
@@ -90,14 +96,17 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
 
     private fun setFocus(targetTextView: TextView, targetBox: ImageView, targetCursor: View) {
         if (isAnswerChecked) return
+        boxCarry.setImageResource(R.drawable.answer_default_box)
+        boxEmpty.setImageResource(R.drawable.answer_default_box)
 
         cursorAnimator?.cancel()
-        activeCursor?.visibility = View.GONE
-        activeBox?.alpha = 1.0f
+        cursorCarry.visibility = View.GONE
+        cursorSecond.visibility = View.GONE
 
         activeInput = targetTextView
         activeBox = targetBox
         activeCursor = targetCursor
+        activeBox?.setImageResource(R.drawable.answer_blue_box)
 
         updateCursorPosition()
         activeCursor?.visibility = View.VISIBLE
@@ -113,29 +122,15 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     private fun updateCursorPosition() {
         val cursor = activeCursor ?: return
         val input = activeInput ?: return
-
         val density = resources.displayMetrics.density
-        val shiftAmount = 10f * density
-
-        if (input.text.isNotEmpty()) {
-            cursor.translationX = shiftAmount
-        } else {
-            cursor.translationX = 0f
-        }
+        cursor.translationX = if (input.text.isNotEmpty()) 10f * density else 0f
     }
 
     private fun setupKeyboard(view: View) {
-        val buttonIds = listOf(
-            R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4,
-            R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9
-        )
-
+        val buttonIds = listOf(R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9)
         buttonIds.forEach { id ->
             view.findViewById<Button>(id).setOnClickListener {
                 if (isAnswerChecked) return@setOnClickListener
-
-                // NEW LOGIC: Only allow input if the text field is empty
-                // User must press DELETE to change a number
                 if (activeInput?.text.isNullOrEmpty()) {
                     activeInput?.text = (it as Button).text.toString()
                     activeInput?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
@@ -144,7 +139,6 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
                 }
             }
         }
-
         view.findViewById<Button>(R.id.btnDel).setOnClickListener {
             if (isAnswerChecked) return@setOnClickListener
             activeInput?.text = ""
@@ -154,38 +148,32 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     }
 
     private fun toggleCheckButtonState() {
-        val hasInput = tvCarryInput.text.isNotEmpty() || tvSecondNumInput.text.isNotEmpty()
-        if (hasInput) enableCheckButton() else disableCheckButton()
+        if (tvCarryInput.text.isNotEmpty() || tvSecondNumInput.text.isNotEmpty()) enableCheckButton() else disableCheckButton()
     }
 
     private fun generateProblem() {
         val totalSum = Random.nextInt(20, 91)
-        val num1 = Random.nextInt(10, totalSum - 5)
-        val num2 = totalSum - num1
+        val maxNum1 = totalSum - 10
+        fullNum1 = Random.nextInt(1, maxNum1 + 1)
+        fullNum2 = totalSum - fullNum1
 
-        correctCarry = num1 / 10
-        correctSecondDigit = num2 % 10
+        correctCarry = fullNum1 / 10
+        correctSecondDigit = fullNum2 % 10
 
-        tvTopNumber.text = (num1 % 10).toString()
-        tvStaticSecondNum.text = (num2 / 10).toString()
+        tvTopNumber.text = (fullNum1 % 10).toString()
+        tvStaticSecondNum.text = (fullNum2 / 10).toString()
         tvResultTens.text = (totalSum / 10).toString()
         tvResultOnes.text = (totalSum % 10).toString()
 
         tvCarryInput.text = ""
         tvSecondNumInput.text = ""
-        tvCarryInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-        tvSecondNumInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-
-        boxCarry.setImageResource(R.drawable.answer_blue_box)
-        boxEmpty.setImageResource(R.drawable.answer_blue_box)
-
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
+        isSolutionShown = false // RESET FLAG
         seeBtn.visibility = View.GONE
 
         setFocus(tvCarryInput, boxCarry, cursorCarry)
-
         checkBtn.text = "CHECK"
         disableCheckButton()
         setupInitialButtonState()
@@ -194,19 +182,16 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     private fun checkAnswer(stateContainer: FrameLayout, circleState: ImageView) {
         cursorAnimator?.cancel()
         activeCursor?.visibility = View.GONE
-
         isAnswerChecked = true
+
         val activity = requireActivity() as Math2GradeQuestionActivity
         activity.isResultCurrentlyVisible = true
 
         val userCarry = tvCarryInput.text.toString().toIntOrNull() ?: -1
         val userDigit = tvSecondNumInput.text.toString().toIntOrNull() ?: -1
 
-        val topNum = tvTopNumber.text.toString().toIntOrNull() ?: 0
-        val staticSecondTens = tvStaticSecondNum.text.toString().toIntOrNull() ?: 0
-
-        val userResult = (userCarry * 10 + topNum) + (staticSecondTens * 10 + userDigit)
-        val targetSum = tvResultTens.text.toString().toInt() * 10 + tvResultOnes.text.toString().toInt()
+        val userResult = (userCarry * 10 + (fullNum1 % 10)) + ((fullNum2 / 10) * 10 + userDigit)
+        val targetSum = fullNum1 + fullNum2
 
         stateContainer.visibility = View.VISIBLE
 
@@ -214,63 +199,43 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
+
             boxCarry.setImageResource(R.drawable.answer_correct_box)
             boxEmpty.setImageResource(R.drawable.answer_correct_box)
 
-            tvCarryInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-            tvSecondNumInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-
+            // --- PROGRESS & XP LOGIC ---
+            // 1. Increment progress (fills the bar)
             val isFinished = activity.incrementProgress()
-            if (isFirstAttempt) activity.totalXp += MathGrade2Type.COLUMN_METHOD_ADDITION.xp
+
+            // 2. Award XP ONLY on the first attempt
+            if (isFirstAttempt) {
+                activity.totalXp += MathGrade2Type.COLUMN_METHOD_ADDITION.xp
+            }
+
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
+            // 3. Set button text based on progress
             checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             boxCarry.setImageResource(R.drawable.answer_incorrect_box)
             boxEmpty.setImageResource(R.drawable.answer_incorrect_box)
-
-            tvCarryInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-            tvSecondNumInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-
             isIncorrectAttempt = true
             checkBtn.text = "TRY AGAIN"
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
-        isFirstAttempt = false
-    }
-
-    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
-        seeEnabledButton.setOnClickListener {
-            seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctCarry and $correctSecondDigit"
-            answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
-
-            boxCarry.setImageResource(R.drawable.answer_solution_box)
-            boxEmpty.setImageResource(R.drawable.answer_solution_box)
-
-            tvCarryInput.text = correctCarry.toString()
-            tvSecondNumInput.text = correctSecondDigit.toString()
-
-            tvCarryInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-            tvSecondNumInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-
-            circleState.setImageResource(R.drawable.solution_lamp_icon)
-            isIncorrectAttempt = false
-            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
-        }
+        isFirstAttempt = false // Mark first attempt as over
     }
 
     private fun setupCheckButton() {
         checkBtn.setOnClickListener {
-            val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
-            val circleState = requireActivity().findViewById<ImageView>(R.id.circleState)
+            val activity = requireActivity() as Math2GradeQuestionActivity
+            val stateContainer = activity.findViewById<FrameLayout>(R.id.stateContainer)
+            val circleState = activity.findViewById<ImageView>(R.id.circleState)
 
             if (!isAnswerChecked) {
                 checkAnswer(stateContainer, circleState)
@@ -278,10 +243,11 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    val activity = requireActivity() as Math2GradeQuestionActivity
+                    // If the button says FINISH, go to XP Gained screen
                     if (checkBtn.text == "FINISH") {
                         activity.navigateToXpGained()
                     } else {
+                        // Otherwise, check for milestones or show next random question
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
                             resetUIForNext()
@@ -293,27 +259,44 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
         }
     }
 
+    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
+        seeEnabledButton.setOnClickListener {
+            isSolutionShown = true // MARK AS SKIPPED/SOLUTION SHOWN
+            seeBtn.visibility = View.GONE
+            stateAnswer.text = "Solution"
+            answer.text = "Answer: $fullNum1+$fullNum2=${fullNum1+fullNum2}"
+            answer.visibility = View.VISIBLE
+            checkBtn.text = "CONTINUE"
+
+            boxCarry.setImageResource(R.drawable.answer_solution_box)
+            boxEmpty.setImageResource(R.drawable.answer_solution_box)
+            tvCarryInput.text = correctCarry.toString()
+            tvSecondNumInput.text = correctSecondDigit.toString()
+
+            circleState.setImageResource(R.drawable.solution_lamp_icon)
+
+            // Allow them to move forward, but treat as non-correct for progress
+            isIncorrectAttempt = false
+            isFirstAttempt = false
+            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
+            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+        }
+    }
+
     private fun resetForTryAgain() {
         val activity = requireActivity() as Math2GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
+        val stateContainer = activity.findViewById<FrameLayout>(R.id.stateContainer)
 
         isAnswerChecked = false
         isIncorrectAttempt = false
-
         tvCarryInput.text = ""
         tvSecondNumInput.text = ""
-        tvCarryInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-        tvSecondNumInput.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-
         boxCarry.setImageResource(R.drawable.answer_blue_box)
         boxEmpty.setImageResource(R.drawable.answer_blue_box)
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        stateAnswer.text = ""
-        answer.text = ""
-
         setFocus(tvCarryInput, boxCarry, cursorCarry)
         checkBtn.text = "CHECK"
         disableCheckButton()
@@ -324,7 +307,8 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctCarry and $correctSecondDigit"
+        answer.text = "Answer: $fullNum1+$fullNum2=${fullNum1+fullNum2}"
+        answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -341,7 +325,7 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
         val activity = requireActivity() as Math2GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
-        requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
+        activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         checkBtn.text = "CHECK"
         setupInitialButtonState()

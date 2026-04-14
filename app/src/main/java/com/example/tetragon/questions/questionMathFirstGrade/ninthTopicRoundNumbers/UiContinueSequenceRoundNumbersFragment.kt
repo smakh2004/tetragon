@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import com.example.tetragon.R
 import com.example.tetragon.questions.questionMathFirstGrade.Math1GradeQuestionActivity
 import com.example.tetragon.questions.questionMathFirstGrade.MathGrade1Type
-import kotlin.random.Random
 
 class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_continue_sequence_round_numbers) {
 

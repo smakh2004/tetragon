@@ -146,18 +146,18 @@ class UiCashStormActivity : BaseActivity() {
 
     private fun selectCard(index: Int) {
         selectedOption = index
-        binding.optionCard1.setBackgroundResource(R.drawable.custom_background_two)
-        binding.optionCard2.setBackgroundResource(R.drawable.custom_background_two)
+        binding.optionCard1.setBackgroundResource(R.drawable.answer_default_box)
+        binding.optionCard2.setBackgroundResource(R.drawable.answer_default_box)
         val selected = if (index == 1) binding.optionCard1 else binding.optionCard2
-        selected.setBackgroundResource(R.drawable.custom_background_selected_two)
+        selected.setBackgroundResource(R.drawable.answer_blue_box)
         binding.enabledButtonFrame.visibility = View.VISIBLE
         binding.disabledButtonFrame.visibility = View.INVISIBLE
     }
 
     private fun resetSelection() {
         selectedOption = 0
-        binding.optionCard1.setBackgroundResource(R.drawable.custom_background_two)
-        binding.optionCard2.setBackgroundResource(R.drawable.custom_background_two)
+        binding.optionCard1.setBackgroundResource(R.drawable.answer_default_box)
+        binding.optionCard2.setBackgroundResource(R.drawable.answer_default_box)
         binding.enabledButtonFrame.visibility = View.INVISIBLE
         binding.disabledButtonFrame.visibility = View.VISIBLE
     }
