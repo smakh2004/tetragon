@@ -28,6 +28,80 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="20dp">
+
+                <TextView
+                    android:id="@+id/next_grade_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:fontFamily="@font/inter_bold"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="4dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="4dp"
+                    android:text="GRADE 2"
+                    android:textAllCaps="true"
+                    android:textColor="@color/gray_1"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/next_topic_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Topic 1: Arithmetics Basics"
+                    android:textColor="@color/text_color"
+                    android:textSize="18sp" />
+
+                <FrameLayout
+                    android:id="@+id/move_on_btn_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:minWidth="220dp"
+                    android:layout_marginBottom="5dp"
+                    android:paddingRight="16dp"
+                    android:paddingLeft="16dp">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/blue_1"
+                        android:translationY="5dp"
+                        android:layout_marginBottom="5dp"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/move_on_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/blue_2"
+                        android:fontFamily="@font/inter_bold"
+                        android:paddingStart="40dp"
+                        android:paddingEnd="40dp"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="JUMP AHEAD"
+                        android:textColor="@color/white"
+                        android:textSize="17sp" />
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/gray_2" />
+
+            </LinearLayout>
+
             <app.rive.runtime.kotlin.RiveAnimationView
                 android:id="@+id/topic12"
                 android:layout_width="match_parent"

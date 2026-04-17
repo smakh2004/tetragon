@@ -185,6 +185,7 @@ class Math1GradeQuestionActivity : AppCompatActivity() {
                 MathGrade1Type.ADDITION_THREE_REPRESENTATION,
                 MathGrade1Type.ADDITION_VISUAL_PROBLEM,
                 MathGrade1Type.ADDITION_TREE,
+                MathGrade1Type.BASIC_AI_ADDITION,
             )
 
             MathGrade1Topic.SUBTRACTION -> listOf(
@@ -280,6 +281,7 @@ class Math1GradeQuestionActivity : AppCompatActivity() {
             MathGrade1Type.ADDITION_THREE_REPRESENTATION -> UiRepresentSumOfThreeNumbersFragment()
             MathGrade1Type.ADDITION_VISUAL_PROBLEM -> UiVisualAdditionProblemFragment()
             MathGrade1Type.ADDITION_TREE -> UiAdditionTreeFragment()
+            MathGrade1Type.BASIC_AI_ADDITION -> UiAiAdditionFragment()
 
             MathGrade1Type.SUBTRACTION_NUMBERS -> UiSubtractionFragment()
             MathGrade1Type.SUBTRACTION_MISSED_NUMBER -> UiFindMissedNumberInSubtractionFragment()

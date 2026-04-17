@@ -7,6 +7,8 @@ enum class MathGrade2Type(val xp: Int) {
     COLUMN_METHOD_ADDITION(2),
     COLUMN_METHOD_ADDITION_MATCH(3),
 
+    COLUMN_METHOD_ADDITION_THREE_DIGITS(3),
+
     SET_TIME(2),
     SET_ANGLE(2),
     FRACTION(2),

@@ -346,16 +346,23 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
-        val activity = requireActivity()
+        val activity = requireActivity() as Math2GradeQuestionActivity
+
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
+        // Hide the shadow background
+        checkBtnBack.visibility = View.INVISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
 
     private fun enableCheckButton() {
         checkBtn.isEnabled = true
-        val activity = requireActivity()
+        val activity = requireActivity() as Math2GradeQuestionActivity
+
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
+        // Show the shadow background
+        checkBtnBack.visibility = View.VISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
+
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
     }

@@ -1,6 +1,7 @@
 package com.example.tetragon.questions.questionMathSecondGrade
 
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.controllers.RiveFileController
 import app.rive.runtime.kotlin.core.PlayableInstance
+import com.example.tetragon.MainActivity
 import com.example.tetragon.R
 import com.example.tetragon.fragments.HomeFragment
 import com.example.tetragon.reward.BagTapActivity
@@ -35,16 +37,25 @@ class Math2GradeFragment : Fragment() {
     private lateinit var continueEnabledBtnBack: View
     private lateinit var startLessonLabel: TextView
 
+    // --- JUMP AHEAD UI ---
+    private lateinit var nextGradeLabel: TextView
+    private lateinit var nextTopicName: TextView
+    private lateinit var moveOnBtn: AppCompatButton
+
     // Scroll to Target UI
     private lateinit var scrollTargetContainer: View
     private lateinit var scrollArrowIcon: ImageView
 
     private lateinit var topic1: RiveAnimationView
     private lateinit var topic2: RiveAnimationView
+    private lateinit var topic3: RiveAnimationView
 
-    private val topicViews by lazy { listOf(topic1, topic2) }
-    private val topicNames = listOf("Arithmetics Basics", "Column Method")
-    private val topicKeys = listOf("ADDITION_SUBTRACTION_BASICS", "COLUMN_METHOD")
+    private val topicViews by lazy { listOf(topic1, topic2, topic3) }
+    private val topicNames = listOf("Arithmetics Basics", "Column Method", "Three Digit Numbers")
+    private val topicKeys = listOf("ADDITION_SUBTRACTION_BASICS", "COLUMN_METHOD", "THREE_DIGIT_NUMBERS")
+
+    // Data for dynamic Jump Ahead (Pointing to Grade 3)
+    private val nextGradeTopicName = "Multiplication Tables"
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -69,6 +80,7 @@ class Math2GradeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
         setupRiveTopics()
+        setupJumpAheadUI()
 
         scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             userHasScrolled = true
@@ -81,12 +93,54 @@ class Math2GradeFragment : Fragment() {
 
         continueEnabledBtn.setOnClickListener { handleContinueClick() }
 
+        // --- JUMP AHEAD LOGIC ---
+        moveOnBtn.setOnClickListener {
+            val intent = Intent(requireContext(), MainActivity::class.java).apply {
+                putExtra("SELECTED_GRADE", 3) // Move to Grade 3
+                putExtra("SELECTED_SUBJECT", "MATH")
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
+            (requireActivity() as? Activity)?.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
+
         scrollTargetContainer.setOnClickListener {
             userHasScrolled = false
             scrollToSpecificTopic(currentTargetIndex, instant = false)
         }
 
         listenToTopicProgress()
+    }
+
+    private fun initViews(view: View) {
+        scrollView = view.findViewById(R.id.level_scroll_container)
+        startContainer = view.findViewById(R.id.start_container)
+        startEnabledBtnContainer = view.findViewById(R.id.start_enabled_btn_container)
+        startDisabledBtnContainer = view.findViewById(R.id.start_disabled_btn_container)
+        startDisabledBtn = view.findViewById(R.id.start_disabled_btn)
+        continueEnabledBtn = view.findViewById(R.id.continue_enabled_btn)
+        continueEnabledBtnBack = view.findViewById(R.id.continue_enabled_btn_back)
+        startLessonLabel = view.findViewById(R.id.start_lesson_label)
+
+        // --- INIT JUMP AHEAD ---
+        nextGradeLabel = view.findViewById(R.id.next_grade_label)
+        nextTopicName = view.findViewById(R.id.next_topic_name)
+        moveOnBtn = view.findViewById(R.id.move_on_btn)
+
+        scrollTargetContainer = view.findViewById(R.id.scroll_to_target_container)
+        scrollArrowIcon = view.findViewById(R.id.scroll_arrow_icon)
+
+        topic1 = view.findViewById(R.id.topic1)
+        topic2 = view.findViewById(R.id.topic2)
+        topic3 = view.findViewById(R.id.topic3)
+
+        startContainer.visibility = View.GONE
+        scrollTargetContainer.visibility = View.GONE
+    }
+
+    private fun setupJumpAheadUI() {
+        nextGradeLabel.text = "3 GRADE"
+        nextTopicName.text = "Topic 1: $nextGradeTopicName"
     }
 
     private fun determineVisibleTopic() {
@@ -106,24 +160,17 @@ class Math2GradeFragment : Fragment() {
             }
         }
 
-        // --- UPDATED ARROW NAVIGATION LOGIC ---
         if (userHasScrolled && hasInitialScrolled) {
             if (bestIndex != currentTargetIndex) {
-                // Show container using your custom animation
                 if (scrollTargetContainer.visibility != View.VISIBLE) {
                     scrollTargetContainer.fadeInAndSlideUp()
                 }
-
-                // Direction Logic:
-                // Since topic1 is bottom and topic4 is top:
-                // if bestIndex < currentTargetIndex, we are below the target -> scroll UP
                 if (bestIndex < currentTargetIndex) {
                     scrollArrowIcon.setImageResource(R.drawable.arrow_up)
                 } else {
                     scrollArrowIcon.setImageResource(R.drawable.arrow_down)
                 }
             } else {
-                // Hide container using your custom animation
                 if (scrollTargetContainer.visibility == View.VISIBLE) {
                     scrollTargetContainer.fadeOutAndSlideDown()
                 }
@@ -137,29 +184,10 @@ class Math2GradeFragment : Fragment() {
         }
     }
 
-    private fun initViews(view: View) {
-        scrollView = view.findViewById(R.id.level_scroll_container)
-        startContainer = view.findViewById(R.id.start_container)
-        startEnabledBtnContainer = view.findViewById(R.id.start_enabled_btn_container)
-        startDisabledBtnContainer = view.findViewById(R.id.start_disabled_btn_container)
-        startDisabledBtn = view.findViewById(R.id.start_disabled_btn)
-        continueEnabledBtn = view.findViewById(R.id.continue_enabled_btn)
-        continueEnabledBtnBack = view.findViewById(R.id.continue_enabled_btn_back)
-        startLessonLabel = view.findViewById(R.id.start_lesson_label)
-
-        scrollTargetContainer = view.findViewById(R.id.scroll_to_target_container)
-        scrollArrowIcon = view.findViewById(R.id.scroll_arrow_icon)
-
-        topic1 = view.findViewById(R.id.topic1)
-        topic2 = view.findViewById(R.id.topic2)
-
-        startContainer.visibility = View.GONE
-        scrollTargetContainer.visibility = View.GONE
-    }
-
     private fun setupRiveTopics() {
         setupSingleTopic(topic1, R.raw.progress_path_odd, 1f, "ADDITION_SUBTRACTION_BASICS")
         setupSingleTopic(topic2, R.raw.progress_path_even, 2f, "COLUMN_METHOD")
+        setupSingleTopic(topic3, R.raw.progress_path_odd, 3f, "THREE_DIGIT_NUMBERS")
     }
 
     private fun setupSingleTopic(rive: RiveAnimationView, res: Int, level: Float, topicKey: String) {
@@ -207,8 +235,8 @@ class Math2GradeFragment : Fragment() {
                 }
 
                 claimedRewards[key] = claimed
-                isUnlocked[key] = prevClaimed
-                updateRiveButtonStates(topicViews[index], prog >= 100f, prevClaimed, claimed)
+                isUnlocked[key] = if (index == 0) true else prevClaimed
+                updateRiveButtonStates(topicViews[index], prog >= 100f, isUnlocked[key] ?: false, claimed)
                 prevClaimed = prog >= 100f && claimed
             }
 
@@ -246,16 +274,9 @@ class Math2GradeFragment : Fragment() {
         val rect = Rect()
         targetView.getDrawingRect(rect)
         scrollView.offsetDescendantRectToMyCoords(targetView, rect)
-
         val offset = scrollView.height / 16
         val scrollY = (rect.top - offset).coerceAtLeast(0)
-
-        if (instant) {
-            scrollView.scrollTo(0, scrollY)
-        } else {
-            scrollView.smoothScrollTo(0, scrollY)
-        }
-
+        if (instant) scrollView.scrollTo(0, scrollY) else scrollView.smoothScrollTo(0, scrollY)
         determineVisibleTopic()
     }
 
@@ -275,14 +296,9 @@ class Math2GradeFragment : Fragment() {
     }
 
     private fun showLoadingState(isLoading: Boolean) {
-        if (isLoading) {
-            startEnabledBtnContainer.visibility = View.GONE
-            startDisabledBtnContainer.visibility = View.VISIBLE
-            startDisabledBtn.text = "PROCESSING..."
-        } else {
-            startEnabledBtnContainer.visibility = View.VISIBLE
-            startDisabledBtnContainer.visibility = View.GONE
-        }
+        startEnabledBtnContainer.visibility = if (isLoading) View.GONE else View.VISIBLE
+        startDisabledBtnContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+        if (isLoading) startDisabledBtn.text = "PROCESSING..."
     }
 
     private fun showBottomControls(buttonText: String, topicKey: String?, rewardKey: String?, isLocked: Boolean) {
@@ -312,23 +328,18 @@ class Math2GradeFragment : Fragment() {
     private fun handleContinueClick() {
         showLoadingState(true)
         if (pendingRewardKey != null) {
-            val view = findTopicViewByKey(pendingRewardKey!!)
-            handleRewardClaimed(view, pendingRewardKey!!)
+            handleRewardClaimed(findTopicViewByKey(pendingRewardKey!!), pendingRewardKey!!)
         } else if (pendingTopic != null) {
-            val intent = Intent(requireContext(), Math2GradeQuestionActivity::class.java).apply {
+            startActivity(Intent(requireContext(), Math2GradeQuestionActivity::class.java).apply {
                 putExtra("TOPIC_KEY", pendingTopic)
-            }
-            startActivity(intent)
+            })
             scrollView.postDelayed({ if (isAdded) showLoadingState(false) }, 1000)
         }
     }
 
     private fun findTopicViewByKey(key: String): RiveAnimationView {
-        return when (key) {
-            "ADDITION_SUBTRACTION_BASICS" -> topic1
-            "COLUMN_METHOD" -> topic2
-            else -> topic1
-        }
+        val index = topicKeys.indexOf(key).coerceAtLeast(0)
+        return topicViews[index]
     }
 
     private fun updateRiveButtonStates(view: RiveAnimationView, isFinished: Boolean, unlocked: Boolean, claimed: Boolean) {

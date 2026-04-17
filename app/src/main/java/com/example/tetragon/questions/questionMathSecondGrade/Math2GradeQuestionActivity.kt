@@ -25,6 +25,8 @@ import com.example.tetragon.questions.questionMathSecondGrade.firstTopic.UiAddit
 import com.example.tetragon.questions.questionMathSecondGrade.firstTopic.UiArithmeticsBasicsFragment
 import com.example.tetragon.questions.questionMathSecondGrade.secondTopic.UiColumnAdditionPairsFragment
 import com.example.tetragon.questions.questionMathSecondGrade.secondTopic.UiColumnMethodFragment
+import com.example.tetragon.questions.questionMathFirstGrade.secondTopicAddition.UiAiAdditionFragment
+import com.example.tetragon.questions.questionMathSecondGrade.thirdTopic.UiColumnAdditionThreeDigitNumbersFragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -135,6 +137,11 @@ class Math2GradeQuestionActivity : AppCompatActivity() {
                 MathGrade2Type.COLUMN_METHOD_ADDITION,
                 MathGrade2Type.COLUMN_METHOD_ADDITION_MATCH
             )
+
+            MathGrade2Topic.THREE_DIGIT_NUMBERS -> listOf(
+                MathGrade2Type.COLUMN_METHOD_ADDITION_THREE_DIGITS,
+                MathGrade2Type.FRACTION
+            )
         }
     }
 
@@ -167,6 +174,8 @@ class Math2GradeQuestionActivity : AppCompatActivity() {
 
             MathGrade2Type.COLUMN_METHOD_ADDITION -> UiColumnMethodFragment()
             MathGrade2Type.COLUMN_METHOD_ADDITION_MATCH -> UiColumnAdditionPairsFragment()
+
+            MathGrade2Type.COLUMN_METHOD_ADDITION_THREE_DIGITS -> UiColumnAdditionThreeDigitNumbersFragment()
 
             MathGrade2Type.SET_TIME -> UiSetTimeFragment()
             MathGrade2Type.SET_ANGLE -> UiSetAngleInProtractorFragment()
