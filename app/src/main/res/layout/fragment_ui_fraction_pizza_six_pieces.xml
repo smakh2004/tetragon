@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".questions.questionMathSecondGrade.UiFractionPizzaSixPiecesFragment">
+    tools:context=".questions.questionMathThirdGrade.thirdTopic.UiFractionPizzaSixPiecesFragment">
 
     <TextView
         android:id="@+id/questionText"

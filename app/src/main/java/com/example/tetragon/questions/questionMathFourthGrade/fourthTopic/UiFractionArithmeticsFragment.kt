@@ -1,4 +1,4 @@
-package com.example.tetragon.questions.questionMathSecondGrade
+package com.example.tetragon.questions.questionMathFourthGrade.fourthTopic
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -6,7 +6,11 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -15,14 +19,20 @@ import app.rive.runtime.kotlin.controllers.RiveFileController
 import app.rive.runtime.kotlin.core.PlayableInstance
 import app.rive.runtime.kotlin.core.SMIBoolean
 import com.example.tetragon.R
+import com.example.tetragon.questions.questionMathFourthGrade.Math4GradeQuestionActivity
+import com.example.tetragon.questions.questionMathFourthGrade.MathGrade4Type
 
-class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem) {
+class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_arithmetics) {
 
     private lateinit var riveAnimation: RiveAnimationView
     private lateinit var animationOverlay: View
     private lateinit var questionText: TextView
+    private lateinit var tvNum1: TextView
+    private lateinit var tvDenom1: TextView
+    private lateinit var tvNum2: TextView
+    private lateinit var tvDenom2: TextView
+    private lateinit var tvOperator: TextView // Assuming you have a TextView for the +/- sign
 
-    // Layout piece buttons (Plus/Minus)
     private lateinit var addBtn: LinearLayout
     private lateinit var minusBtn: LinearLayout
     private lateinit var addEnabledContainer: FrameLayout
@@ -30,7 +40,6 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private lateinit var minusEnabledContainer: FrameLayout
     private lateinit var minusDisabledContainer: FrameLayout
 
-    // Shared Activity UI Elements
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
     private lateinit var btnBack: ConstraintLayout
@@ -41,10 +50,12 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private lateinit var stateContainer: FrameLayout
     private lateinit var circleState: ImageView
 
-    // Logic Variables
-    private var targetNumerator = 0
-    private var targetDenominator = 0
+    private var n1 = 0
+    private var n2 = 0
+    private var targetNumeratorResult = 0
+    private var targetDenominatorResult = 0
     private var currentDenominator = 1
+    private var isAddition = true
 
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
@@ -74,6 +85,11 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
         riveAnimation = view.findViewById(R.id.fraction)
         animationOverlay = view.findViewById(R.id.animationOverlay)
         questionText = view.findViewById(R.id.questionText)
+        tvNum1 = view.findViewById(R.id.tvNum1)
+        tvDenom1 = view.findViewById(R.id.tvDenom1)
+        tvNum2 = view.findViewById(R.id.tvNum2)
+        tvDenom2 = view.findViewById(R.id.tvDenom2)
+        tvOperator = view.findViewById(R.id.tvOperator) // Update your XML to include this ID
 
         addBtn = view.findViewById(R.id.add_btn)
         minusBtn = view.findViewById(R.id.minus_btn)
@@ -82,7 +98,7 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
         minusEnabledContainer = view.findViewById(R.id.minus_enabled_container)
         minusDisabledContainer = view.findViewById(R.id.minus_disabled_container)
 
-        val activity = requireActivity() as Math2GradeQuestionActivity
+        val activity = requireActivity() as Math4GradeQuestionActivity
         checkBtn = activity.findViewById(R.id.check_enabled_btn)
         checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
         btnBack = activity.findViewById(R.id.btnBackground)
@@ -105,12 +121,9 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
                 } else {
                     if (checkBtn.text == "FINISH") activity.navigateToXpGained()
                     else {
-                        val isMilestoneActive = activity.checkAndTriggerMilestone()
-                        if (!isMilestoneActive) {
-                            activity.isResultCurrentlyVisible = false
-                            activity.hideSuccessAnimation()
-                            activity.showRandomQuestion()
-                        }
+                        activity.isResultCurrentlyVisible = false
+                        activity.hideSuccessAnimation()
+                        activity.showRandomQuestion()
                     }
                 }
             }
@@ -182,85 +195,29 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
         }
     }
 
-    private fun checkAnswer() {
-        var selectedCount = 0
-        for (i in 1..currentDenominator) {
-            if (getRiveBoolean("1/${currentDenominator}_$i")) selectedCount++
-        }
-
-        isAnswerChecked = true
-        animationOverlay.visibility = View.VISIBLE
-
-        val activity = requireActivity() as Math2GradeQuestionActivity
-        activity.isResultCurrentlyVisible = true
-        stateContainer.visibility = View.VISIBLE
-        updateLayoutButtonsUI()
-
-        // 🔥 FIXED FRACTION LOGIC
-        val isCorrect = selectedCount * targetDenominator == targetNumerator * currentDenominator
-
-        if (isCorrect) {
-            playSound(R.raw.correct)
-            activity.playSuccessAnimation()
-
-            val isFinished = activity.incrementProgress()
-            if (isFirstAttempt) activity.totalXp += 10
-
-            activity.handleCorrectAnswer()
-            isIncorrectAttempt = false
-
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
-            showCorrectState()
-
-        } else {
-            playSound(R.raw.wrong)
-            isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
-            showIncorrectState()
-            setupSeeSolution()
-        }
-
-        isFirstAttempt = false
-    }
-
-    private fun setupSeeSolution() {
-        seeEnabledButton.setOnClickListener {
-            isAnswerChecked = true
-            isIncorrectAttempt = false
-            animationOverlay.visibility = View.VISIBLE
-
-            seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "The correct answer is $targetNumerator/$targetDenominator"
-            answerDisplay.visibility = View.VISIBLE
-            circleState.setImageResource(R.drawable.solution_lamp_icon)
-            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
-
-            currentDenominator = targetDenominator
-            riveAnimation.setNumberState(STATE_MACHINE, FRACTION_INPUT, currentDenominator.toFloat())
-            resetAllVisualSlices()
-
-            for (i in 1..targetNumerator) {
-                riveAnimation.setBooleanState(STATE_MACHINE, "1/${targetDenominator}_$i", true)
-            }
-
-            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
-            updateLayoutButtonsUI()
-        }
-    }
-
-    private fun resetAllVisualSlices() {
-        riveAnimation.controller.stateMachines.firstOrNull()?.inputs?.forEach {
-            if (it.name.contains("/") && it is SMIBoolean) {
-                riveAnimation.setBooleanState(STATE_MACHINE, it.name, false)
-            }
-        }
-    }
-
     private fun generateProblem() {
-        targetDenominator = (2..6).random()
-        targetNumerator = (1..targetDenominator).random()
+        targetDenominatorResult = (2..6).random()
+        isAddition = (0..1).random() == 1
+
+        if (isAddition) {
+            tvOperator.text = "+"
+            n1 = (1 until targetDenominatorResult).random()
+            n2 = 1
+            // Ensure result doesn't exceed 1 (e.g., if n1=5 and denom=6, result is 6/6)
+            if (n1 + n2 > targetDenominatorResult) n1 = targetDenominatorResult - 1
+            targetNumeratorResult = n1 + n2
+        } else {
+            tvOperator.text = "-"
+            n1 = (2..targetDenominatorResult).random()
+            n2 = (1 until n1).random() // Ensures n1 - n2 is at least 1/targetDenominatorResult
+            targetNumeratorResult = n1 - n2
+        }
+
+        tvNum1.text = n1.toString()
+        tvDenom1.text = targetDenominatorResult.toString()
+        tvNum2.text = n2.toString()
+        tvDenom2.text = targetDenominatorResult.toString()
+
         updateQuestionText()
 
         isAnswerChecked = false
@@ -281,29 +238,122 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     }
 
     private fun updateQuestionText() {
-        val fractionText = "$targetNumerator/$targetDenominator"
-        val sentence = "Show $fractionText of the shape."
+        val sentence = "Create a fraction to find the answer."
         val spannable = SpannableString(sentence)
-        val start = sentence.indexOf(fractionText)
+        val wordToHighlight = "fraction"
+        val start = sentence.indexOf(wordToHighlight)
         if (start != -1) {
-            spannable.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.blue_2)),
-                start, start + fractionText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.blue_2)),
+                start, start + wordToHighlight.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         questionText.text = spannable
     }
 
+    private fun checkAnswer() {
+        var selectedCount = 0
+        for (i in 1..currentDenominator) {
+            if (getRiveBoolean("1/${currentDenominator}_$i")) selectedCount++
+        }
+
+        isAnswerChecked = true
+        animationOverlay.visibility = View.VISIBLE
+
+        val activity = requireActivity() as Math4GradeQuestionActivity
+        activity.isResultCurrentlyVisible = true
+        stateContainer.visibility = View.VISIBLE
+        updateLayoutButtonsUI()
+
+        val isVisualCorrect = selectedCount * targetDenominatorResult == targetNumeratorResult * currentDenominator
+
+        if (isVisualCorrect) {
+            playSound(R.raw.correct)
+            activity.playSuccessAnimation()
+
+            val isFinished = activity.incrementProgress()
+            if (isFirstAttempt) activity.totalXp += MathGrade4Type.FRACTION.xp
+
+            activity.handleCorrectAnswer()
+            isIncorrectAttempt = false
+
+            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            showCorrectState()
+        } else {
+            playSound(R.raw.wrong)
+            isIncorrectAttempt = true
+            checkBtn.text = "TRY AGAIN"
+            showIncorrectState()
+            setupSeeSolution()
+        }
+        isFirstAttempt = false
+    }
+
+    private fun setupSeeSolution() {
+        seeEnabledButton.setOnClickListener {
+            isAnswerChecked = true
+            isIncorrectAttempt = false
+            seeBtn.visibility = View.GONE
+            stateAnswer.text = "Solution"
+
+            answerDisplay.text = "Answer: ${formatAnswer(targetNumeratorResult, targetDenominatorResult)}"
+            answerDisplay.visibility = View.VISIBLE
+
+            currentDenominator = targetDenominatorResult
+            riveAnimation.setNumberState(STATE_MACHINE, FRACTION_INPUT, currentDenominator.toFloat())
+
+            resetAllVisualSlices()
+            for (i in 1..targetNumeratorResult) {
+                riveAnimation.setBooleanState(STATE_MACHINE, "1/${targetDenominatorResult}_$i", true)
+            }
+
+            circleState.setImageResource(R.drawable.solution_lamp_icon)
+            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
+            checkBtn.text = "CONTINUE"
+            updateLayoutButtonsUI()
+        }
+    }
+
+    private fun formatAnswer(num: Int, denom: Int): String {
+        if (num == 0) return "0"
+        if (num == denom) return "1"
+
+        val commonDivisor = gcd(num, denom)
+        val simplifiedNum = num / commonDivisor
+        val simplifiedDenom = denom / commonDivisor
+
+        return "$simplifiedNum/$simplifiedDenom"
+    }
+
+    private fun gcd(a: Int, b: Int): Int {
+        var x = a
+        var y = b
+        while (y != 0) {
+            val temp = y
+            y = x % y
+            x = temp
+        }
+        return x
+    }
+
+    private fun resetAllVisualSlices() {
+        riveAnimation.controller.stateMachines.firstOrNull()?.inputs?.forEach {
+            if (it.name.contains("/") && it is SMIBoolean) {
+                riveAnimation.setBooleanState(STATE_MACHINE, it.name, false)
+            }
+        }
+    }
+
     private fun resetForTryAgain() {
-        val activity = requireActivity() as Math2GradeQuestionActivity
+        val activity = requireActivity() as Math4GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         isAnswerChecked = false
         isIncorrectAttempt = false
         animationOverlay.visibility = View.GONE
-
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         checkBtn.text = "CHECK"
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-
         resetAllVisualSlices()
         disableCheckButton()
         updateLayoutButtonsUI()
@@ -313,7 +363,7 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $targetNumerator/$targetDenominator"
+        answerDisplay.text = "Answer: ${formatAnswer(targetNumeratorResult, targetDenominatorResult)}"
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -335,7 +385,6 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
             minusDisabledContainer.visibility = View.VISIBLE
             return
         }
-
         val canAdd = currentDenominator < 6
         val canMinus = currentDenominator > 1
         addEnabledContainer.visibility = if (canAdd) View.VISIBLE else View.GONE
@@ -346,23 +395,18 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
-        val activity = requireActivity() as Math2GradeQuestionActivity
-
+        val activity = requireActivity() as Math4GradeQuestionActivity
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        // Hide the shadow background
         checkBtnBack.visibility = View.INVISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
 
     private fun enableCheckButton() {
         checkBtn.isEnabled = true
-        val activity = requireActivity() as Math2GradeQuestionActivity
-
+        val activity = requireActivity() as Math4GradeQuestionActivity
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
-        // Show the shadow background
         checkBtnBack.visibility = View.VISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
-
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
     }

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".questions.questionMathThirdGrade.firstTopic.UiComplexMultiplicationInteractiveFragment">
+
+    <TextView
+        android:id="@+id/complexMultInteractiveQuestionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Solve the multiplication."
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/complexMultInteractiveProblemRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/complexMultInteractiveRive"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/complexMultInteractiveQuestionText">
+
+        <TextView
+            android:id="@+id/complexMultInteractiveEquationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="25 × 4 ="
+            android:textColor="#64748b"
+            android:textSize="38sp" />
+
+        <FrameLayout
+            android:id="@+id/complexMultInteractiveAnswerFrame"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="12dp">
+
+            <ImageView
+                android:id="@+id/complexMultInteractiveAnswerBox"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="answer box"
+                android:src="@drawable/answer_blue_box" />
+
+            <TextView
+                android:id="@+id/complexMultInteractiveAnswerText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:textColor="@color/text_color"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="100"
+                tools:visibility="visible" />
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/complexMultInteractiveRive"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.45"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/complexMultInteractiveQuestionText"
+        app:layout_constraintVertical_bias="0.9"
+        app:layout_constraintWidth_max="500dp"
+        app:riveAlignment="CENTER"
+        app:riveFit="FIT_WIDTH"
+        app:riveResource="@raw/otrezok_no_cm"
+        app:riveStateMachine="State Machine 1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

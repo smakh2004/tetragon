@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="2dp"
+    android:paddingRight="2dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <TextView
+        android:id="@+id/tvDayNumber"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="1"
+        android:textSize="16sp"
+        android:fontFamily="@font/inter_semibold"
+        android:textColor="#D3D3D3"
+        android:background="@drawable/bg_inactive" />
+</FrameLayout>

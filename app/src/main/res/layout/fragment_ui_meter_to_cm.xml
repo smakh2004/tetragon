@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".questions.questionMathSecondGrade.fifthTopic.UiMeterToCmFragment">
+
+    <TextView
+        android:id="@+id/instructionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Convert meter to centimeter."
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/conversionContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="200dp"
+        android:paddingHorizontal="12dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/riveAnimation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/instructionText"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <TextView
+            android:id="@+id/firstNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:textColor="@color/text_color"
+            android:textSize="38sp"
+            app:autoSizeTextType="uniform"
+            tools:text="1" />
+
+        <TextView
+            android:id="@+id/unitMeterText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:textColor="@color/text_color"
+            android:textSize="38sp"
+            app:autoSizeTextType="uniform"
+            tools:text="m =" />
+
+        <FrameLayout
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp">
+
+            <ImageView
+                android:id="@+id/problemImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="problem image"
+                android:src="@drawable/answer_blue_box" />
+
+            <TextView
+                android:id="@+id/problemAnswerText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:textColor="@color/text_color"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="100"
+                tools:visibility="visible" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/unitCmText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="cm"
+            android:textColor="@color/blue_2"
+            android:textSize="38sp"
+            app:autoSizeTextType="uniform" />
+    </LinearLayout>
+
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/riveAnimation"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.45"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/conversionContainer"
+        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintWidth_max="500dp"
+        app:riveAlignment="CENTER"
+        app:riveFit="FIT_WIDTH"
+        app:riveResource="@raw/otrezok_additional_hashes"
+        app:riveStateMachine="State Machine 1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

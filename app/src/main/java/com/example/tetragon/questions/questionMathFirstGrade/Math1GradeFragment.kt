@@ -38,6 +38,8 @@ class Math1GradeFragment : Fragment() {
     private lateinit var startLessonLabel: TextView
 
     // --- JUMP AHEAD UI ---
+    private lateinit var nextGradeLabel: TextView
+    private lateinit var nextTopicName: TextView
     private lateinit var moveOnBtn: AppCompatButton
 
     // Scroll Navigation UI
@@ -71,6 +73,14 @@ class Math1GradeFragment : Fragment() {
         "COUNT_NUMBERS", "ADDITION", "SUBTRACTION", "ODD_OR_EVEN",
         "COMPARISON", "PARENTHESES", "ADDITION_UP_TO_20", "SUBTRACTION_UP_TO_20",
         "ROUND_NUMBERS", "TWO_DIGIT_NUMBERS", "PROBLEM_SOLVING", "LENGTH_CENTIMETER"
+    )
+
+    // --- GRADE 2 TOPIC DATA FOR JUMP AHEAD ---
+    private val grade2TopicNames = listOf(
+        "Arithmetics Basics", "Column Method", "Three Digit Numbers", "Comparison", "Length Measurement", "Time", "Multiplication table", "Division"
+    )
+    private val grade2TopicKeys = listOf(
+        "ADDITION_SUBTRACTION_BASICS", "COLUMN_METHOD", "THREE_DIGIT_NUMBERS", "COMPARISON_THREE_DIGIT_NUMBERS", "LENGTH_MEASUREMENT", "TIME", "MULTIPLICATION", "DIVISION"
     )
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
@@ -139,6 +149,8 @@ class Math1GradeFragment : Fragment() {
 
         // --- JUMP AHEAD VIEWS ---
         moveOnBtn = view.findViewById(R.id.move_on_btn)
+        nextGradeLabel = view.findViewById(R.id.next_grade_label)
+        nextTopicName = view.findViewById(R.id.next_topic_name)
 
         scrollTargetContainer = view.findViewById(R.id.scroll_to_target_container)
         scrollArrowIcon = view.findViewById(R.id.scroll_arrow_icon)
@@ -152,6 +164,9 @@ class Math1GradeFragment : Fragment() {
 
         startContainer.visibility = View.GONE
         scrollTargetContainer.visibility = View.GONE
+
+        // Static label for Jump Ahead
+        nextGradeLabel.text = "2 GRADE"
     }
 
     private fun determineVisibleTopic() {
@@ -176,7 +191,6 @@ class Math1GradeFragment : Fragment() {
                 if (scrollTargetContainer.visibility != View.VISIBLE) {
                     scrollTargetContainer.fadeInAndSlideUp()
                 }
-                // Arrow direction logic matched to Math2GradeFragment
                 if (bestIndex < currentTargetIndex) {
                     scrollArrowIcon.setImageResource(R.drawable.arrow_up)
                 } else {
@@ -234,6 +248,7 @@ class Math1GradeFragment : Fragment() {
         topicProgressListener = db.collection("users").document(user.uid).addSnapshotListener { snapshot, _ ->
             if (snapshot == null || !isAdded) return@addSnapshotListener
 
+            // 1. GRADE 1 PROGRESS
             val progressMap = snapshot.get("class1MathProgress") as? Map<*, *> ?: emptyMap<String, Any>()
             val claimedMap = snapshot.get("claimedRewardsMath1") as? Map<*, *> ?: emptyMap<String, Any>()
 
@@ -254,6 +269,15 @@ class Math1GradeFragment : Fragment() {
             }
 
             currentTargetIndex = findTargetTopicIndex(progressMap, topicKeys, claimedMap)
+
+            // 2. DYNAMIC JUMP AHEAD (GRADE 2)
+            val progressMap2 = snapshot.get("class2MathProgress") as? Map<*, *> ?: emptyMap<String, Any>()
+            val claimedMap2 = snapshot.get("claimedRewardsMath2") as? Map<*, *> ?: emptyMap<String, Any>()
+
+            val activeGrade2Index = findTargetTopicIndex(progressMap2, grade2TopicKeys, claimedMap2)
+            val activeTopicName2 = grade2TopicNames.getOrNull(activeGrade2Index) ?: grade2TopicNames[0]
+
+            nextTopicName.text = "Topic ${activeGrade2Index + 1}: $activeTopicName2"
 
             if (!hasInitialScrolled) {
                 scrollView.post {

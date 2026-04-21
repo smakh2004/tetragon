@@ -47,7 +47,9 @@ class NaturalSciencesActivity : BaseActivity() {
             selectTab(isMath = false)
         }
 
-        btnClose.setOnClickListener { finish() }
+        btnClose.setOnClickListener {
+            finish()
+        }
     }
 
     private fun selectTab(isMath: Boolean) {

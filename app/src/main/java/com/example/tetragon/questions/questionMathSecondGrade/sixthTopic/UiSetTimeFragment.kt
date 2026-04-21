@@ -1,4 +1,4 @@
-package com.example.tetragon.questions.questionMathSecondGrade
+package com.example.tetragon.questions.questionMathSecondGrade.sixthTopic
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.core.SMINumber
 import com.example.tetragon.R
+import com.example.tetragon.questions.questionMathSecondGrade.Math2GradeQuestionActivity
 
 class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
 

@@ -147,7 +147,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_semibold"
-                            android:text="5 topics"
+                            android:text="8 topics"
                             android:textColor="@color/gray_2"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -214,7 +214,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_semibold"
-                            android:text="5 topics"
+                            android:text="4 topics"
                             android:textColor="@color/gray_2"
                             android:textSize="14sp" />
                     </LinearLayout>

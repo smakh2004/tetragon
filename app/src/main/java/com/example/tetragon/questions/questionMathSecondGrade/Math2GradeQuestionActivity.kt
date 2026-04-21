@@ -26,7 +26,18 @@ import com.example.tetragon.questions.questionMathSecondGrade.firstTopic.UiArith
 import com.example.tetragon.questions.questionMathSecondGrade.secondTopic.UiColumnAdditionPairsFragment
 import com.example.tetragon.questions.questionMathSecondGrade.secondTopic.UiColumnMethodFragment
 import com.example.tetragon.questions.questionMathFirstGrade.secondTopicAddition.UiAiAdditionFragment
+import com.example.tetragon.questions.questionMathSecondGrade.eighthTopic.UiDivisionFragment
+import com.example.tetragon.questions.questionMathSecondGrade.eighthTopic.UiDivisionInteractiveFragment
+import com.example.tetragon.questions.questionMathSecondGrade.fifthTopic.UiMeasurementArithmeticsFragment
+import com.example.tetragon.questions.questionMathSecondGrade.fifthTopic.UiMeterToCmFragment
+import com.example.tetragon.questions.questionMathSecondGrade.fourthTopic.UiComparisonThreeDigitNumbersFragment
+import com.example.tetragon.questions.questionMathSecondGrade.fourthTopic.UiComparisonThreeGigitNumbersArithmeticsFragment
+import com.example.tetragon.questions.questionMathSecondGrade.seventhTopic.UiMultiplicationFragment
+import com.example.tetragon.questions.questionMathSecondGrade.seventhTopic.UiMultiplicationInteractiveFragment
+import com.example.tetragon.questions.questionMathSecondGrade.sixthTopic.UiSetTimeFragment
+import com.example.tetragon.questions.questionMathSecondGrade.sixthTopic.UiTimeArithmeticsFragment
 import com.example.tetragon.questions.questionMathSecondGrade.thirdTopic.UiColumnAdditionThreeDigitNumbersFragment
+import com.example.tetragon.questions.questionMathSecondGrade.thirdTopic.UiColumnSubtractionThreeDigitNumbersFragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -140,7 +151,32 @@ class Math2GradeQuestionActivity : AppCompatActivity() {
 
             MathGrade2Topic.THREE_DIGIT_NUMBERS -> listOf(
                 MathGrade2Type.COLUMN_METHOD_ADDITION_THREE_DIGITS,
-                MathGrade2Type.FRACTION
+                MathGrade2Type.COLUMN_METHOD_SUBTRACTION_THREE_DIGITS,
+            )
+
+            MathGrade2Topic.COMPARISON_THREE_DIGIT_NUMBERS -> listOf(
+                MathGrade2Type.COMPARISON_THREE_DIGITS,
+                MathGrade2Type.COMPARISON_THREE_DIGITS_ARITHMETICS,
+            )
+
+            MathGrade2Topic.LENGTH_MEASUREMENT -> listOf(
+                MathGrade2Type.METER_TO_CM,
+                MathGrade2Type.MEASUREMENT_ARITHMETICS,
+            )
+
+            MathGrade2Topic.TIME -> listOf(
+                MathGrade2Type.SET_TIME,
+                MathGrade2Type.TIME_ARITHMETICS
+            )
+
+            MathGrade2Topic.MULTIPLICATION -> listOf(
+                MathGrade2Type.MULTIPLICATION_TABLE,
+                MathGrade2Type.MULTIPLICATION_INTERACTIVE
+            )
+
+            MathGrade2Topic.DIVISION -> listOf(
+                MathGrade2Type.DIVISION_SIMPLE,
+                MathGrade2Type.DIVISION_INTERACTIVE,
             )
         }
     }
@@ -176,12 +212,22 @@ class Math2GradeQuestionActivity : AppCompatActivity() {
             MathGrade2Type.COLUMN_METHOD_ADDITION_MATCH -> UiColumnAdditionPairsFragment()
 
             MathGrade2Type.COLUMN_METHOD_ADDITION_THREE_DIGITS -> UiColumnAdditionThreeDigitNumbersFragment()
+            MathGrade2Type.COLUMN_METHOD_SUBTRACTION_THREE_DIGITS -> UiColumnSubtractionThreeDigitNumbersFragment()
+
+            MathGrade2Type.COMPARISON_THREE_DIGITS -> UiComparisonThreeDigitNumbersFragment()
+            MathGrade2Type.COMPARISON_THREE_DIGITS_ARITHMETICS -> UiComparisonThreeGigitNumbersArithmeticsFragment()
+
+            MathGrade2Type.METER_TO_CM -> UiMeterToCmFragment()
+            MathGrade2Type.MEASUREMENT_ARITHMETICS -> UiMeasurementArithmeticsFragment()
 
             MathGrade2Type.SET_TIME -> UiSetTimeFragment()
-            MathGrade2Type.SET_ANGLE -> UiSetAngleInProtractorFragment()
-            MathGrade2Type.FRACTION -> UiFractionProblemFragment()
-            MathGrade2Type.PIZZA_6 -> UiFractionPizzaSixPiecesFragment()
-            MathGrade2Type.FIND_PERIMETER -> UiFindPerimeterFragment()
+            MathGrade2Type.TIME_ARITHMETICS -> UiTimeArithmeticsFragment()
+
+            MathGrade2Type.MULTIPLICATION_TABLE -> UiMultiplicationFragment()
+            MathGrade2Type.MULTIPLICATION_INTERACTIVE -> UiMultiplicationInteractiveFragment()
+
+            MathGrade2Type.DIVISION_SIMPLE -> UiDivisionFragment()
+            MathGrade2Type.DIVISION_INTERACTIVE -> UiDivisionInteractiveFragment()
         }
 
         supportFragmentManager.beginTransaction()

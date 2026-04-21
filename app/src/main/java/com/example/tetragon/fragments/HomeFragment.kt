@@ -8,14 +8,29 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.example.tetragon.MainActivity
 import com.example.tetragon.R
 import com.example.tetragon.gameModel.GradeManager
+import com.example.tetragon.questions.questionMathEighthGrade.Math8GradeFragment
+import com.example.tetragon.questions.questionMathEleventhGrade.Math11GradeFragment
+import com.example.tetragon.questions.questionMathFifthGrade.Math5GradeFragment
 import com.example.tetragon.questions.questionMathFirstGrade.Math1GradeFragment
+import com.example.tetragon.questions.questionMathFourthGrade.Math4GradeFragment
+import com.example.tetragon.questions.questionMathNinthGrade.Math9GradeFragment
 import com.example.tetragon.questions.questionMathSecondGrade.Math2GradeFragment
+import com.example.tetragon.questions.questionMathSeventhGrade.Math7GradeFragment
+import com.example.tetragon.questions.questionMathSixthGrade.Math6GradeFragment
+import com.example.tetragon.questions.questionMathTenthGrade.Math10GradeFragment
 import com.example.tetragon.questions.questionMathThirdGrade.Math3GradeFragment
+import com.example.tetragon.questions.questionPhysicsEighthGrade.Physics8GradeFragment
+import com.example.tetragon.questions.questionPhysicsEleventhGrade.Physics11GradeFragment
+import com.example.tetragon.questions.questionPhysicsNinthGrade.Physics9GradeFragment
 import com.example.tetragon.questions.questionPhysicsSevenGrade.Physics7GradeFragment
+import com.example.tetragon.questions.questionPhysicsTenthGrade.Physics10GradeFragment
+import com.example.tetragon.aiChatBot.ChatActivity
+import com.example.tetragon.streakCalendar.StreakCalendarActivity
 import com.example.tetragon.ui.NaturalSciencesActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,7 +43,9 @@ class HomeFragment : Fragment() {
     private lateinit var classLabel: TextView
     private lateinit var topicNameDisplay: TextView
     private lateinit var classBtn: FrameLayout
+    private lateinit var streakContainer: ConstraintLayout
 
+    private lateinit var chatContainer: ConstraintLayout
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private var streakListener: ListenerRegistration? = null
@@ -44,14 +61,25 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        chatContainer = view.findViewById(R.id.chatContainer)
+        streakContainer = view.findViewById(R.id.constraintLayout6)
+
         streakNumberTextView = view.findViewById(R.id.streakNumber)
         streakIcon = view.findViewById(R.id.streakIcon)
         classLabel = view.findViewById(R.id.class_label)
         topicNameDisplay = view.findViewById(R.id.topic_name)
         classBtn = view.findViewById(R.id.class_btn)
 
+        streakContainer.setOnClickListener {
+            startActivity(Intent(requireContext(), StreakCalendarActivity::class.java))
+        }
+
         classBtn.setOnClickListener {
             startActivity(Intent(requireContext(), NaturalSciencesActivity::class.java))
+        }
+
+        chatContainer.setOnClickListener {
+            startActivity(Intent(requireContext(), ChatActivity::class.java))
         }
 
         if (savedInstanceState == null) {
@@ -84,7 +112,11 @@ class HomeFragment : Fragment() {
         // 2. Fragment Selection Logic
         val fragment = if (subject == "PHYSICS") {
             when (grade) {
-                1 -> Physics7GradeFragment()
+                7 -> Physics7GradeFragment()
+                8 -> Physics8GradeFragment()
+                9 -> Physics9GradeFragment()
+                10 -> Physics10GradeFragment()
+                11 -> Physics11GradeFragment()
                 else -> Physics7GradeFragment()
             }
         } else {
@@ -92,6 +124,14 @@ class HomeFragment : Fragment() {
                 1 -> Math1GradeFragment()
                 2 -> Math2GradeFragment()
                 3 -> Math3GradeFragment()
+                4 -> Math4GradeFragment()
+                5 -> Math5GradeFragment()
+                6 -> Math6GradeFragment()
+                7 -> Math7GradeFragment()
+                8 -> Math8GradeFragment()
+                9 -> Math9GradeFragment()
+                10 -> Math10GradeFragment()
+                11 -> Math11GradeFragment()
                 else -> Math1GradeFragment()
             }
         }
@@ -121,29 +161,6 @@ class HomeFragment : Fragment() {
                 streakNumberTextView.text = streak.toString()
                 streakIcon.setImageResource(if (streak > 0) R.drawable.streak else R.drawable.streak_null)
             }
-    }
-
-    /**
-     * Loads a specific grade fragment (1, 2, or 3)
-     */
-    fun loadGrade(grade: Int) {
-        val fragment: Fragment = when (grade) {
-            1 -> Math1GradeFragment()
-            2 -> Math2GradeFragment()
-            3 -> Math3GradeFragment()
-            else -> return
-        }
-
-        childFragmentManager.beginTransaction()
-            .replace(R.id.home_content_frame, fragment)
-            .commit()
-
-        classLabel.text = when (grade) {
-            1 -> "1 CLASS"
-            2 -> "2 CLASS"
-            3 -> "3 CLASS"
-            else -> ""
-        }
     }
 
     override fun onDestroyView() {

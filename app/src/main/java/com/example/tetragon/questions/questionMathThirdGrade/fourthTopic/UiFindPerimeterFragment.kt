@@ -1,4 +1,4 @@
-package com.example.tetragon.questions.questionMathSecondGrade
+package com.example.tetragon.questions.questionMathThirdGrade.fourthTopic
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -8,13 +8,18 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.core.SMINumber
 import com.example.tetragon.R
+import com.example.tetragon.questions.questionMathThirdGrade.Math3GradeQuestionActivity
+import com.example.tetragon.questions.questionMathThirdGrade.MathGrade3Type
 
 class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
 
@@ -128,7 +133,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
         val isUserSquare = (userW == userH)
 
         isAnswerChecked = true
-        val activity = requireActivity() as Math2GradeQuestionActivity
+        val activity = requireActivity() as Math3GradeQuestionActivity
         activity.isResultCurrentlyVisible = true
         stateContainer.visibility = View.VISIBLE
         riveRectangle.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, true)
@@ -142,7 +147,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
             playSound(R.raw.correct)
             activity.playSuccessAnimation()
             val isFinished = activity.incrementProgress()
-            if (isFirstAttempt) activity.totalXp += 10
+            if (isFirstAttempt) activity.totalXp += MathGrade3Type.PERIMETER.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
             checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
@@ -224,7 +229,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
         perimeterValueDisplay = view.findViewById(R.id.textView5)
         riveRectangle = view.findViewById(R.id.perimeter)
 
-        val activity = requireActivity() as Math2GradeQuestionActivity
+        val activity = requireActivity() as Math3GradeQuestionActivity
         checkBtn = activity.findViewById(R.id.check_enabled_btn)
         checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
         btnBack = activity.findViewById(R.id.btnBackground)
@@ -264,7 +269,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
     }
 
     private fun resetForTryAgain() {
-        val activity = requireActivity() as Math2GradeQuestionActivity
+        val activity = requireActivity() as Math3GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         mainHandler.removeCallbacks(checkRunnable)
 
@@ -284,7 +289,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
         mainHandler.postDelayed(checkRunnable, 300)
     }
 
-    private fun handleNavigation(activity: Math2GradeQuestionActivity) {
+    private fun handleNavigation(activity: Math3GradeQuestionActivity) {
         if (checkBtn.text == "FINISH") activity.navigateToXpGained()
         else if (!activity.checkAndTriggerMilestone()) {
             resetUIForNext()
@@ -293,7 +298,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
     }
 
     private fun resetUIForNext() {
-        val activity = requireActivity() as Math2GradeQuestionActivity
+        val activity = requireActivity() as Math3GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
         mainHandler.removeCallbacks(checkRunnable)

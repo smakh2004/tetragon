@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="24dp"
+    tools:context=".questions.questionMathFourthGrade.firstTopic.UiComplexSubtractionFragment">
+
+    <TextView
+        android:id="@+id/tvInstruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Find missed numbers."
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/mathContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/row1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvInstruction"
+        app:layout_constraintVertical_bias="0.3">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View android:layout_width="40dp" android:layout_height="0dp" />
+
+            <FrameLayout
+                android:id="@+id/frameInputThousandsSubFirst"
+                android:layout_width="50dp"
+                android:layout_height="60dp">
+                <ImageView
+                    android:id="@+id/boxThousSubFirst"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/answer_default_box" />
+                <TextView
+                    android:id="@+id/tvInputThousandsSubFirstText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:textColor="@color/text_color"
+                    android:textSize="28sp" />
+                <View
+                    android:id="@+id/cursorThousSubFirst"
+                    android:layout_width="2dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@color/blue_2"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvTopHundredSub"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:textColor="@color/text_color"
+                android:textSize="40sp"
+                tools:text="8" />
+
+            <FrameLayout
+                android:id="@+id/frameInputTensSubFirst"
+                android:layout_width="50dp"
+                android:layout_height="60dp">
+                <ImageView
+                    android:id="@+id/boxTensSubFirst"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/answer_default_box" />
+                <TextView
+                    android:id="@+id/tvInputTensSubFirstText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:textColor="@color/text_color"
+                    android:textSize="28sp" />
+                <View
+                    android:id="@+id/cursorTensSubFirst"
+                    android:layout_width="2dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@color/blue_2"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvTopOnesSub"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:textColor="@color/text_color"
+                android:textSize="40sp"
+                tools:text="5" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="−"
+                android:textColor="@color/blue_2"
+                android:textSize="32sp" />
+
+            <TextView
+                android:id="@+id/tvBottomThousandSub"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:textColor="@color/text_color"
+                android:textSize="40sp"
+                tools:text="2" />
+
+            <FrameLayout
+                android:id="@+id/frameInputHundredsSubSecond"
+                android:layout_width="50dp"
+                android:layout_height="60dp">
+                <ImageView
+                    android:id="@+id/boxHundSubSecond"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/answer_default_box" />
+                <TextView
+                    android:id="@+id/tvInputHundredsSubSecondText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:textColor="@color/text_color"
+                    android:textSize="28sp" />
+                <View
+                    android:id="@+id/cursorHundSubSecond"
+                    android:layout_width="2dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@color/blue_2"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvBottomTensSub"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:textColor="@color/text_color"
+                android:textSize="40sp"
+                tools:text="3" />
+
+            <FrameLayout
+                android:id="@+id/frameOnesSubSecond"
+                android:layout_width="50dp"
+                android:layout_height="60dp">
+                <ImageView
+                    android:id="@+id/boxOnesSubSecond"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/answer_default_box" />
+                <TextView
+                    android:id="@+id/tvBottomOnesSubInputText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:textColor="@color/text_color"
+                    android:textSize="28sp" />
+                <View
+                    android:id="@+id/cursorOnesSubSecond"
+                    android:layout_width="2dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@color/blue_2"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/blue_2" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <View android:layout_width="40dp" android:layout_height="0dp" />
+            <TextView android:id="@+id/tvResThousandSub" android:layout_width="50dp" android:layout_height="wrap_content" android:fontFamily="@font/inter_semibold" android:gravity="center" android:textColor="@color/text_color" android:textSize="40sp" tools:text="1" />
+            <TextView android:id="@+id/tvResHundredSub" android:layout_width="50dp" android:layout_height="wrap_content" android:fontFamily="@font/inter_semibold" android:gravity="center" android:textColor="@color/text_color" android:textSize="40sp" tools:text="4" />
+            <TextView android:id="@+id/tvResTensSub" android:layout_width="50dp" android:layout_height="wrap_content" android:fontFamily="@font/inter_semibold" android:gravity="center" android:textColor="@color/text_color" android:textSize="40sp" tools:text="2" />
+            <TextView android:id="@+id/tvResOnesSub" android:layout_width="50dp" android:layout_height="wrap_content" android:fontFamily="@font/inter_semibold" android:gravity="center" android:textColor="@color/text_color" android:textSize="40sp" tools:text="1" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:weightSum="3"
+        app:layout_constraintBottom_toTopOf="@id/row2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingRight="4dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn1" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="1" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingLeft="2dp" android:paddingRight="2dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn2" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="2" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingLeft="4dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn3" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="3" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:weightSum="3"
+        app:layout_constraintBottom_toTopOf="@id/row3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingRight="4dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn4" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="4" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingLeft="2dp" android:paddingRight="2dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn5" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="5" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingLeft="4dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn6" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="6" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:weightSum="3"
+        app:layout_constraintBottom_toTopOf="@id/row4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingRight="4dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn7" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="7" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingLeft="2dp" android:paddingRight="2dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn8" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="8" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingLeft="4dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn9" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="9" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:weightSum="3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <View android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingLeft="2dp" android:paddingRight="2dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btn0" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/number_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="0" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:clipChildren="false" android:clipToPadding="false" android:paddingLeft="4dp"><View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/number_button" android:backgroundTint="#E5E5E5" android:translationY="5dp" /><Button android:id="@+id/btnDel" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_gravity="center" android:background="@drawable/delete_button" android:fontFamily="@font/inter_semibold" android:includeFontPadding="false" android:padding="0dp" android:stateListAnimator="@drawable/button_animator" android:text="⌫" android:textColor="#64748b" android:textSize="30sp" app:backgroundTint="@null" /></FrameLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

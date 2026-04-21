@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="24dp"
+    tools:context=".questions.questionMathFourthGrade.thirdTopic.UiColumnDivisionFragment">
+
+    <View
+        android:id="@+id/cursor"
+        android:layout_width="2dp"
+        android:layout_height="28dp"
+        android:background="@color/blue_2"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvInstruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Solve the division."
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/mathContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/row1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvInstruction"
+        app:layout_constraintVertical_bias="0.2">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View android:layout_width="32dp" android:layout_height="1dp" />
+
+                <TextView
+                    android:id="@+id/tvDividend1"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="@color/text_color"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:id="@+id/tvDividend2"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="4"
+                    android:textColor="@color/text_color"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:id="@+id/tvDividend3"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="4"
+                    android:textColor="@color/text_color"
+                    android:textSize="32sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="2.5dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="8dp"
+                android:background="@color/blue_2" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvDivisor"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="start"
+                    android:text="12"
+                    android:textColor="@color/text_color"
+                    android:textSize="32sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2.5dp"
+                    android:background="@color/blue_2" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvQuotientStatic"
+                        android:layout_width="32dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="1"
+                        android:textColor="@color/text_color"
+                        android:textSize="32sp" />
+
+                    <FrameLayout
+                        android:id="@+id/frameQuotient"
+                        android:layout_width="32dp"
+                        android:layout_height="50dp">
+
+                        <ImageView
+                            android:id="@+id/ivBoxQuotient"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/answer_default_box" />
+
+                        <TextView
+                            android:id="@+id/tvInputQuotient"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="@font/inter_semibold"
+                            android:gravity="center"
+                            android:textColor="@color/text_color"
+                            android:textSize="24sp" />
+
+                        <View
+                            android:id="@+id/cursorQuotient"
+                            android:layout_width="2dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:background="@color/blue_2"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-40dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="-"
+                    android:textColor="@color/blue_2"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:id="@+id/tvSub1Static"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="@color/text_color"
+                    android:textSize="32sp" />
+
+                <FrameLayout
+                    android:id="@+id/frameSub1"
+                    android:layout_width="32dp"
+                    android:layout_height="50dp">
+
+                    <ImageView
+                        android:id="@+id/ivBoxSub1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/answer_default_box" />
+
+                    <TextView
+                        android:id="@+id/tvInputSub1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:textColor="@color/text_color"
+                        android:textSize="24sp" />
+
+                    <View
+                        android:id="@+id/cursorSub1"
+                        android:layout_width="2dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:background="@color/blue_2"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="96dp"
+                android:layout_height="2.5dp"
+                android:layout_marginTop="5dp"
+                android:background="@color/blue_2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvStep2Static1"
+                android:layout_width="32dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="2"
+                android:textColor="@color/text_color"
+                android:textSize="32sp" />
+
+            <TextView
+                android:id="@+id/tvStep2Static2"
+                android:layout_width="32dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="4"
+                android:textColor="@color/text_color"
+                android:textSize="32sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="-"
+                    android:textColor="@color/blue_2"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:id="@+id/tvSub2Static"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="2"
+                    android:textColor="@color/text_color"
+                    android:textSize="32sp" />
+
+                <FrameLayout
+                    android:id="@+id/frameSub2"
+                    android:layout_width="32dp"
+                    android:layout_height="50dp">
+
+                    <ImageView
+                        android:id="@+id/ivBoxSub2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/answer_default_box" />
+
+                    <TextView
+                        android:id="@+id/tvInputSub2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:textColor="@color/text_color"
+                        android:textSize="24sp" />
+
+                    <View
+                        android:id="@+id/cursorSub2"
+                        android:layout_width="2dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:background="@color/blue_2"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="96dp"
+                android:layout_height="2.5dp"
+                android:layout_marginTop="5dp"
+                android:background="@color/blue_2" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvRemainder"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="96dp"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
+            android:text="0"
+            android:textColor="@color/text_color"
+            android:textSize="32sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:weightSum="3"
+        app:layout_constraintBottom_toTopOf="@id/row2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingRight="4dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="1"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="2"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="4dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="3"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:weightSum="3"
+        app:layout_constraintBottom_toTopOf="@id/row3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingRight="4dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="4"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="5"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="4dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn6"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="6"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:weightSum="3"
+        app:layout_constraintBottom_toTopOf="@id/row4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingRight="4dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn7"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="7"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn8"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="8"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="4dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn9"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="9"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:weightSum="3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btn0"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/number_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="0"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingLeft="4dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/delete_button"
+                android:backgroundTint="#E5E5E5"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/btnDel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/delete_button"
+                android:fontFamily="@font/inter_semibold"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="⌫"
+                android:textColor="#64748b"
+                android:textSize="30sp"
+                app:backgroundTint="@null" />
+        </FrameLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

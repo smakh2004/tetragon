@@ -4,9 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.tetragon.R
+import com.example.tetragon.streakCalendar.StreakCalendarActivity
 import com.example.tetragon.ui.uiSettings.SettingsActivity
 import com.example.tetragon.ui.WelcomeActivity
 import com.google.firebase.Timestamp
@@ -28,6 +30,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private lateinit var streakSubtitle: TextView
     private lateinit var tickViews: List<ImageView>
     private lateinit var dayLabels: List<TextView>
+    private lateinit var streakContainer: LinearLayout
 
     // Bottom stats
     private lateinit var maxStreakText: TextView
@@ -69,6 +72,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             view.findViewById(R.id.sa_label),
             view.findViewById(R.id.su_label)
         )
+        streakContainer = view.findViewById(R.id.linearLayout7)
 
         // Bottom stats UI
         maxStreakText = view.findViewById(R.id.max_streak_value)
@@ -80,6 +84,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         loadUserData()
         loadStreak()
         loadBottomStats()
+
+        // Set Navigation Click Listener
+        streakContainer.setOnClickListener {
+            val intent = Intent(requireContext(), StreakCalendarActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun loadUserData() {

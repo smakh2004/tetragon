@@ -1,4 +1,4 @@
-package com.example.tetragon.questions.questionMathSecondGrade
+package com.example.tetragon.questions
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -8,13 +8,17 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.core.SMINumber
 import com.example.tetragon.R
+import com.example.tetragon.questions.questionMathSecondGrade.Math2GradeQuestionActivity
 
 class UiSetAngleInProtractorFragment : Fragment(R.layout.fragment_ui_set_angle_in_protractor) {
 
