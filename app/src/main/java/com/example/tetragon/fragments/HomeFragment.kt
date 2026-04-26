@@ -2,6 +2,7 @@ package com.example.tetragon.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tetragon.MainActivity
 import com.example.tetragon.R
@@ -32,9 +34,12 @@ import com.example.tetragon.questions.questionPhysicsTenthGrade.Physics10GradeFr
 import com.example.tetragon.aiChatBot.ChatActivity
 import com.example.tetragon.streakCalendar.StreakCalendarActivity
 import com.example.tetragon.ui.NaturalSciencesActivity
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.type.Color
+import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
 
@@ -44,11 +49,20 @@ class HomeFragment : Fragment() {
     private lateinit var topicNameDisplay: TextView
     private lateinit var classBtn: FrameLayout
     private lateinit var streakContainer: ConstraintLayout
-
     private lateinit var chatContainer: ConstraintLayout
+
+    // Star/Attempt UI
+    private lateinit var starCountText: TextView
+    private lateinit var starIcon: ImageView
+
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
-    private var streakListener: ListenerRegistration? = null
+    private var userDataListener: ListenerRegistration? = null
+
+    // Timer Variables
+    private var countDownTimer: CountDownTimer? = null
+    private val REGEN_TIME_MILLIS = 3600000L // 1 Hour
+    private val MAX_STARS = 15
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +84,10 @@ class HomeFragment : Fragment() {
         topicNameDisplay = view.findViewById(R.id.topic_name)
         classBtn = view.findViewById(R.id.class_btn)
 
+        // Initialize Star Count UI
+        starCountText = view.findViewById(R.id.starCountText)
+        starIcon = view.findViewById(R.id.starIcon)
+
         streakContainer.setOnClickListener {
             startActivity(Intent(requireContext(), StreakCalendarActivity::class.java))
         }
@@ -83,8 +101,6 @@ class HomeFragment : Fragment() {
         }
 
         if (savedInstanceState == null) {
-            // 1. Try to get from Intent/Arguments
-            // 2. Fallback to saved SharedPreferences
             val savedGrade = GradeManager.getGrade(requireContext())
             val savedSubject = GradeManager.getSubject(requireContext())
 
@@ -94,22 +110,13 @@ class HomeFragment : Fragment() {
             displayGrade(targetGrade, targetSubject)
         }
 
-        listenToStreakChanges()
+        listenToUserData()
     }
 
-    /**
-     * Replaces the child fragment and updates the class label
-     */
     private fun displayGrade(grade: Int, subject: String) {
-        // 1. Handle Bottom Navigation Visibility
         val mainActivity = activity as? MainActivity
-        if (subject == "PHYSICS") {
-            mainActivity?.setMiniGamesVisible(false)
-        } else {
-            mainActivity?.setMiniGamesVisible(true)
-        }
+        mainActivity?.setMiniGamesVisible(subject != "PHYSICS")
 
-        // 2. Fragment Selection Logic
         val fragment = if (subject == "PHYSICS") {
             when (grade) {
                 7 -> Physics7GradeFragment()
@@ -143,28 +150,98 @@ class HomeFragment : Fragment() {
         classLabel.text = "$subject - GRADE $grade"
     }
 
-    /**
-     * Called by child fragments when the visible topic changes
-     */
     fun onTopicChanged(title: String) {
         topicNameDisplay.text = title
     }
 
-    /**
-     * Listen to streak changes from Firestore
-     */
-    private fun listenToStreakChanges() {
+    private fun listenToUserData() {
         val user = auth.currentUser ?: return
-        streakListener = db.collection("users").document(user.uid)
+        userDataListener = db.collection("users").document(user.uid)
             .addSnapshotListener { snapshot, _ ->
-                val streak = snapshot?.getLong("streak") ?: 0
+                if (snapshot == null || !isAdded) return@addSnapshotListener
+
+                // 1. STREAK LOGIC
+                val streak = snapshot.getLong("streak") ?: 0
                 streakNumberTextView.text = streak.toString()
                 streakIcon.setImageResource(if (streak > 0) R.drawable.streak else R.drawable.streak_null)
+
+                // 2. STAR / SUBSCRIPTION LOGIC
+                val isInfinity = snapshot.getBoolean("subscription") ?: false
+                val stars = snapshot.getLong("stars") ?: 15L
+                val lastStarUsed = snapshot.getTimestamp("lastStarUsedTime")
+
+                countDownTimer?.cancel()
+
+                when {
+                    isInfinity -> {
+                        starCountText.text = "∞"
+                        starIcon.setImageResource(R.drawable.star_infinity)
+                        starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
+                    }
+                    else -> {
+                        // Icon Logic
+                        starIcon.setImageResource(if (stars <= 0) R.drawable.star_null else R.drawable.star)
+
+                        // If stars < 15, we need to show/run the timer
+                        if (stars < MAX_STARS && lastStarUsed != null) {
+                            startRegenTimer(lastStarUsed, stars.toInt())
+                        } else {
+                            starCountText.text = stars.toString()
+                        }
+                    }
+                }
             }
+    }
+
+    private fun startRegenTimer(lastUsed: Timestamp, currentStars: Int) {
+        val currentTime = System.currentTimeMillis()
+        val elapsedTime = currentTime - lastUsed.toDate().time
+        val timeLeft = REGEN_TIME_MILLIS - elapsedTime
+
+        if (timeLeft <= 0) {
+            recoverStar(currentStars)
+            return
+        }
+
+        countDownTimer = object : CountDownTimer(timeLeft, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                // Requirement: Only show timer text if stars are 0
+                if (currentStars <= 0) {
+                    val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
+                    val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
+                    starCountText.text = String.format("%02dm %02ds", minutes, seconds)
+                    starCountText.setTextColor(android.graphics.Color.parseColor("#FA236E"))
+                } else {
+                    starCountText.text = currentStars.toString()
+                    starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
+                }
+            }
+
+            override fun onFinish() {
+                recoverStar(currentStars)
+            }
+        }.start()
+    }
+
+    private fun recoverStar(currentStars: Int) {
+        val user = auth.currentUser ?: return
+        val nextStars = (currentStars + 3).coerceAtMost(MAX_STARS)
+
+        val updates = mutableMapOf<String, Any>("stars" to nextStars)
+
+        // If we haven't reached max, restart the clock from now
+        if (nextStars < MAX_STARS) {
+            updates["lastStarUsedTime"] = Timestamp.now()
+        } else {
+            updates["lastStarUsedTime"] = com.google.firebase.firestore.FieldValue.delete()
+        }
+
+        db.collection("users").document(user.uid).update(updates)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        streakListener?.remove()
+        userDataListener?.remove()
+        countDownTimer?.cancel()
     }
 }

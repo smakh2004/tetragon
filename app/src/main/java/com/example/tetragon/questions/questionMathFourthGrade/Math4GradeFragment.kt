@@ -55,12 +55,13 @@ class Math4GradeFragment : Fragment() {
 
     private val topicViews by lazy { listOf(topic1, topic2, topic3, topic4, topic5) }
 
-    // Updated for Grade 4 Topics
+    // Grade 4 Topics
     private val topicNames = listOf("Complex Arithmetics", "Column Multiplication", "Column Division", "Fraction Arithmetics", "Mixed Numbers")
     private val topicKeys = listOf("COMPLEX_ARITHMETICS", "COLUMN_MULTIPLICATION", "COLUMN_DIVISION", "FRACTION_ARITHMETICS", "MIXED_NUMBERS")
 
-    // Data for Jump Ahead (Pointing to Grade 5)
-    private val nextGradeTopicName = "Algebra Basics"
+    // --- GRADE 5 DATA FOR DYNAMIC JUMP AHEAD ---
+    private val grade5TopicNames = listOf("Natural Numbers")
+    private val grade5TopicKeys = listOf("NATURAL_NUMBERS")
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -85,7 +86,6 @@ class Math4GradeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
         setupRiveTopics()
-        setupJumpAheadUI()
 
         scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             userHasScrolled = true
@@ -146,19 +146,15 @@ class Math4GradeFragment : Fragment() {
         scrollTargetContainer = view.findViewById(R.id.scroll_to_target_container)
         scrollArrowIcon = view.findViewById(R.id.scroll_arrow_icon)
 
-        topic1 = view.findViewById(R.id.topic1)
-        topic2 = view.findViewById(R.id.topic2)
-        topic3 = view.findViewById(R.id.topic3)
-        topic4 = view.findViewById(R.id.topic4)
+        topic1 = view.findViewById(R.id.topic1); topic2 = view.findViewById(R.id.topic2)
+        topic3 = view.findViewById(R.id.topic3); topic4 = view.findViewById(R.id.topic4)
         topic5 = view.findViewById(R.id.topic5)
 
         startContainer.visibility = View.GONE
         scrollTargetContainer.visibility = View.GONE
-    }
 
-    private fun setupJumpAheadUI() {
+        // Static label for the header
         nextGradeLabel.text = "5 GRADE"
-        nextTopicName.text = "Topic 1: $nextGradeTopicName"
     }
 
     private fun determineVisibleTopic() {
@@ -237,28 +233,35 @@ class Math4GradeFragment : Fragment() {
         topicProgressListener = db.collection("users").document(user.uid).addSnapshotListener { snapshot, _ ->
             if (snapshot == null || !isAdded) return@addSnapshotListener
 
-            // Switched to Grade 4 Firestore Fields
-            val progressMap = snapshot.get("class4MathProgress") as? Map<*, *> ?: emptyMap<String, Any>()
-            val claimedMap = snapshot.get("claimedRewardsMath4") as? Map<*, *> ?: emptyMap<String, Any>()
+            // 1. GRADE 4 PROGRESS (Current Fragment)
+            val progressMap4 = snapshot.get("class4MathProgress") as? Map<*, *> ?: emptyMap<String, Any>()
+            val claimedMap4 = snapshot.get("claimedRewardsMath4") as? Map<*, *> ?: emptyMap<String, Any>()
 
             var prevClaimed = true
+            topicKeys.forEachIndexed { index, key ->
+                val prog = (progressMap4[key] as? Long ?: 0).toFloat()
+                val claimed = claimedMap4[key] as? Boolean ?: false
 
-            topicViews.forEachIndexed { index, _ ->
-                val keyFromList = topicKeys[index]
-                val prog = (progressMap[keyFromList] as? Long ?: 0).toFloat()
-                val claimed = claimedMap[keyFromList] as? Boolean ?: false
-
-                animateRiveProgress(topicViews[index], currentTopicProgress[keyFromList] ?: 0f, prog) {
-                    currentTopicProgress[keyFromList] = it
+                animateRiveProgress(topicViews[index], currentTopicProgress[key] ?: 0f, prog) {
+                    currentTopicProgress[key] = it
                 }
 
-                claimedRewards[keyFromList] = claimed
-                isUnlocked[keyFromList] = if (index == 0) true else prevClaimed
-                updateRiveButtonStates(topicViews[index], prog >= 100f, isUnlocked[keyFromList] ?: false, claimed)
+                claimedRewards[key] = claimed
+                isUnlocked[key] = if (index == 0) true else prevClaimed
+                updateRiveButtonStates(topicViews[index], prog >= 100f, isUnlocked[key] ?: false, claimed)
                 prevClaimed = prog >= 100f && claimed
             }
 
-            currentTargetIndex = findTargetTopicIndex(progressMap, topicKeys, claimedMap)
+            currentTargetIndex = findTargetTopicIndex(progressMap4, topicKeys, claimedMap4)
+
+            // 2. DYNAMIC PREVIEW FOR GRADE 5 (Jump Ahead Section)
+            val progressMap5 = snapshot.get("class5MathProgress") as? Map<*, *> ?: emptyMap<String, Any>()
+            val claimedMap5 = snapshot.get("claimedRewardsMath5") as? Map<*, *> ?: emptyMap<String, Any>()
+
+            val activeGrade5Index = findTargetTopicIndex(progressMap5, grade5TopicKeys, claimedMap5)
+            val activeTopicName5 = grade5TopicNames.getOrNull(activeGrade5Index) ?: grade5TopicNames[0]
+
+            nextTopicName.text = "Topic ${activeGrade5Index + 1}: $activeTopicName5"
 
             if (!hasInitialScrolled) {
                 scrollView.post {
@@ -348,7 +351,6 @@ class Math4GradeFragment : Fragment() {
         if (pendingRewardKey != null) {
             handleRewardClaimed(findTopicViewByKey(pendingRewardKey!!), pendingRewardKey!!)
         } else if (pendingTopic != null) {
-            // Points to Grade 4 Question Activity
             startActivity(Intent(requireContext(), Math4GradeQuestionActivity::class.java).apply {
                 putExtra("TOPIC_KEY", pendingTopic)
             })

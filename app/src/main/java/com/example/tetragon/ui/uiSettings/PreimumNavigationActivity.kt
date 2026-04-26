@@ -1,12 +1,10 @@
 package com.example.tetragon.ui.uiSettings
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.tetragon.R
 import com.example.tetragon.databinding.ActivityPreimumNavigationBinding
+import com.example.tetragon.subscriptionModel.IntroSubscriptionActivity
 import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 
 class PreimumNavigationActivity : BaseActivity() {
@@ -23,5 +21,12 @@ class PreimumNavigationActivity : BaseActivity() {
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
         }
 
+        // --- Navigate to Premium Subscription ---
+        binding.goPremium.setOnClickListener {
+            val intent = Intent(this, IntroSubscriptionActivity::class.java)
+            startActivity(intent)
+            // Optional: Add transition animation if you have one
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
     }
 }

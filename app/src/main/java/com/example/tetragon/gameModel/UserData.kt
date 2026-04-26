@@ -14,5 +14,7 @@ data class UserData(
     var xp: Long = 0,          // total XP (never resets)
     var monthlyXP: Long = 0,   // leaderboard XP (resets monthly)
     var level: Int = 1,
-    var streak: Int = 0
+    var streak: Int = 0,
+    var subscription: Boolean = false, // Default is False (Infinity mode off)
+    var stars: Long = 15               // Default starting stars
 )

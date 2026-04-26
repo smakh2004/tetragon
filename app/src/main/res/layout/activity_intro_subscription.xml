@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/custom_bg_top_glow"
+    tools:context=".subscriptionModel.IntroSubscriptionActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="6dp"
+            android:src="@drawable/exit_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/headerContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnClose">
+
+            <ImageView
+                android:id="@+id/ivHeaderStar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/star_subscription"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/headerTextContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@id/ivHeaderStar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ivHeaderStar"
+                app:layout_constraintTop_toTopOf="@id/ivHeaderStar">
+
+                <TextView
+                    android:id="@+id/tvHeaderTitleCombined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Unlock the Tetragon Infinity"
+                    android:textColor="@color/text_color"
+                    android:textSize="18sp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/ivInfinity"
+                    app:layout_constraintWidth_default="wrap" />
+
+                <ImageView
+                    android:id="@+id/ivInfinity"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/infinity_subscription"
+                    app:layout_constraintBottom_toBottomOf="@id/tvHeaderTitleCombined"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tvHeaderTitleCombined"
+                    app:layout_constraintTop_toTopOf="@id/tvHeaderTitleCombined" />
+
+                <TextView
+                    android:id="@+id/tvSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/inter_medium"
+                    android:text="Premium gives you full access to every feature"
+                    android:textColor="#78849E"
+                    android:textSize="12sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvHeaderTitleCombined" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/comparisonTableContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:paddingTop="80dp"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            app:layout_constraintWidth_max="600dp"
+            app:layout_constraintWidth_default="wrap"
+            app:layout_constraintBottom_toTopOf="@id/subscirbe_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/headerContainer">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/g1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.05" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/g2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.45" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/g3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.72" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/freePillContainer"
+                android:layout_width="85dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="-35dp"
+                android:layout_marginBottom="-35dp"
+                android:padding="5dp"
+                app:layout_constraintTop_toTopOf="@id/labelBenefits"
+                app:layout_constraintBottom_toBottomOf="@id/r4"
+                app:layout_constraintStart_toStartOf="@id/g2"
+                app:layout_constraintEnd_toStartOf="@id/g3">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/custom_free_column_border" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/custom_inner_pill_gray"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/freeHeaderGuideline" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/freeHeaderGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.22" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/premiumPillContainer"
+                android:layout_width="85dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="-35dp"
+                android:layout_marginBottom="-35dp"
+                android:padding="5dp"
+                app:layout_constraintTop_toTopOf="@id/labelBenefits"
+                app:layout_constraintBottom_toBottomOf="@id/r4"
+                app:layout_constraintStart_toStartOf="@id/g3"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/custom_premium_column_gradient" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/custom_inner_pill"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/premiumHeaderGuideline" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/premiumHeaderGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.22" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/labelBenefits"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/inter_bold"
+                android:text="Benefits"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@id/g2"
+                app:layout_constraintStart_toStartOf="@id/g1"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvFreeHeader"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="Free"
+                android:textAlignment="center"
+                android:textColor="@color/text_color"
+                app:layout_constraintBottom_toBottomOf="@id/labelBenefits"
+                app:layout_constraintEnd_toEndOf="@id/freePillContainer"
+                app:layout_constraintStart_toStartOf="@id/freePillContainer"
+                app:layout_constraintTop_toTopOf="@id/labelBenefits" />
+
+            <TextView
+                android:id="@+id/tvPremiumHeader"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="Premium"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="@id/labelBenefits"
+                app:layout_constraintEnd_toEndOf="@id/premiumPillContainer"
+                app:layout_constraintStart_toStartOf="@id/premiumPillContainer"
+                app:layout_constraintTop_toTopOf="@id/labelBenefits" />
+
+            <TextView
+                android:id="@+id/r1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="Daily lessons"
+                android:textColor="#78849E"
+                app:layout_constraintEnd_toEndOf="@id/labelBenefits"
+                app:layout_constraintStart_toStartOf="@id/labelBenefits"
+                app:layout_constraintTop_toBottomOf="@id/labelBenefits" />
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle"
+                app:layout_constraintBottom_toBottomOf="@id/r1"
+                app:layout_constraintEnd_toEndOf="@id/freePillContainer"
+                app:layout_constraintStart_toStartOf="@id/freePillContainer"
+                app:layout_constraintTop_toTopOf="@id/r1" />
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle"
+                app:layout_constraintBottom_toBottomOf="@id/r1"
+                app:layout_constraintEnd_toEndOf="@id/premiumPillContainer"
+                app:layout_constraintStart_toStartOf="@id/premiumPillContainer"
+                app:layout_constraintTop_toTopOf="@id/r1" />
+
+            <TextView
+                android:id="@+id/r2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="Unlimited learning"
+                android:textColor="#78849E"
+                app:layout_constraintEnd_toEndOf="@id/r1"
+                app:layout_constraintStart_toStartOf="@id/r1"
+                app:layout_constraintTop_toBottomOf="@id/r1" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_uncheck_circle"
+                app:layout_constraintBottom_toBottomOf="@id/r2"
+                app:layout_constraintEnd_toEndOf="@id/freePillContainer"
+                app:layout_constraintStart_toStartOf="@id/freePillContainer"
+                app:layout_constraintTop_toTopOf="@id/r2" />
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle"
+                app:layout_constraintBottom_toBottomOf="@id/r2"
+                app:layout_constraintEnd_toEndOf="@id/premiumPillContainer"
+                app:layout_constraintStart_toStartOf="@id/premiumPillContainer"
+                app:layout_constraintTop_toTopOf="@id/r2" />
+
+            <TextView
+                android:id="@+id/r3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="No ads"
+                android:textColor="#78849E"
+                app:layout_constraintEnd_toEndOf="@id/r2"
+                app:layout_constraintStart_toStartOf="@id/r2"
+                app:layout_constraintTop_toBottomOf="@id/r2" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_uncheck_circle"
+                app:layout_constraintBottom_toBottomOf="@id/r3"
+                app:layout_constraintEnd_toEndOf="@id/freePillContainer"
+                app:layout_constraintStart_toStartOf="@id/freePillContainer"
+                app:layout_constraintTop_toTopOf="@id/r3" />
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle"
+                app:layout_constraintBottom_toBottomOf="@id/r3"
+                app:layout_constraintEnd_toEndOf="@id/premiumPillContainer"
+                app:layout_constraintStart_toStartOf="@id/premiumPillContainer"
+                app:layout_constraintTop_toTopOf="@id/r3" />
+
+            <TextView
+                android:id="@+id/r4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="Unlimited mini games"
+                android:textColor="#78849E"
+                app:layout_constraintEnd_toEndOf="@id/r3"
+                app:layout_constraintStart_toStartOf="@id/r3"
+                app:layout_constraintTop_toBottomOf="@id/r3" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_uncheck_circle"
+                app:layout_constraintBottom_toBottomOf="@id/r4"
+                app:layout_constraintEnd_toEndOf="@id/freePillContainer"
+                app:layout_constraintStart_toStartOf="@id/freePillContainer"
+                app:layout_constraintTop_toTopOf="@id/r4" />
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle"
+                app:layout_constraintBottom_toBottomOf="@id/r4"
+                app:layout_constraintEnd_toEndOf="@id/premiumPillContainer"
+                app:layout_constraintStart_toStartOf="@id/premiumPillContainer"
+                app:layout_constraintTop_toTopOf="@id/r4" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:id="@+id/subscirbe_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <FrameLayout
+                android:id="@+id/subscribe_enabled_btn_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/custom_gradient_button_shadow"
+                    android:translationY="5dp" />
+
+                <Button
+                    android:id="@+id/subscribe_enabled_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/custom_gradient_button"
+                    android:fontFamily="@font/inter_semibold"
+                    android:stateListAnimator="@drawable/button_animator"
+                    android:text="SUBSCRIBE FOR $1.33"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    app:backgroundTint="@null" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/subscribe_disabled_btn_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:translationY="5dp" />
+
+                <TextView
+                    android:id="@+id/subscribe_disabled_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="LOADING.."
+                    android:textColor="@color/gray_1"
+                    android:textSize="17sp"
+                    android:translationY="5dp" />
+            </FrameLayout>
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

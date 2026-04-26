@@ -55,11 +55,12 @@
                     android:src="@drawable/star" />
 
                 <TextView
+                    android:id="@+id/starCountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:fontFamily="@font/inter_semibold"
-                    android:text="12"
+                    android:text="15"
                     android:textColor="@color/text_color"
                     android:textSize="16sp" />
 

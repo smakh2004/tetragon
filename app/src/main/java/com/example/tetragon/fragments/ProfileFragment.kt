@@ -3,20 +3,20 @@ package com.example.tetragon.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.tetragon.R
 import com.example.tetragon.streakCalendar.StreakCalendarActivity
+import com.example.tetragon.subscriptionModel.IntroSubscriptionActivity
 import com.example.tetragon.ui.uiSettings.SettingsActivity
 import com.example.tetragon.ui.WelcomeActivity
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -37,6 +37,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private lateinit var xpText: TextView
     private lateinit var battleWinsText: TextView
     private lateinit var mathStormText: TextView
+    private lateinit var cashStormText: TextView
     private lateinit var levelText: TextView
 
     private val auth = FirebaseAuth.getInstance()
@@ -45,6 +46,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val subscribeEnabledContainer = view.findViewById<View>(R.id.subscribe_enabled_btn_container)
+        val subscribeDisabledContainer = view.findViewById<View>(R.id.subscribe_disabled_btn_container)
+        val subscribeBtn = view.findViewById<Button>(R.id.subscribe_enabled_btn)
 
         // Profile info
         fullNameText = view.findViewById(R.id.fullNameText)
@@ -79,6 +84,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         xpText = view.findViewById(R.id.xp_value)
         battleWinsText = view.findViewById(R.id.battleStormCount)
         mathStormText = view.findViewById(R.id.mathStormCount)
+        cashStormText = view.findViewById(R.id.cashStormCount)
         levelText = view.findViewById(R.id.level)
 
         loadUserData()
@@ -89,6 +95,17 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         streakContainer.setOnClickListener {
             val intent = Intent(requireContext(), StreakCalendarActivity::class.java)
             startActivity(intent)
+        }
+
+        subscribeBtn.setOnClickListener {
+            // Show disabled state
+            subscribeEnabledContainer.visibility = View.INVISIBLE
+            subscribeDisabledContainer.visibility = View.VISIBLE
+
+            // Navigate to IntroSubscriptionActivity
+            val intent = Intent(requireContext(), IntroSubscriptionActivity::class.java)
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
     }
 
@@ -182,7 +199,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 mathStormText.text = mathHighScore.toString()
             }
 
-        // Fetch Online MathStorm Score
+        // Fetch Online Battle Score (OnlineMathStorm)
         userRef
             .collection("games")
             .document("OnlineMathStorm")
@@ -190,6 +207,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             .addOnSuccessListener { doc ->
                 val onlineScore = doc.getLong("onlineScore") ?: 0L
                 battleWinsText.text = onlineScore.toString()
+            }
+
+        // Fetch CashStorm High Score
+        userRef
+            .collection("games")
+            .document("CashStorm")
+            .get()
+            .addOnSuccessListener { doc ->
+                val cashHighScore = doc.getLong("highScore") ?: 0L
+                cashStormText.text = cashHighScore.toString()
             }
     }
 
@@ -243,5 +270,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             Calendar.SUNDAY -> "Su"
             else -> ""
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Ensure the button is enabled again when the user returns to the fragment
+        view?.findViewById<View>(R.id.subscribe_enabled_btn_container)?.visibility = View.VISIBLE
+        view?.findViewById<View>(R.id.subscribe_disabled_btn_container)?.visibility = View.INVISIBLE
     }
 }

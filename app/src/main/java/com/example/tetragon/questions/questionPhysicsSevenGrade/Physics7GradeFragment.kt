@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.controllers.RiveFileController
 import app.rive.runtime.kotlin.core.PlayableInstance
+import com.example.tetragon.MainActivity
 import com.example.tetragon.R
 import com.example.tetragon.fragments.HomeFragment
 import com.example.tetragon.reward.BagTapActivity
@@ -29,15 +30,30 @@ class Physics7GradeFragment : Fragment() {
     private lateinit var continueEnabledBtn: AppCompatButton
     private lateinit var startLessonLabel: TextView
 
+    // --- JUMP AHEAD UI ---
+    private lateinit var nextGradeLabel: TextView
+    private lateinit var nextTopicName: TextView
+    private lateinit var moveOnBtn: AppCompatButton
+
     // Scroll Navigation UI
     private lateinit var scrollTargetContainer: View
     private lateinit var scrollArrowIcon: ImageView
 
     private lateinit var topic1: RiveAnimationView
+    private lateinit var topic2: RiveAnimationView
+    private lateinit var topic3: RiveAnimationView
 
-    private val topicViews by lazy { listOf(topic1) }
-    private val topicNames = listOf("SI Units")
-    private val physicsTopics = listOf("SI_UNITS")
+    private val topicViews by lazy { listOf(topic1, topic2, topic3) }
+    private val topicNames = listOf("SI Units", "Density", "Simple Machines")
+    private val physicsTopics = listOf("SI_UNITS", "DENSITY", "SIMPLE_MACHINES")
+
+    // --- GRADE 8 TOPIC DATA FOR JUMP AHEAD ---
+    private val grade8TopicNames = listOf(
+        "Force and Motion"
+    )
+    private val grade8TopicKeys = listOf(
+        "FORCE_AND_MOTION"
+    )
 
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
@@ -63,29 +79,34 @@ class Physics7GradeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
         setupRive()
-        listenProgress()
 
         scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             userHasScrolled = true
             determineVisibleTopic()
-
-            // Check if the container is visible before trying to hide it
             if (startContainer.visibility == View.VISIBLE) {
-                // Cancel any running animations to prevent flickering
                 startContainer.animate().cancel()
-
-                // Use the same logic as your Math fragment for a snappier feel,
-                // or keep your custom extension:
                 startContainer.fadeOutAndSlideDown()
             }
         }
 
         continueEnabledBtn.setOnClickListener { handleContinue() }
 
+        moveOnBtn.setOnClickListener {
+            val intent = Intent(requireContext(), MainActivity::class.java).apply {
+                putExtra("SELECTED_GRADE", 8)
+                putExtra("SELECTED_SUBJECT", "PHYSICS")
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
+            activity?.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
+
         scrollTargetContainer.setOnClickListener {
             userHasScrolled = false
             scrollToSpecificTopic(currentTargetIndex, instant = false)
         }
+
+        listenProgress()
     }
 
     private fun determineVisibleTopic() {
@@ -105,15 +126,11 @@ class Physics7GradeFragment : Fragment() {
             }
         }
 
-        // --- NAVIGATION UI LOGIC ---
         if (userHasScrolled && hasInitialScrolled) {
             if (bestIndex != currentTargetIndex) {
                 if (scrollTargetContainer.visibility != View.VISIBLE) {
                     scrollTargetContainer.fadeInAndSlideUp()
                 }
-
-                // If bestIndex < currentTargetIndex, current view is "above" target in list index
-                // (Assuming topic1 is at the bottom, bestIndex < currentTargetIndex means user is below target)
                 if (bestIndex < currentTargetIndex) {
                     scrollArrowIcon.setImageResource(R.drawable.arrow_up)
                 } else {
@@ -142,17 +159,28 @@ class Physics7GradeFragment : Fragment() {
         continueEnabledBtn = view.findViewById(R.id.continue_enabled_btn)
         startLessonLabel = view.findViewById(R.id.start_lesson_label)
 
+        // --- JUMP AHEAD VIEWS ---
+        moveOnBtn = view.findViewById(R.id.move_on_btn)
+        nextGradeLabel = view.findViewById(R.id.next_grade_label)
+        nextTopicName = view.findViewById(R.id.next_topic_name)
+
         scrollTargetContainer = view.findViewById(R.id.scroll_to_target_container)
         scrollArrowIcon = view.findViewById(R.id.scroll_arrow_icon)
 
         topic1 = view.findViewById(R.id.topic1)
+        topic2 = view.findViewById(R.id.topic2)
+        topic3 = view.findViewById(R.id.topic3)
 
         startContainer.visibility = View.GONE
         scrollTargetContainer.visibility = View.GONE
+
+        nextGradeLabel.text = "8 GRADE"
     }
 
     private fun setupRive() {
         setupSingleTopic(topic1, R.raw.progress_path_odd, 1f, PhysicsGrade7Topic.SI_UNITS)
+        setupSingleTopic(topic2, R.raw.progress_path_even, 2f, PhysicsGrade7Topic.DENSITY)
+        setupSingleTopic(topic3, R.raw.progress_path_odd, 3f, PhysicsGrade7Topic.SIMPLE_MACHINES)
     }
 
     private fun setupSingleTopic(rive: RiveAnimationView, res: Int, level: Float, topic: PhysicsGrade7Topic) {
@@ -169,7 +197,7 @@ class Physics7GradeFragment : Fragment() {
                         }
                         "reward_button_pressed" -> {
                             if (claimedRewards[topic.name] == true) return@runOnUiThread
-                            val canClaim = (currentProgress[topic.name] ?: 0f) >= 100f && (if (topic == PhysicsGrade7Topic.SI_UNITS) true else isUnlocked[topic.name] == true)
+                            val canClaim = (currentProgress[topic.name] ?: 0f) >= 100f && (isUnlocked[topic.name] == true || topic == PhysicsGrade7Topic.SI_UNITS)
                             showBottom("CLAIM", null, topic.name, !canClaim)
                         }
                     }
@@ -186,6 +214,7 @@ class Physics7GradeFragment : Fragment() {
         listener = db.collection("users").document(user.uid).addSnapshotListener { snap, _ ->
             if (snap == null || !isAdded) return@addSnapshotListener
 
+            // 1. GRADE 7 PROGRESS
             val progress = snap.get("class7PhysicsProgress") as? Map<*, *> ?: emptyMap<String, Any>()
             val claimed = snap.get("claimedRewardsPhysics7") as? Map<*, *> ?: emptyMap<String, Any>()
 
@@ -205,6 +234,14 @@ class Physics7GradeFragment : Fragment() {
             }
 
             currentTargetIndex = findTargetTopicIndex(progress, physicsTopics, claimed)
+
+            // 2. DYNAMIC JUMP AHEAD (GRADE 8)
+            val progressMap8 = snap.get("class8PhysicsProgress") as? Map<*, *> ?: emptyMap<String, Any>()
+            val claimedMap8 = snap.get("claimedRewardsPhysics8") as? Map<*, *> ?: emptyMap<String, Any>()
+
+            val activeGrade8Index = findTargetTopicIndex(progressMap8, grade8TopicKeys, claimedMap8)
+            val activeTopicName8 = grade8TopicNames.getOrNull(activeGrade8Index) ?: grade8TopicNames[0]
+            nextTopicName.text = "Topic ${activeGrade8Index + 1}: $activeTopicName8"
 
             if (!hasInitialScrolled) {
                 scrollView.post {
@@ -242,12 +279,7 @@ class Physics7GradeFragment : Fragment() {
         val offset = scrollView.height / 16
         val scrollY = (rect.top - offset).coerceAtLeast(0)
 
-        if (instant) {
-            scrollView.scrollTo(0, scrollY)
-        } else {
-            scrollView.smoothScrollTo(0, scrollY)
-        }
-
+        if (instant) scrollView.scrollTo(0, scrollY) else scrollView.smoothScrollTo(0, scrollY)
         determineVisibleTopic()
     }
 
@@ -271,24 +303,19 @@ class Physics7GradeFragment : Fragment() {
             .addOnSuccessListener {
                 if (!isAdded) return@addOnSuccessListener
                 startContainer.fadeOutAndSlideDown()
-                topic1.setBooleanState("State Machine 1", "reward", true)
-                topic1.setBooleanState("State Machine 1", "rewardAvailable", false)
+                // Update based on which topic it is
+                val view = if (key == "SI_UNITS") topic1 else topic2
+                view.setBooleanState("State Machine 1", "reward", true)
+                view.setBooleanState("State Machine 1", "rewardAvailable", false)
                 startActivity(Intent(requireContext(), BagTapActivity::class.java))
             }
-            .addOnFailureListener {
-                if (isAdded) showLoadingState(false)
-            }
+            .addOnFailureListener { if (isAdded) showLoadingState(false) }
     }
 
     private fun showLoadingState(isLoading: Boolean) {
-        if (isLoading) {
-            startEnabledBtnContainer.visibility = View.GONE
-            startDisabledBtnContainer.visibility = View.VISIBLE
-            startDisabledBtn.text = "PROCESSING..."
-        } else {
-            startEnabledBtnContainer.visibility = View.VISIBLE
-            startDisabledBtnContainer.visibility = View.GONE
-        }
+        startEnabledBtnContainer.visibility = if (isLoading) View.GONE else View.VISIBLE
+        startDisabledBtnContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+        if (isLoading) startDisabledBtn.text = "PROCESSING..."
     }
 
     private fun showBottom(text: String, topic: PhysicsGrade7Topic?, rewardKey: String?, locked: Boolean) {

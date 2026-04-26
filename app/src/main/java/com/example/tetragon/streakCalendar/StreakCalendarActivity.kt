@@ -72,14 +72,16 @@ class StreakCalendarActivity : AppCompatActivity() {
         val uid = auth.currentUser?.uid ?: return
         db.collection("users").document(uid).get().addOnSuccessListener { doc ->
             if (doc.exists()) {
-                val maxStreak = doc.getLong("maxStreak") ?: 0
+                // CHANGE: Pull "streak" instead of "maxStreak"
+                val currentStreakValue = doc.getLong("streak") ?: 0
+
                 currentStreakMap = doc.get("weeklyStreakDays") as? Map<String, Boolean> ?: emptyMap()
 
-                // Update Streak Text
-                tvStreakCount.text = maxStreak.toString()
+                // Update Streak Text with the current streak
+                tvStreakCount.text = currentStreakValue.toString()
 
                 // Toggle Icon based on streak value
-                if (maxStreak == 0L) {
+                if (currentStreakValue == 0L) {
                     ivStreakIcon.setImageResource(R.drawable.streak_null)
                 } else {
                     ivStreakIcon.setImageResource(R.drawable.streak)

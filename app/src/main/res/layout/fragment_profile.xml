@@ -91,19 +91,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
 
-        <!-- Storm Cards -->
         <LinearLayout
             android:id="@+id/storm_cards_container"
             android:layout_width="0dp"
+            android:background="@drawable/custom_background_two"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:padding="12dp"
+            android:layout_marginTop="12dp"
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/level">
 
-            <!-- Math Storm Card -->
             <LinearLayout
                 android:id="@+id/math_storm_card_container"
                 android:layout_width="0dp"
@@ -120,39 +120,39 @@
 
                     <ImageView
                         android:id="@+id/mathStormIcon"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
                         android:src="@drawable/mathstormicon" />
 
                     <TextView
                         android:id="@+id/mathStormCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="6dp"
                         android:fontFamily="@font/inter_semibold"
-                        android:text=""
+                        android:text="0"
                         android:textColor="@color/text_color"
-                        android:textSize="28sp" />
+                        android:textSize="22sp" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:fontFamily="@font/inter_semibold"
                     android:text="MATH STORM"
                     android:textColor="@color/gray_1"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <View
-                android:layout_width="2dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="6dp"
-                android:layout_marginEnd="6dp"
+                android:layout_width="1.5dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:background="@color/gray_2" />
 
-            <!-- Battle Storm Card -->
             <LinearLayout
                 android:id="@+id/battle_storm_card_container"
                 android:layout_width="0dp"
@@ -169,29 +169,78 @@
 
                     <ImageView
                         android:id="@+id/battleStormIcon"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
                         android:src="@drawable/battlestormicon" />
 
                     <TextView
                         android:id="@+id/battleStormCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="6dp"
                         android:fontFamily="@font/inter_semibold"
-                        android:text=""
+                        android:text="0"
                         android:textColor="@color/text_color"
-                        android:textSize="28sp" />
+                        android:textSize="22sp" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:fontFamily="@font/inter_semibold"
                     android:text="BATTLE STORM"
                     android:textColor="@color/gray_1"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1.5dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@color/gray_2" />
+
+            <LinearLayout
+                android:id="@+id/cash_storm_card_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/cashStormIcon"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:src="@drawable/cash_storm" />
+
+                    <TextView
+                        android:id="@+id/cashStormCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:text="0"
+                        android:textColor="@color/text_color"
+                        android:textSize="22sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="CASH STORM"
+                    android:textColor="@color/gray_1"
+                    android:textSize="10sp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -538,8 +587,8 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -559,17 +608,17 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="16dp"
+                            android:layout_weight="1"
                             android:fontFamily="@font/inter_semibold"
                             android:text="Unlock the Tetragon Infinity"
                             android:textColor="@color/text_color"
-                            android:textSize="20sp"/>
+                            android:textSize="20sp" />
 
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/infinity_subscription"/>
+                            android:src="@drawable/infinity_subscription" />
                     </LinearLayout>
 
                     <TextView
@@ -588,10 +637,10 @@
                 android:id="@+id/subscirbe_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="8dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:layout_marginTop="5dp"
                 android:paddingBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -647,7 +696,7 @@
                         android:layout_height="48dp"
                         android:fontFamily="@font/inter_semibold"
                         android:gravity="center"
-                        android:text="SUBSCRIBE NOW"
+                        android:text="LOADING.."
                         android:textColor="@color/gray_1"
                         android:textSize="17sp"
                         android:translationY="5dp" />

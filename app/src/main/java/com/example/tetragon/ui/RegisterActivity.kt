@@ -144,24 +144,26 @@ class RegisterActivity : BaseActivity() {
     private fun finishRegistrationAndSaveToFirestore() {
         val user = auth.currentUser ?: return
 
-        // 1. IMMEDIATELY show the disabled/loading state for instant feedback
         setContinueButtonEnabled(false)
-        binding.continueDisabledBtn.text = "CREATING ACCOUNT..." // Change text inside the disabled button
-        isRegistrationInProgress = true // Prevents other UI interactions
+        binding.continueDisabledBtn.text = "CREATING ACCOUNT..."
+        isRegistrationInProgress = true
 
         user.reload().addOnCompleteListener { task ->
             if (task.isSuccessful && user.isEmailVerified) {
 
-                // Prepare data
+                // --- ADDED THE NEW VALUES HERE ---
                 val userMap = hashMapOf(
                     "uid" to user.uid,
                     "firstName" to userData.firstName,
                     "lastName" to userData.lastName,
                     "age" to userData.age,
                     "email" to userData.email,
-                    "xp" to 0,
+                    "xp" to 0L,
                     "level" to 1,
-                    "registeredAt" to com.google.firebase.Timestamp.now()
+                    "registeredAt" to com.google.firebase.Timestamp.now(),
+                    "stars" to 15L,           // New users start with 15 stars
+                    "subscription" to false,  // Default is standard/false
+                    "streak" to 0             // Initialize streak
                 )
 
                 // Save to Firestore
@@ -173,12 +175,10 @@ class RegisterActivity : BaseActivity() {
                         finish()
                     }
                     .addOnFailureListener { e ->
-                        // Re-enable if Firestore fails
                         resetLoadingState()
                         Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             } else {
-                // Re-enable if they aren't verified yet
                 resetLoadingState()
                 Toast.makeText(this, "Please verify your email first!", Toast.LENGTH_SHORT).show()
             }

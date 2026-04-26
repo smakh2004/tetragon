@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    tools:context=".questions.questionMathSixthGrade.firstTopic.UiFractionsAdditionFragment">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Find the answer."
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/problemRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/option1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTitle">
+
+        <LinearLayout
+            android:id="@+id/fractionContainer1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/num1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="1"
+                android:textColor="@color/text_color"
+                android:textSize="32sp" />
+            <View
+                android:layout_width="40dp"
+                android:layout_height="3dp"
+                android:background="@color/blue_2" />
+            <TextView
+                android:id="@+id/denom1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="2"
+                android:textColor="@color/text_color"
+                android:textSize="32sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvOperator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="+"
+            android:textColor="@color/blue_2"
+            android:textSize="32sp"
+            android:fontFamily="@font/inter_bold"/>
+
+        <LinearLayout
+            android:id="@+id/fractionContainer2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/num2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="1"
+                android:textColor="@color/text_color"
+                android:textSize="32sp" />
+            <View
+                android:layout_width="40dp"
+                android:layout_height="3dp"
+                android:background="@color/blue_2" />
+            <TextView
+                android:id="@+id/denom2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="2"
+                android:textColor="@color/text_color"
+                android:textSize="32sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="="
+            android:textColor="@color/blue_2"
+            android:textSize="32sp"
+            android:fontFamily="@font/inter_bold"/>
+
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="56dp">
+            <ImageView
+                android:id="@+id/problemImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/answer_blue_box" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/custom_background"
+        android:gravity="center"
+        android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/option2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView android:id="@+id/optionNum1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="20sp" android:fontFamily="@font/inter_semibold" android:textColor="@color/text_color" />
+            <View android:layout_width="28dp" android:layout_height="2dp" android:background="@color/blue_2" />
+            <TextView android:id="@+id/optionDenom1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="20sp" android:fontFamily="@font/inter_semibold" android:textColor="@color/text_color" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/custom_background"
+        android:gravity="center"
+        android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/option3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView android:id="@+id/optionNum2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="20sp" android:fontFamily="@font/inter_semibold" android:textColor="@color/text_color" />
+            <View android:layout_width="28dp" android:layout_height="2dp" android:background="@color/blue_2" />
+            <TextView android:id="@+id/optionDenom2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="20sp" android:fontFamily="@font/inter_semibold" android:textColor="@color/text_color" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/custom_background"
+        android:gravity="center"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView android:id="@+id/optionNum3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="20sp" android:fontFamily="@font/inter_semibold" android:textColor="@color/text_color" />
+            <View android:layout_width="28dp" android:layout_height="2dp" android:background="@color/blue_2" />
+            <TextView android:id="@+id/optionDenom3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="20sp" android:fontFamily="@font/inter_semibold" android:textColor="@color/text_color" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

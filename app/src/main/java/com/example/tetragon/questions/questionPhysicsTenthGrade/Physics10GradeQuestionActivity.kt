@@ -1,0 +1,252 @@
+package com.example.tetragon.questions.questionPhysicsTenthGrade
+
+import android.animation.ObjectAnimator
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.view.View
+import android.view.animation.DecelerateInterpolator
+import android.widget.Button
+import androidx.activity.addCallback
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.*
+import app.rive.runtime.kotlin.core.Rive
+import com.example.tetragon.R
+import com.example.tetragon.connectivityCheck.AndroidConnectivityObserver
+import com.example.tetragon.connectivityCheck.ConnectivityViewModel
+import com.example.tetragon.databinding.ActivityPhysics10GradeQuestionBinding
+import com.example.tetragon.questions.FiveCorrectAnswerFragment
+import com.example.tetragon.questions.SubjectConstants
+import com.example.tetragon.questions.XpGainedActivity
+import com.example.tetragon.questions.questionPhysicsTenthGrade.PhysicsGrade10Type
+import com.example.tetragon.questions.questionPhysicsNinthGrade.firstTopic.UiFindForceFragment
+import com.example.tetragon.questions.questionPhysicsTenthGrade.firstTopic.UiFindForceBILFragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+class Physics10GradeQuestionActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityPhysics10GradeQuestionBinding
+    private lateinit var selectedTopic: PhysicsGrade10Topic
+
+    private var lastType: PhysicsGrade10Type? = null
+
+    var totalXp: Int = 0
+    private var correctAnswersCount = 0
+
+    var isResultCurrentlyVisible: Boolean = false
+    var isCorrectAnswerShowing: Boolean = false
+
+    private val viewModel: ConnectivityViewModel by viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ConnectivityViewModel(
+                    AndroidConnectivityObserver(applicationContext)
+                ) as T
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        Rive.init(this)
+
+        binding = ActivityPhysics10GradeQuestionBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // UI Styling for Navigation Bar
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            window.decorView.systemUiVisibility =
+                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+        }
+
+        binding.exitBtn.setOnClickListener { showQuitBottomSheet() }
+
+        onBackPressedDispatcher.addCallback(this) {
+            showQuitBottomSheet()
+        }
+
+        // Logic to get the topic from intent
+        val topicName = intent.getStringExtra("TOPIC_KEY")
+            ?: throw IllegalArgumentException("TOPIC_KEY missing for Grade 10 Physics")
+
+        selectedTopic = PhysicsGrade10Topic.valueOf(topicName)
+
+        observeConnectivity()
+
+        if (savedInstanceState == null) {
+            showRandomQuestion()
+        }
+    }
+
+    // --- Answer Handling ---
+
+    fun handleCorrectAnswer() {
+        correctAnswersCount++
+        isCorrectAnswerShowing = true
+    }
+
+    fun checkAndTriggerMilestone(): Boolean {
+        if (correctAnswersCount >= 5) {
+            correctAnswersCount = 0
+            triggerMilestone()
+            return true
+        }
+        return false
+    }
+
+    private fun triggerMilestone() {
+        isResultCurrentlyVisible = false
+
+        binding.stateContainer.visibility = View.GONE
+        binding.correctMrSquare.visibility = View.GONE
+        binding.btnBackground.visibility = View.GONE
+
+        supportFragmentManager.beginTransaction()
+            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
+            .replace(R.id.questionFragmentContainer, FiveCorrectAnswerFragment())
+            .commit()
+
+        lifecycleScope.launch {
+            delay(2500)
+            binding.btnBackground.visibility = View.VISIBLE
+            showRandomQuestion()
+        }
+    }
+
+    // --- Animations ---
+
+    fun playSuccessAnimation() {
+        binding.correctMrSquare.apply {
+            val randomResource = if ((0..1).random() == 0) {
+                R.raw.mr_square_correct
+            } else {
+                R.raw.mr_square_correct_2
+            }
+            setRiveResource(randomResource)
+            visibility = View.VISIBLE
+            fireState("State Machine 1", "play")
+        }
+    }
+
+    fun hideSuccessAnimation() {
+        binding.correctMrSquare.apply {
+            fireState("State Machine 1", "finish")
+            stop()
+            visibility = View.INVISIBLE
+        }
+        isCorrectAnswerShowing = false
+    }
+
+    // --- Question Logic ---
+
+    private fun getTypesForTopic(topic: PhysicsGrade10Topic): List<PhysicsGrade10Type> {
+        return when (topic) {
+            PhysicsGrade10Topic.MAGNETISM -> listOf(
+                PhysicsGrade10Type.FORCE_BIL
+            )
+        }
+    }
+
+    fun showRandomQuestion() {
+        isResultCurrentlyVisible = false
+        hideSuccessAnimation()
+
+        val available = getTypesForTopic(selectedTopic).toMutableList()
+        lastType?.let { available.remove(it) }
+
+        val nextType = if (available.isNotEmpty()) available.random() else getTypesForTopic(selectedTopic).random()
+        lastType = nextType
+
+        val fragment = when (nextType) {
+            PhysicsGrade10Type.FORCE_BIL -> UiFindForceBILFragment()
+        }
+
+        supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right, R.anim.slide_out_left,
+                R.anim.slide_in_left, R.anim.slide_out_right
+            )
+            .replace(R.id.questionFragmentContainer, fragment)
+            .commit()
+    }
+
+    fun incrementProgress(): Boolean {
+        val progressBar = binding.progressBar
+        val increment = progressBar.max / 10
+        val newProgress = (progressBar.progress + increment).coerceAtMost(progressBar.max)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            progressBar.setProgress(newProgress, true)
+        } else {
+            val animator = ObjectAnimator.ofInt(
+                progressBar, "progress", progressBar.progress, newProgress
+            )
+            animator.duration = 500
+            animator.interpolator = DecelerateInterpolator()
+            animator.start()
+        }
+        return newProgress >= progressBar.max
+    }
+
+    fun navigateToXpGained() {
+        val intent = Intent(this, XpGainedActivity::class.java).apply {
+            putExtra(SubjectConstants.EXTRA_XP, totalXp)
+            putExtra(SubjectConstants.EXTRA_TOPIC, selectedTopic.name)
+            putExtra(SubjectConstants.EXTRA_GRADE, 10)
+            putExtra(SubjectConstants.EXTRA_SUBJECT, SubjectConstants.SUBJECT_PHYSICS)
+        }
+        startActivity(intent)
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        finish()
+    }
+
+    private fun showQuitBottomSheet() {
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.dialog_quit, null)
+        dialog.setContentView(view)
+
+        view.findViewById<Button>(R.id.noButton).setOnClickListener { dialog.dismiss() }
+        view.findViewById<Button>(R.id.finishButton).setOnClickListener {
+            finish()
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    // --- Connectivity ---
+
+    private fun observeConnectivity() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isConnected.collect { isConnected ->
+                    updateUIForConnectivity(isConnected)
+                }
+            }
+        }
+    }
+
+    private fun updateUIForConnectivity(isConnected: Boolean) {
+        val visibility = if (isConnected) View.VISIBLE else View.GONE
+        val inverseVisibility = if (isConnected) View.GONE else View.VISIBLE
+
+        binding.internetConnection.visibility = inverseVisibility
+        binding.offlineContainer.visibility = inverseVisibility
+
+        binding.topBarContainer.visibility = visibility
+        binding.questionFragmentContainer.visibility = visibility
+        binding.btnBackground.visibility = visibility
+
+        if (isConnected && isResultCurrentlyVisible) {
+            binding.stateContainer.visibility = View.VISIBLE
+            binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
+        } else {
+            binding.stateContainer.visibility = View.GONE
+        }
+    }
+}

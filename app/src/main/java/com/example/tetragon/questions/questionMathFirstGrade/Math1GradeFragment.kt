@@ -3,6 +3,7 @@ package com.example.tetragon.questions.questionMathFirstGrade
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import android.widget.ImageView
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.controllers.RiveFileController
@@ -22,7 +24,10 @@ import com.example.tetragon.MainActivity
 import com.example.tetragon.R
 import com.example.tetragon.fragments.HomeFragment
 import com.example.tetragon.reward.BagTapActivity
+import com.example.tetragon.subscriptionModel.IntroSubscriptionActivity
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
@@ -60,7 +65,10 @@ class Math1GradeFragment : Fragment() {
     private lateinit var topic12: RiveAnimationView
 
     private val topicViews by lazy {
-        listOf(topic1, topic2, topic3, topic4, topic5, topic6, topic7, topic8, topic9, topic10, topic11, topic12)
+        listOf(
+            topic1, topic2, topic3, topic4, topic5, topic6,
+            topic7, topic8, topic9, topic10, topic11, topic12
+        )
     }
 
     private val topicNames = listOf(
@@ -75,12 +83,14 @@ class Math1GradeFragment : Fragment() {
         "ROUND_NUMBERS", "TWO_DIGIT_NUMBERS", "PROBLEM_SOLVING", "LENGTH_CENTIMETER"
     )
 
-    // --- GRADE 2 TOPIC DATA FOR JUMP AHEAD ---
     private val grade2TopicNames = listOf(
-        "Arithmetics Basics", "Column Method", "Three Digit Numbers", "Comparison", "Length Measurement", "Time", "Multiplication table", "Division"
+        "Arithmetics Basics", "Column Method", "Three Digit Numbers",
+        "Comparison", "Length Measurement", "Time", "Multiplication table", "Division"
     )
     private val grade2TopicKeys = listOf(
-        "ADDITION_SUBTRACTION_BASICS", "COLUMN_METHOD", "THREE_DIGIT_NUMBERS", "COMPARISON_THREE_DIGIT_NUMBERS", "LENGTH_MEASUREMENT", "TIME", "MULTIPLICATION", "DIVISION"
+        "ADDITION_SUBTRACTION_BASICS", "COLUMN_METHOD", "THREE_DIGIT_NUMBERS",
+        "COMPARISON_THREE_DIGIT_NUMBERS", "LENGTH_MEASUREMENT", "TIME",
+        "MULTIPLICATION", "DIVISION"
     )
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
@@ -91,6 +101,9 @@ class Math1GradeFragment : Fragment() {
     private var claimedRewards = mutableMapOf<String, Boolean>()
     private var isUnlocked = mutableMapOf<String, Boolean>()
 
+    private var userStars: Int = 15
+    private var isInfinity: Boolean = false
+
     private var pendingTopic: String? = null
     private var pendingRewardKey: String? = null
     private var hasInitialScrolled = false
@@ -98,7 +111,11 @@ class Math1GradeFragment : Fragment() {
     private var lastReportedTopic = ""
     private var currentTargetIndex: Int = 0
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         return inflater.inflate(R.layout.fragment_math1_grade, container, false)
     }
 
@@ -110,7 +127,6 @@ class Math1GradeFragment : Fragment() {
         scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             userHasScrolled = true
             determineVisibleTopic()
-
             if (startContainer.visibility == View.VISIBLE) {
                 startContainer.animate().cancel()
                 startContainer.visibility = View.GONE
@@ -126,7 +142,10 @@ class Math1GradeFragment : Fragment() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             startActivity(intent)
-            (requireActivity() as? Activity)?.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            (requireActivity() as? Activity)?.overridePendingTransition(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left
+            )
         }
 
         scrollTargetContainer.setOnClickListener {
@@ -146,12 +165,9 @@ class Math1GradeFragment : Fragment() {
         continueEnabledBtn = view.findViewById(R.id.continue_enabled_btn)
         continueEnabledBtnBack = view.findViewById(R.id.continue_enabled_btn_back)
         startLessonLabel = view.findViewById(R.id.start_lesson_label)
-
-        // --- JUMP AHEAD VIEWS ---
         moveOnBtn = view.findViewById(R.id.move_on_btn)
         nextGradeLabel = view.findViewById(R.id.next_grade_label)
         nextTopicName = view.findViewById(R.id.next_topic_name)
-
         scrollTargetContainer = view.findViewById(R.id.scroll_to_target_container)
         scrollArrowIcon = view.findViewById(R.id.scroll_arrow_icon)
 
@@ -164,8 +180,6 @@ class Math1GradeFragment : Fragment() {
 
         startContainer.visibility = View.GONE
         scrollTargetContainer.visibility = View.GONE
-
-        // Static label for Jump Ahead
         nextGradeLabel.text = "2 GRADE"
     }
 
@@ -173,7 +187,6 @@ class Math1GradeFragment : Fragment() {
         var bestIndex = 0
         var minDistance = Int.MAX_VALUE
         val focusPoint = scrollView.height / 2
-
         topicViews.forEachIndexed { index, view ->
             val rect = Rect()
             if (view.getGlobalVisibleRect(rect)) {
@@ -185,24 +198,14 @@ class Math1GradeFragment : Fragment() {
                 }
             }
         }
-
         if (userHasScrolled && hasInitialScrolled) {
             if (bestIndex != currentTargetIndex) {
-                if (scrollTargetContainer.visibility != View.VISIBLE) {
-                    scrollTargetContainer.fadeInAndSlideUp()
-                }
-                if (bestIndex < currentTargetIndex) {
-                    scrollArrowIcon.setImageResource(R.drawable.arrow_up)
-                } else {
-                    scrollArrowIcon.setImageResource(R.drawable.arrow_down)
-                }
+                if (scrollTargetContainer.visibility != View.VISIBLE) scrollTargetContainer.fadeInAndSlideUp()
+                scrollArrowIcon.setImageResource(if (bestIndex < currentTargetIndex) R.drawable.arrow_up else R.drawable.arrow_down)
             } else {
-                if (scrollTargetContainer.visibility == View.VISIBLE) {
-                    scrollTargetContainer.fadeOutAndSlideDown()
-                }
+                if (scrollTargetContainer.visibility == View.VISIBLE) scrollTargetContainer.fadeOutAndSlideDown()
             }
         }
-
         val currentTitle = topicNames.getOrNull(bestIndex) ?: ""
         if (currentTitle != lastReportedTopic && currentTitle.isNotEmpty()) {
             lastReportedTopic = currentTitle
@@ -220,7 +223,10 @@ class Math1GradeFragment : Fragment() {
     private fun setupSingleTopic(rive: RiveAnimationView, res: Int, level: Float, topicKey: String) {
         rive.setRiveResource(res, stateMachineName = "State Machine 1", autoplay = true)
         rive.registerListener(object : RiveFileController.Listener {
-            override fun notifyPlay(animation: PlayableInstance) { setupRiveViewModel(rive, level) }
+            override fun notifyPlay(animation: PlayableInstance) {
+                setupRiveViewModel(rive, level)
+            }
+
             override fun notifyStateChanged(stateMachineName: String, stateName: String) {
                 activity?.runOnUiThread {
                     when (stateName) {
@@ -247,21 +253,17 @@ class Math1GradeFragment : Fragment() {
         val user = auth.currentUser ?: return
         topicProgressListener = db.collection("users").document(user.uid).addSnapshotListener { snapshot, _ ->
             if (snapshot == null || !isAdded) return@addSnapshotListener
+            userStars = snapshot.getLong("stars")?.toInt() ?: 15
+            isInfinity = snapshot.getBoolean("subscription") ?: false
 
-            // 1. GRADE 1 PROGRESS
             val progressMap = snapshot.get("class1MathProgress") as? Map<*, *> ?: emptyMap<String, Any>()
             val claimedMap = snapshot.get("claimedRewardsMath1") as? Map<*, *> ?: emptyMap<String, Any>()
 
             var prevClaimed = true
-
             topicKeys.forEachIndexed { index, key ->
                 val prog = (progressMap[key] as? Long ?: 0).toFloat()
                 val claimed = claimedMap[key] as? Boolean ?: false
-
-                animateRiveProgress(topicViews[index], currentTopicProgress[key] ?: 0f, prog) {
-                    currentTopicProgress[key] = it
-                }
-
+                animateRiveProgress(topicViews[index], currentTopicProgress[key] ?: 0f, prog) { currentTopicProgress[key] = it }
                 claimedRewards[key] = claimed
                 isUnlocked[key] = if (index == 0) true else prevClaimed
                 updateRiveButtonStates(topicViews[index], prog >= 100f, isUnlocked[key] ?: false, claimed)
@@ -270,14 +272,10 @@ class Math1GradeFragment : Fragment() {
 
             currentTargetIndex = findTargetTopicIndex(progressMap, topicKeys, claimedMap)
 
-            // 2. DYNAMIC JUMP AHEAD (GRADE 2)
             val progressMap2 = snapshot.get("class2MathProgress") as? Map<*, *> ?: emptyMap<String, Any>()
             val claimedMap2 = snapshot.get("claimedRewardsMath2") as? Map<*, *> ?: emptyMap<String, Any>()
-
             val activeGrade2Index = findTargetTopicIndex(progressMap2, grade2TopicKeys, claimedMap2)
-            val activeTopicName2 = grade2TopicNames.getOrNull(activeGrade2Index) ?: grade2TopicNames[0]
-
-            nextTopicName.text = "Topic ${activeGrade2Index + 1}: $activeTopicName2"
+            nextTopicName.text = "Topic ${activeGrade2Index + 1}: ${grade2TopicNames.getOrNull(activeGrade2Index) ?: grade2TopicNames[0]}"
 
             if (!hasInitialScrolled) {
                 scrollView.post {
@@ -335,29 +333,108 @@ class Math1GradeFragment : Fragment() {
             startLessonLabel.text = "${idx + 1} Topic: ${topicNames[idx]}"
         }
 
+        val startContainerBg = view?.findViewById<android.widget.LinearLayout>(R.id.start_container_background)
+
+        /**
+         * 1. PRIORITY: LOCKED STATE
+         * If the topic is locked, always show "NOT AVAILABLE" regardless of star count.
+         */
         if (isLocked) {
             startEnabledBtnContainer.visibility = View.GONE
             startDisabledBtnContainer.visibility = View.VISIBLE
             startDisabledBtn.text = "NOT AVAILABLE"
-        } else {
+            startContainerBg?.setBackgroundResource(R.drawable.custom_background)
+        }
+        /**
+         * 2. REWARD CLAIM CASE (Unlocked)
+         * If it's a reward and not locked, it's always free to claim.
+         */
+        else if (rewardKey != null) {
+            continueEnabledBtn.text = "CLAIM"
+            startContainerBg?.setBackgroundResource(R.drawable.custom_background)
+            resetButtonToDefaultTheme()
+            startEnabledBtnContainer.visibility = View.VISIBLE
+            startDisabledBtnContainer.visibility = View.GONE
+        }
+        /**
+         * 3. UNLOCKED TOPIC + NO STARS CASE:
+         * Only show SUBSCRIBE if the topic is unlocked (Start/Review) but stars are 0.
+         */
+        else if (!isInfinity && userStars <= 0) {
+            continueEnabledBtn.text = "SUBSCRIBE"
+            startLessonLabel.text = "Out of Stars!"
+            startContainerBg?.setBackgroundResource(R.drawable.custom_premium_background_2)
+
+            continueEnabledBtn.backgroundTintList = null
+            continueEnabledBtnBack.backgroundTintList = null
+            continueEnabledBtn.setBackgroundResource(R.drawable.custom_gradient_button)
+            continueEnabledBtnBack.setBackgroundResource(R.drawable.custom_gradient_button_shadow)
+
+            startEnabledBtnContainer.visibility = View.VISIBLE
+            startDisabledBtnContainer.visibility = View.GONE
+        }
+        /**
+         * 4. NORMAL START/REVIEW CASE:
+         * Unlocked and has stars/infinity.
+         */
+        else {
             continueEnabledBtn.text = buttonText
+            startContainerBg?.setBackgroundResource(R.drawable.custom_background)
+            resetButtonToDefaultTheme()
+
             startEnabledBtnContainer.visibility = View.VISIBLE
             startDisabledBtnContainer.visibility = View.GONE
         }
         startContainer.fadeInAndSlideUp()
     }
 
+    private fun resetButtonToDefaultTheme() {
+        val black3 = ContextCompat.getColor(requireContext(), R.color.black_3)
+        val black2 = ContextCompat.getColor(requireContext(), R.color.black_2)
+        continueEnabledBtn.setBackgroundResource(R.drawable.custom_button)
+        continueEnabledBtnBack.setBackgroundResource(R.drawable.custom_button)
+        continueEnabledBtn.backgroundTintList = ColorStateList.valueOf(black3)
+        continueEnabledBtnBack.backgroundTintList = ColorStateList.valueOf(black2)
+    }
+
     private fun handleContinueClick() {
+        // Start loading immediately when any action button is pressed
         showLoadingState(true)
+
+        if (continueEnabledBtn.text == "SUBSCRIBE") {
+            startActivity(Intent(requireContext(), IntroSubscriptionActivity::class.java))
+            // Note: We don't call showLoadingState(false) here because the activity is changing,
+            // but onResume() will reset the container visibility anyway.
+            return
+        }
+
         if (pendingRewardKey != null) {
             handleRewardClaimed(findTopicViewByKey(pendingRewardKey!!), pendingRewardKey!!)
         } else if (pendingTopic != null) {
-            val intent = Intent(requireContext(), Math1GradeQuestionActivity::class.java).apply {
-                putExtra("TOPIC_KEY", pendingTopic)
+            val user = auth.currentUser
+            if (user != null && !isInfinity) {
+                val updates = mutableMapOf<String, Any>("stars" to FieldValue.increment(-1))
+                if (userStars >= 15) {
+                    updates["lastStarUsedTime"] = Timestamp.now()
+                }
+                db.collection("users").document(user.uid).update(updates).addOnCompleteListener {
+                    if (isAdded) launchQuestionActivity()
+                }
+            } else {
+                launchQuestionActivity()
             }
-            startActivity(intent)
-            scrollView.postDelayed({ if (isAdded) showLoadingState(false) }, 1000)
+        } else {
+            // If for some reason nothing is pending, stop the loading state
+            showLoadingState(false)
         }
+    }
+
+    private fun launchQuestionActivity() {
+        val intent = Intent(requireContext(), Math1GradeQuestionActivity::class.java).apply {
+            putExtra("TOPIC_KEY", pendingTopic)
+        }
+        startActivity(intent)
+        scrollView.postDelayed({ if (isAdded) showLoadingState(false) }, 1000)
     }
 
     private fun findTopicViewByKey(key: String): RiveAnimationView {
@@ -368,16 +445,14 @@ class Math1GradeFragment : Fragment() {
     private fun handleRewardClaimed(view: RiveAnimationView, topicKey: String) {
         val user = auth.currentUser ?: return
         showLoadingState(true)
-        db.collection("users").document(user.uid)
-            .update("claimedRewardsMath1.$topicKey", true)
+        db.collection("users").document(user.uid).update("claimedRewardsMath1.$topicKey", true)
             .addOnSuccessListener {
                 if (!isAdded) return@addOnSuccessListener
                 view.setBooleanState("State Machine 1", "rewardAvailable", false)
                 view.setBooleanState("State Machine 1", "reward", true)
                 startContainer.fadeOutAndSlideDown()
                 startActivity(Intent(requireContext(), BagTapActivity::class.java))
-            }
-            .addOnFailureListener { if (isAdded) showLoadingState(false) }
+            }.addOnFailureListener { if (isAdded) showLoadingState(false) }
     }
 
     private fun updateRiveButtonStates(view: RiveAnimationView, isFinished: Boolean, unlocked: Boolean, claimed: Boolean) {
@@ -422,5 +497,13 @@ class Math1GradeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         topicProgressListener?.remove()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::startContainer.isInitialized && startContainer.visibility == View.VISIBLE) {
+            startContainer.animate().cancel()
+            startContainer.visibility = View.GONE
+        }
     }
 }

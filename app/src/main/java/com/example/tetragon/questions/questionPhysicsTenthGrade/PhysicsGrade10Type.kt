@@ -1,0 +1,5 @@
+package com.example.tetragon.questions.questionPhysicsTenthGrade
+
+enum class PhysicsGrade10Type(val xp: Int) {
+    FORCE_BIL(2)
+}

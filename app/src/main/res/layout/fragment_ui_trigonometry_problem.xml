@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp">
+
+    <TextView
+        android:id="@+id/questionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Find the value."
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/problemRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/option1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/questionTitle">
+
+        <TextView
+            android:id="@+id/firstNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="sin 30° ="
+            android:textColor="#64748b"
+            android:textSize="38sp" />
+
+        <FrameLayout
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:id="@+id/problemImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/answer_blue_box" />
+
+            <LinearLayout
+                android:id="@+id/problemAnswerText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <TextView android:id="@+id/blueBoxTop" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_color" android:textSize="18sp" android:textStyle="bold" />
+                <View android:id="@+id/blueBoxLine" android:layout_width="15dp" android:layout_height="2dp" android:background="@color/blue_2" />
+                <TextView android:id="@+id/blueBoxBottom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_color" android:textSize="18sp" android:textStyle="bold" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/custom_background"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/option2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <TextView android:id="@+id/option1Top" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_color" android:textSize="24sp" android:fontFamily="@font/inter_semibold"/>
+        <View android:id="@+id/option1Line" android:layout_width="20dp" android:layout_height="2dp" android:background="@color/blue_2" android:visibility="gone" />
+        <TextView android:id="@+id/option1Bottom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_color" android:textSize="16sp" android:visibility="gone" android:fontFamily="@font/inter_semibold"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/custom_background"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/option3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <TextView android:id="@+id/option2Top" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_color" android:textSize="16sp" android:fontFamily="@font/inter_semibold"/>
+        <View android:id="@+id/option2Line" android:layout_width="20dp" android:layout_height="2dp" android:background="@color/blue_2" />
+        <TextView android:id="@+id/option2Bottom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_color" android:textSize="16sp" android:fontFamily="@font/inter_semibold"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/custom_background"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <TextView android:id="@+id/option3Top" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_color" android:textSize="16sp" android:fontFamily="@font/inter_semibold"/>
+        <View android:id="@+id/option3Line" android:layout_width="20dp" android:layout_height="2dp" android:background="@color/blue_2" />
+        <TextView android:id="@+id/option3Bottom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_color" android:textSize="16sp" android:fontFamily="@font/inter_semibold"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

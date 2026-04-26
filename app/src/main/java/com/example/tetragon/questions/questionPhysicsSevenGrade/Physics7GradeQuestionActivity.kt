@@ -23,6 +23,10 @@ import com.example.tetragon.questions.questionPhysicsSevenGrade.firstTopicLength
 import com.example.tetragon.questions.questionPhysicsSevenGrade.firstTopicLength.UiLiteresFragment
 import com.example.tetragon.questions.questionPhysicsSevenGrade.firstTopicLength.UiMassFragment
 import com.example.tetragon.questions.questionPhysicsSevenGrade.firstTopicLength.UiTemperatureFragment
+import com.example.tetragon.questions.questionPhysicsSevenGrade.secondTopicDensity.UiDensityFragment
+import com.example.tetragon.questions.questionPhysicsSevenGrade.secondTopicDensity.UiFindMassFragment
+import com.example.tetragon.questions.questionPhysicsSevenGrade.thirdTopic.UiSimpleMachinesFragment
+import com.example.tetragon.questions.questionPhysicsSevenGrade.thirdTopic.UiWorkFragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 
@@ -159,6 +163,16 @@ class Physics7GradeQuestionActivity : AppCompatActivity() {
                 PhysicsGrade7Type.KETTLE_LITRES,
                 PhysicsGrade7Type.MASS
             )
+
+            PhysicsGrade7Topic.DENSITY -> listOf(
+                PhysicsGrade7Type.DENSITY,
+                PhysicsGrade7Type.DENSITY_MASS
+            )
+
+            PhysicsGrade7Topic.SIMPLE_MACHINES -> listOf(
+                PhysicsGrade7Type.MECHANICAL_ADVANTAGE,
+                PhysicsGrade7Type.WORK
+            )
         }
     }
 
@@ -181,6 +195,12 @@ class Physics7GradeQuestionActivity : AppCompatActivity() {
             PhysicsGrade7Type.TEMPERATURE -> UiTemperatureFragment()
             PhysicsGrade7Type.KETTLE_LITRES -> UiLiteresFragment()
             PhysicsGrade7Type.MASS -> UiMassFragment()
+
+            PhysicsGrade7Type.DENSITY -> UiDensityFragment()
+            PhysicsGrade7Type.DENSITY_MASS -> UiFindMassFragment()
+
+            PhysicsGrade7Type.MECHANICAL_ADVANTAGE -> UiSimpleMachinesFragment()
+            PhysicsGrade7Type.WORK -> UiWorkFragment()
         }
 
         supportFragmentManager.beginTransaction()
