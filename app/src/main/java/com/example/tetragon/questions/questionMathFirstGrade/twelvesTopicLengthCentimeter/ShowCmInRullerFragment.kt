@@ -45,7 +45,7 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
-    private var isInitialized = false // Guard for one-time initialization
+    private var isInitialized = false
     private var mediaPlayer: MediaPlayer? = null
 
     private val STATE_MACHINE = "State Machine 1"
@@ -73,7 +73,6 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
 
-        // Only run setup and generation if this is the first time the fragment is viewed
         if (!isInitialized) {
             riveRuler.post {
                 setupRiveViewModel()
@@ -95,8 +94,9 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
                 vmi.getNumberProperty(key)?.let { prop -> numberProperties[key] = prop }
             }
 
+            // TRANSLATED UNIT HERE
             vmi.getStringProperty("unit")?.let { unitProp ->
-                unitProp.value = "cm"
+                unitProp.value = getString(R.string.keyword_cm)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -131,10 +131,10 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
     }
 
     private fun updateQuestionText() {
-        val sentence = "Show $targetCm cm on the ruler."
+        val targetPhrase = getString(R.string.cm_unit_template, targetCm)
+        val sentence = getString(R.string.question_show_cm_ruler, targetPhrase)
         val spannable = SpannableString(sentence)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
-        val targetPhrase = "$targetCm cm"
         val start = sentence.indexOf(targetPhrase)
         if (start != -1) {
             spannable.setSpan(ForegroundColorSpan(blueColor), start, start + targetPhrase.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -157,12 +157,12 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
             if (isFirstAttempt) activity.totalXp += MathGrade1Type.CM_RULER.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -172,8 +172,9 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "The correct length is $targetCm cm"
+            stateAnswer.text = getString(R.string.state_solution)
+            val cmText = getString(R.string.cm_unit_template, targetCm)
+            answerDisplay.text = getString(R.string.label_correct_length, cmText)
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -182,7 +183,7 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
             riveRuler.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, true)
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
         }
     }
@@ -204,19 +205,16 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
         checkBtn.setOnClickListener {
             if (!isAnswerChecked) {
                 checkAnswer()
+            } else if (isIncorrectAttempt) {
+                resetForTryAgain()
             } else {
-                if (isIncorrectAttempt) {
-                    resetForTryAgain()
+                if (checkBtn.text == getString(R.string.btn_finish)) {
+                    activity.navigateToXpGained()
                 } else {
-                    val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
-                        activity.navigateToXpGained()
-                    } else {
-                        val isMilestoneActive = activity.checkAndTriggerMilestone()
-                        if (!isMilestoneActive) {
-                            resetUIForNext()
-                            activity.showRandomQuestion()
-                        }
+                    val isMilestoneActive = activity.checkAndTriggerMilestone()
+                    if (!isMilestoneActive) {
+                        resetUIForNext()
+                        activity.showRandomQuestion()
                     }
                 }
             }
@@ -227,7 +225,7 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
     private fun resetFragmentState() {
         isAnswerChecked = false
         isIncorrectAttempt = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         riveRuler.setNumberState(STATE_MACHINE, INPUT_CHOICE, 0f)
@@ -237,8 +235,7 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
     }
 
     private fun resetForTryAgain() {
-        val activity = requireActivity() as Math1GradeQuestionActivity
-        activity.isResultCurrentlyVisible = false
+        (requireActivity() as Math1GradeQuestionActivity).isResultCurrentlyVisible = false
         isAnswerChecked = false
         isIncorrectAttempt = false
 
@@ -250,7 +247,7 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
         stateAnswer.text = ""
         answerDisplay.text = ""
 
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         disableCheckButton()
         mainHandler.post(checkRunnable)
@@ -260,19 +257,14 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
-
-        // STOP the listener to prevent updates during navigation
         mainHandler.removeCallbacks(checkRunnable)
-
-        // DO NOT reset Rive or internal UI here to keep the "Success" view
-        // frozen until the fragment is swapped.
     }
 
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $targetCm cm"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer, "${targetCm} cm")
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -280,9 +272,10 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

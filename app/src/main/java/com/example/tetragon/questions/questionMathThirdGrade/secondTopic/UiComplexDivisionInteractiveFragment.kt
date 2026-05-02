@@ -108,7 +108,6 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
     }
 
     private fun generateProblem() {
-        // Step 1: Generate clean division using reverse multiplication (Quotient * Divisor = Dividend)
         val divisor = Random.nextInt(2, 11)
         correctAnswer = Random.nextInt(2, 11)
         val dividend = divisor * correctAnswer
@@ -124,7 +123,6 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
         }
         complexDivInteractiveEquationText.text = spannable
 
-        // Step 2: Generate 3 unique distractors
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 4) {
             val distractor = correctAnswer + Random.nextInt(-4, 5)
@@ -133,14 +131,12 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
             }
         }
 
-        // Step 3: Sort options in INCREASING order
         val sortedOptions = optionSet.toList().sorted()
 
-        // Step 4: Map sorted options to Rive ViewModel keys (1_number is smallest, etc.)
         optionMapping.clear()
         viewModelKeys.forEachIndexed { index, key ->
             val value = sortedOptions[index]
-            optionMapping[index + 1] = value // Rive input index
+            optionMapping[index + 1] = value
             optionProperties[key]?.value = value.toFloat()
         }
 
@@ -151,7 +147,7 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
         isIncorrectAttempt = false
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -179,13 +175,13 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             complexDivInteractiveAnswerBox.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -215,7 +211,7 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         if (!activity.checkAndTriggerMilestone()) {
                             resetUIForNext()
@@ -249,10 +245,10 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.label_answer, correctAnswer.toString())
             answerDisplay.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             complexDivInteractiveAnswerBox.setImageResource(R.drawable.answer_solution_box)
             complexDivInteractiveAnswerText.text = correctAnswer.toString()
@@ -271,8 +267,8 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
     private fun showCorrectState(container: FrameLayout, circle: ImageView) {
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circle.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer, correctAnswer.toString())
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -280,9 +276,10 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
     private fun showIncorrectState(container: FrameLayout, circle: ImageView) {
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circle.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
@@ -318,7 +315,7 @@ class UiComplexDivisionInteractiveFragment : Fragment(R.layout.fragment_ui_compl
         activity.hideSuccessAnimation()
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 

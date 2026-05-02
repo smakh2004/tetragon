@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/inter_semibold"
-        android:text="Find the missed number."
+        android:text="@string/find_the_missed_number"
         android:textColor="@color/text_color"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"

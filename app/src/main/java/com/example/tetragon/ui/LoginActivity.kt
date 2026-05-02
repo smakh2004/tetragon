@@ -101,37 +101,33 @@ class LoginActivity : BaseActivity() {
             val password = binding.passwordEditText.text.toString().trim()
 
             if (TextUtils.isEmpty(email)) {
-                Toast.makeText(this, "Enter email", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.enter_email), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (TextUtils.isEmpty(password)) {
-                Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.enter_password), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Start login → disable TextWatcher
+            // Start login
             isLoginInProgress = true
             binding.continueEnabledBtnContainer.visibility = View.INVISIBLE
             binding.continueDisabledBtnContainer.visibility = View.VISIBLE
-            binding.continueDisabledBtn.text = "LOADING.."
+            binding.continueDisabledBtn.text = getString(R.string.loading_caps) // Translated
 
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    isLoginInProgress = false // reset flag after login attempt
+                    isLoginInProgress = false
 
                     if (task.isSuccessful) {
-
                         val uid = auth.currentUser!!.uid
                         val deviceId = DeviceUtils.getDeviceId(this)
 
-                        // 🔥 Always overwrite activeDeviceId (new login wins)
                         db.collection("users")
                             .document(uid)
                             .update("activeDeviceId", deviceId)
                             .addOnSuccessListener {
-
-                                Toast.makeText(this, "Successful login.", Toast.LENGTH_SHORT).show()
-
+                                Toast.makeText(this, getString(R.string.login_successful), Toast.LENGTH_SHORT).show() // Translated
                                 startActivity(Intent(this, MainActivity::class.java))
                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
                                 finish()
@@ -139,8 +135,8 @@ class LoginActivity : BaseActivity() {
                     } else {
                         binding.continueEnabledBtnContainer.visibility = View.VISIBLE
                         binding.continueDisabledBtnContainer.visibility = View.INVISIBLE
-                        binding.continueDisabledBtn.text = "CONTINUE"
-                        Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                        binding.continueDisabledBtn.text = getString(R.string.continue_text) // Translated
+                        Toast.makeText(this, getString(R.string.auth_failed), Toast.LENGTH_SHORT).show() // Translated
                     }
                 }
         }
@@ -178,13 +174,11 @@ class LoginActivity : BaseActivity() {
 
                     // Adjust continue button UI
                     if (isConnected) {
-                        // Restore normal enabled/disabled state based on text fields
                         checkFields()
                     } else {
-                        // Show "NO INTERNET" disabled state
                         binding.continueEnabledBtnContainer.visibility = View.INVISIBLE
                         binding.continueDisabledBtnContainer.visibility = View.VISIBLE
-                        binding.continueDisabledBtn.text = "CONTINUE"
+                        binding.continueDisabledBtn.text = getString(R.string.continue_text)
                     }
                 }
             }

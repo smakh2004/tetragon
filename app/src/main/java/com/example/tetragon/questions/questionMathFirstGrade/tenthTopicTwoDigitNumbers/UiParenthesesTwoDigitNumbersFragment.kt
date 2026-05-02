@@ -11,7 +11,7 @@ import com.example.tetragon.questions.questionMathFirstGrade.Math1GradeQuestionA
 import com.example.tetragon.questions.questionMathFirstGrade.MathGrade1Type
 import kotlin.random.Random
 
-class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_parentheses_two_digit_numbers) { // Ensure this matches your XML filename
+class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_parentheses_two_digit_numbers) {
 
     private lateinit var problemRow: LinearLayout
     private lateinit var firstNumberText: TextView
@@ -37,6 +37,14 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initViews(view)
+        setupInitialButtonState()
+        generateProblem()
+        setupOptionClicks()
+        setupCheckButton()
+    }
+
+    private fun initViews(view: View) {
         problemRow = view.findViewById(R.id.problemRow)
         firstNumberText = view.findViewById(R.id.firstNumber)
         problemImage = view.findViewById(R.id.problemImage)
@@ -47,19 +55,14 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
             view.findViewById(R.id.option3)
         )
 
-        // Activity UI elements
-        checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
-        checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
-        btnBack = requireActivity().findViewById(R.id.btnBackground)
-        seeBtn = requireActivity().findViewById(R.id.see_btn_container)
-        seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
-        stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
-        answer = requireActivity().findViewById(R.id.answer)
-
-        setupInitialButtonState()
-        generateProblem()
-        setupOptionClicks()
-        setupCheckButton()
+        val activity = requireActivity()
+        checkBtn = activity.findViewById(R.id.check_enabled_btn)
+        checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
+        btnBack = activity.findViewById(R.id.btnBackground)
+        seeBtn = activity.findViewById(R.id.see_btn_container)
+        seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
+        stateAnswer = activity.findViewById(R.id.stateAnswer)
+        answer = activity.findViewById(R.id.answer)
     }
 
     private fun playSound(soundResId: Int) {
@@ -74,27 +77,23 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
         checkBtn.isEnabled = false
+        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
-
-    // ---------------------- Problem Generation (Modified for Parentheses) ----------------------
 
     private fun generateProblem() {
         currentProblem = generateParenthesesProblem()
         correctAnswer = evaluateParenthesesProblem(currentProblem)
 
-        firstNumberText.text = "$currentProblem ="
+        firstNumberText.text = getString(R.string.problem_equals_template, currentProblem)
         problemImage.setImageResource(R.drawable.answer_blue_box)
 
         val optionSet = mutableSetOf(correctAnswer)
-
-        // Distractors between 1 and 10
         while (optionSet.size < 3) {
-            val distractor = Random.nextInt(1, 101)
-            optionSet.add(distractor)
+            optionSet.add(Random.nextInt(1, 101))
         }
 
         val shuffledOptions = optionSet.shuffled()
-
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
             tv.text = shuffledOptions[index].toString()
@@ -109,16 +108,9 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         isIncorrectAttempt = false
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
-        checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
-
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
-
-    // ---------------------- Problem Generation (Strictly 1-10) ----------------------
 
     private fun generateParenthesesProblem(): String {
         val isAddition = Random.nextBoolean()
@@ -126,34 +118,22 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         val maxTotal = 100
 
         return if (isAddition) {
-            // Form: a + (b + c) or (a + b) + c
-            val a = Random.nextInt(10, 50) // Use two-digit start
+            val a = Random.nextInt(10, 50)
             val b = Random.nextInt(5, 25)
-            // Ensure total is <= 100
             val remaining = maxTotal - (a + b)
             val c = if (remaining > 1) Random.nextInt(1, remaining) else 1
-
             if (useParenthesesAtEnd) "$a+($b+$c)" else "($a+$b)+$c"
         } else {
-            // SUBTRACTION logic
             if (useParenthesesAtEnd) {
-                // Form: a - (b + c)
-                // 1. Pick 'a' first
                 val a = Random.nextInt(30, 101)
-                // 2. Pick a sum for (b+c) that is smaller than 'a'
                 val innerSum = Random.nextInt(10, a)
-                // 3. Split innerSum into b and c
                 val b = Random.nextInt(5, innerSum)
                 val c = innerSum - b
                 "$a-($b+$c)"
             } else {
-                // Form: (a - b) - c
-                // 1. Pick 'a'
                 val a = Random.nextInt(40, 101)
-                // 2. Pick 'b' smaller than 'a' (ensure result >= 10)
                 val b = Random.nextInt(10, a - 10)
                 val intermediate = a - b
-                // 3. Pick 'c' smaller than intermediate
                 val c = Random.nextInt(5, intermediate)
                 "($a-$b)-$c"
             }
@@ -165,14 +145,10 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         val endIndex = problem.indexOf(')')
 
         return if (startIndex != -1 && endIndex != -1) {
-            // 1. Solve the math inside the brackets first
             val innerExp = problem.substring(startIndex + 1, endIndex)
             val innerResult = solveMixed(innerExp)
-
-            // 2. Replace (b+c) with the result: "a-(innerResult)"
             val leftPart = problem.substring(0, startIndex)
             val rightPart = problem.substring(endIndex + 1)
-
             solveMixed("$leftPart$innerResult$rightPart")
         } else {
             solveMixed(problem)
@@ -180,25 +156,16 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
     }
 
     private fun solveMixed(expression: String): Int {
-        // This handles strings like "50-20+10" or "100-30"
         val tokens = mutableListOf<String>()
         var currentNum = ""
-
         for (char in expression) {
-            if (char.isDigit()) {
-                currentNum += char
-            } else {
-                if (currentNum.isNotEmpty()) {
-                    tokens.add(currentNum)
-                    currentNum = ""
-                }
+            if (char.isDigit()) currentNum += char else {
+                if (currentNum.isNotEmpty()) { tokens.add(currentNum); currentNum = "" }
                 tokens.add(char.toString())
             }
         }
         if (currentNum.isNotEmpty()) tokens.add(currentNum)
-
         if (tokens.isEmpty()) return 0
-
         var result = tokens[0].toInt()
         var i = 1
         while (i < tokens.size) {
@@ -210,29 +177,19 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         return result
     }
 
-    // ---------------------- Option Clicks ----------------------
-
     private fun setupOptionClicks() {
         options.forEachIndexed { index, layout ->
             layout.setOnClickListener {
                 if (isAnswerChecked) return@setOnClickListener
                 selectedOptionIndex = index
-                highlightSelectedOption(index)
+                options.forEachIndexed { i, l ->
+                    l.setBackgroundResource(if (i == index) R.drawable.option_selected else R.drawable.custom_background)
+                }
                 enableCheckButton()
-
                 val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
-                val chosenNumber = (layout.getChildAt(0) as TextView).text.toString()
-                problemAnswerText.text = chosenNumber
+                problemAnswerText.text = (layout.getChildAt(0) as TextView).text
                 problemAnswerText.visibility = View.VISIBLE
             }
-        }
-    }
-
-    private fun highlightSelectedOption(selectedIndex: Int) {
-        options.forEachIndexed { i, layout ->
-            layout.setBackgroundResource(
-                if (i == selectedIndex) R.drawable.option_selected else R.drawable.custom_background
-            )
         }
     }
 
@@ -242,8 +199,6 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
     }
 
-    // ---------------------- Check Answer ----------------------
-
     private fun setupCheckButton() {
         checkBtn.setOnClickListener {
             val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
@@ -251,21 +206,17 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
 
             if (!isAnswerChecked) {
                 selectedOptionIndex?.let { checkAnswer(it, stateContainer, circleState) }
+            } else if (isIncorrectAttempt) {
+                resetForTryAgain()
             } else {
-                if (isIncorrectAttempt) {
-                    resetForTryAgain()
+                val activity = requireActivity() as Math1GradeQuestionActivity
+                if (checkBtn.text == getString(R.string.btn_finish)) {
+                    activity.navigateToXpGained()
                 } else {
-                    val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
-                        activity.navigateToXpGained()
-                    } else {
-                        // GATE: Trigger milestone only after the user chooses to proceed
-                        val isMilestoneActive = activity.checkAndTriggerMilestone()
-
-                        if (!isMilestoneActive) {
-                            resetUIForNext()
-                            activity.showRandomQuestion()
-                        }
+                    val isMilestoneActive = activity.checkAndTriggerMilestone()
+                    if (!isMilestoneActive) {
+                        resetUIForNext()
+                        activity.showRandomQuestion()
                     }
                 }
             }
@@ -279,36 +230,24 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         activity.isResultCurrentlyVisible = true
         stateContainer.visibility = View.VISIBLE
 
-        val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
-        problemAnswerText.text = chosen.toString()
-
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
-
-            // 1. Play success animation (Mr. Square)
             activity.playSuccessAnimation()
             problemImage.setImageResource(R.drawable.answer_correct_box)
-
             val isFinished = activity.incrementProgress()
-
-            if (isFirstAttempt) {
-                activity.totalXp += MathGrade1Type.PARENTHESES_TWO_DIGIT_NUMBERS.xp
-            }
-
-            // 2. Register correct answer for milestones/streaks
+            if (isFirstAttempt) activity.totalXp += MathGrade1Type.PARENTHESES_TWO_DIGIT_NUMBERS.xp
             activity.handleCorrectAnswer()
-
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
-            setupSeeSolution(stateContainer, circleState, index)
+            setupSeeSolution(stateContainer, circleState)
         }
         isFirstAttempt = false
     }
@@ -317,8 +256,8 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circle.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -326,33 +265,30 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circle.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
-    private fun setupSeeSolution(container: FrameLayout, circle: ImageView, wrongIndex: Int) {
+    private fun setupSeeSolution(container: FrameLayout, circle: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             problemImage.setImageResource(R.drawable.answer_solution_box)
             requireView().findViewById<TextView>(R.id.problemAnswerText).text = correctAnswer.toString()
             circle.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
             isIncorrectAttempt = false
-
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
-
             options.forEach { layout ->
                 val tv = layout.getChildAt(0) as TextView
-                layout.setBackgroundResource(
-                    if (tv.text.toString().toInt() == correctAnswer) R.drawable.option_showed else R.drawable.custom_background
-                )
+                layout.setBackgroundResource(if (tv.text.toString().toInt() == correctAnswer) R.drawable.option_showed else R.drawable.custom_background)
             }
         }
     }
@@ -374,23 +310,18 @@ class UiParenthesesTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_paren
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         answer.visibility = View.VISIBLE
-        checkBtn.text = "CHECK"
-        checkBtn.isEnabled = false
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Clear Mr. Square state
-
+        activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
-
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }

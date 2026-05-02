@@ -10,15 +10,17 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tetragon.R
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
+import com.example.tetragon.utils.languageChangeUtils.LocaleHelper
 import kotlinx.coroutines.launch
 
-class ChatActivity : AppCompatActivity() {
+// 1. Inherit from BaseActivity to apply the locale context
+class ChatActivity : BaseActivity() {
 
     private lateinit var adapter: ChatAdapter
     private lateinit var recyclerView: RecyclerView
@@ -26,6 +28,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var btnSend: FrameLayout
     private lateinit var tvSendText: TextView
 
+    // Note: Moving your API key to BuildConfig or Secrets is recommended for safety
     private val API_KEY = "AIzaSyC3cqE-6HW8xRZKB_eZiWjL43rfTY3xi-w"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,9 +36,7 @@ class ChatActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_chat)
 
-        // Find the close button
         val btnClose: android.widget.ImageView = findViewById(R.id.btnClose)
-
         recyclerView = findViewById(R.id.chatRecyclerView)
         etQuestion = findViewById(R.id.etQuestion)
         btnSend = findViewById(R.id.btnSend)
@@ -44,9 +45,8 @@ class ChatActivity : AppCompatActivity() {
         setupRecycler()
         setupSendButtonUI()
 
-        // Handle Quit/Exit
         btnClose.setOnClickListener {
-            finish() // This closes the activity and goes back
+            finish()
         }
 
         btnSend.setOnClickListener {
@@ -61,7 +61,9 @@ class ChatActivity : AppCompatActivity() {
         adapter = ChatAdapter(mutableListOf())
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-        addBot("Hello! I'm Mr. Square. I am your personal math tutor.")
+
+        // 2. Localized Greeting
+        addBot(getString(R.string.bot_greeting))
     }
 
     private fun setupSendButtonUI() {
@@ -75,38 +77,40 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun updateSendButtonState(hasText: Boolean) {
-        if (hasText) {
-            btnSend.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.blue_2))
-            tvSendText.setTextColor(Color.WHITE)
-            btnSend.isEnabled = true
-        } else {
-            btnSend.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gray_2))
-            tvSendText.setTextColor(ContextCompat.getColor(this, R.color.gray_1))
-            btnSend.isEnabled = false
-        }
+        val colorRes = if (hasText) R.color.blue_2 else R.color.gray_2
+        val textColorRes = if (hasText) android.R.color.white else R.color.gray_1
+
+        btnSend.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, colorRes))
+        tvSendText.setTextColor(ContextCompat.getColor(this, textColorRes))
+        btnSend.isEnabled = hasText
     }
 
     private fun sendMessage(text: String) {
-        // 1. Add YOUR actual typed message to the list
-        // This 'text' parameter comes from etQuestion.text.toString()
+        // Add User Message
         adapter.chatList.add(ChatMessage(text, true))
         adapter.notifyItemInserted(adapter.chatList.size - 1)
         recyclerView.scrollToPosition(adapter.chatList.size - 1)
 
-        // 2. Clear the input and disable it so the user can't spam while waiting
         etQuestion.text.clear()
         setUIEnabled(false)
 
-        // 3. Add the "Thinking" Placeholder
-        // We save its position so we can replace it with the real answer later
+        // 3. Localized "Thinking" Placeholder
         val thinkingPos = adapter.chatList.size
-        adapter.chatList.add(ChatMessage("Mr. Square is thinking...", false))
+        adapter.chatList.add(ChatMessage(getString(R.string.bot_thinking), false))
         adapter.notifyItemInserted(thinkingPos)
         recyclerView.scrollToPosition(thinkingPos)
 
+        // Get Current Language for AI Prompt
+        val langCode = LocaleHelper.getLanguage(this)
+        val aiLanguage = when(langCode) {
+            "ru" -> "Russian"
+            "uz" -> "Uzbek"
+            else -> "English"
+        }
+
         lifecycleScope.launch {
             try {
-                // Prepare the Gemini request
+                // 4. Inject language instruction into the prompt
                 val request = GeminiRequest(
                     contents = listOf(
                         Content(
@@ -116,7 +120,8 @@ class ChatActivity : AppCompatActivity() {
                                     """
                     Instruction: You are Mr. Square, a math tutor. 
                     Constraint: ONLY answer math questions. No markdown. 
-                    Context: You have already greeted the user. Do not introduce yourself or say 'Hello, I am Mr. Square' again. Just answer the question directly.
+                    Language: You MUST respond in $aiLanguage.
+                    Context: Do not introduce yourself. Just answer the question directly.
                     
                     User question: $text
                     """.trimIndent()
@@ -126,38 +131,24 @@ class ChatActivity : AppCompatActivity() {
                     )
                 )
 
-                // Make the API Call
                 val response = RetrofitClient.api.getResponse(API_KEY, request)
+                val raw = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                val cleanAnswer = cleanText(raw ?: getString(R.string.bot_no_answer))
 
-                // Extract the text content
-                val raw = response.candidates
-                    ?.firstOrNull()
-                    ?.content
-                    ?.parts
-                    ?.firstOrNull()
-                    ?.text
-
-                val cleanAnswer = cleanText(raw ?: "I'm sorry, I couldn't process that.")
-
-                // 4. REPLACE the "Thinking" message
                 adapter.chatList[thinkingPos] = ChatMessage(cleanAnswer, false, isAnimated = false)
                 adapter.notifyItemChanged(thinkingPos)
 
             } catch (e: Exception) {
-                // Character-driven error messages
-                val errorMessage = when {
-                    e.message?.contains("429") == true -> {
-                        "Mr. Square is taking a short math break to sharpen his pencils. Please wait a moment!"
-                    }
-                    else -> {
-                        "Mr. Square got his angles crossed! Something went wrong. Let's try again in a bit."
-                    }
+                // 5. Localized Error Messages
+                val errorStr = if (e.message?.contains("429") == true) {
+                    getString(R.string.bot_error_429)
+                } else {
+                    getString(R.string.bot_error_generic)
                 }
 
-                adapter.chatList[thinkingPos] = ChatMessage(errorMessage, false)
+                adapter.chatList[thinkingPos] = ChatMessage(errorStr, false)
                 adapter.notifyItemChanged(thinkingPos)
             } finally {
-                // 5. Re-enable the UI so the user can ask the next question
                 setUIEnabled(true)
             }
         }
@@ -168,9 +159,6 @@ class ChatActivity : AppCompatActivity() {
         if (enabled) {
             etQuestion.requestFocus()
             updateSendButtonState(etQuestion.text.isNotEmpty())
-        } else {
-            btnSend.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gray_2))
-            tvSendText.setTextColor(ContextCompat.getColor(this, R.color.gray_1))
         }
     }
 

@@ -4,6 +4,8 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.View
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -97,8 +99,7 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
         stateContainer = activity.findViewById(R.id.stateContainer)
         circleState = activity.findViewById(R.id.circleState)
 
-        // UPDATED: Simply set the text to "kilogram" for all button states
-        val labelText = "KG"
+        val labelText = getString(R.string.unit_kg_uppercase)
         addBtnLabel.text = labelText
         addBtnDisabledText.text = labelText
         minusBtnLabel.text = labelText
@@ -115,7 +116,7 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
                     resetForTryAgain()
                 } else {
                     val act = requireActivity() as Physics7GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         act.navigateToXpGained()
                     } else {
                         val isMilestoneActive = act.checkAndTriggerMilestone()
@@ -142,7 +143,7 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
             }
 
             vmi.getStringProperty("unit")?.let { unitProp ->
-                unitProp.value = "kg"
+                unitProp.value = getString(R.string.unit_kg_lowercase)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -184,7 +185,12 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
     private fun generateProblem() {
         targetMassKg = (1..9).random()
         val grams = targetMassKg * 1000
-        val fullText = "What is $grams grams in kilograms?"
+
+        val gramsStr = grams.toString()
+        val gramsUnit = getString(R.string.unit_grams_full)
+        val kgUnit = getString(R.string.unit_kilograms_full)
+
+        val fullText = getString(R.string.question_mass_conversion, gramsStr, gramsUnit, kgUnit)
         val spannable = SpannableString(fullText)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
@@ -192,19 +198,19 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
             val start = fullText.indexOf(target)
             if (start != -1) {
                 spannable.setSpan(
-                    android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                    StyleSpan(android.graphics.Typeface.BOLD),
                     start, start + target.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 spannable.setSpan(
-                    android.text.style.ForegroundColorSpan(blueColor),
+                    ForegroundColorSpan(blueColor),
                     start, start + target.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             }
         }
 
-        applyHighlight(grams.toString())
-        applyHighlight("grams")
-        applyHighlight("kilograms")
+        applyHighlight(gramsStr)
+        applyHighlight(gramsUnit)
+        applyHighlight(kgUnit)
 
         questionText.text = spannable
         resetFragmentState()
@@ -223,12 +229,12 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
             if (isFirstAttempt) activity.totalXp += PhysicsGrade7Type.LENGTH.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -239,8 +245,8 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "The mass is exactly $targetMassKg kg"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.solution_mass_correct, targetMassKg)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -248,7 +254,8 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
@@ -257,15 +264,15 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "1000 grams = 1 kg, so answer is $targetMassKg kg"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_mass_explanation, targetMassKg)
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
             massProperty?.value = targetMassKg.toFloat()
             riveAnimation.setNumberState(STATE_MACHINE, "weight", targetMassKg.toFloat())
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
             updateVisualButtonStates()
@@ -309,7 +316,7 @@ class UiMassFragment : Fragment(R.layout.fragment_ui_mass) {
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }

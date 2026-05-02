@@ -111,8 +111,6 @@ class UiMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui_multip
         } catch (e: Exception) { e.printStackTrace() }
     }
 
-    // ---------------------- PROBLEM GENERATION ----------------------
-
     private fun generateProblem() {
         val factor1 = Random.nextInt(2, 11)
         val factor2 = Random.nextInt(2, 11)
@@ -157,8 +155,6 @@ class UiMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui_multip
         multEquationText.text = spannable
     }
 
-    // ---------------------- CHECKING LOGIC ----------------------
-
     private fun checkAnswer() {
         val selectedIndex = getAnswerChoiceValue().toInt()
         val userValue = optionMapping[selectedIndex] ?: -1
@@ -184,13 +180,13 @@ class UiMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui_multip
 
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             multAnswerBox.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -200,8 +196,8 @@ class UiMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui_multip
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer, correctAnswer.toString())
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -209,21 +205,22 @@ class UiMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui_multip
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.label_answer, correctAnswer.toString())
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
 
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             multAnswerBox.setImageResource(R.drawable.answer_solution_box)
             multAnswerText.text = correctAnswer.toString()
             multAnswerText.visibility = View.VISIBLE
@@ -264,7 +261,7 @@ class UiMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui_multip
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
@@ -312,7 +309,7 @@ class UiMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui_multip
         answerDisplay.text = ""
         answerDisplay.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 
@@ -335,7 +332,7 @@ class UiMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui_multip
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))

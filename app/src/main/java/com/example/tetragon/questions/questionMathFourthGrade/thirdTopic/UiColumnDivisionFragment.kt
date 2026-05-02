@@ -22,7 +22,6 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
     private var _binding: FragmentUiColumnDivisionBinding? = null
     private val binding get() = _binding!!
 
-    // Shared UI elements from Activity
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
     private lateinit var btnBack: View
@@ -31,13 +30,11 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
     private lateinit var stateAnswer: TextView
     private lateinit var answer: TextView
 
-    // Focus & Cursor
     private var activeInput: TextView? = null
     private var activeBox: ImageView? = null
     private var activeCursor: View? = null
     private var cursorAnimator: ObjectAnimator? = null
 
-    // Problem Variables
     private var dividend = 0
     private var divisor = 0
     private var correctQuotient = 0
@@ -85,7 +82,6 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
     private fun setFocus(targetTextView: TextView, targetBox: ImageView, targetCursor: View) {
         if (isAnswerChecked) return
 
-        // Reset all boxes and cursors
         listOf(binding.ivBoxQuotient, binding.ivBoxSub1, binding.ivBoxSub2).forEach {
             it.setImageResource(R.drawable.answer_default_box)
         }
@@ -102,9 +98,8 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
         activeCursor?.visibility = View.VISIBLE
         updateCursorPosition()
 
-        // Start Blinking Animation
         cursorAnimator = ObjectAnimator.ofFloat(targetCursor, "alpha", 1.0f, 0.0f).apply {
-            duration = 500 // Use property access syntax here
+            duration = 500
             repeatMode = ValueAnimator.REVERSE
             repeatCount = ValueAnimator.INFINITE
             start()
@@ -115,7 +110,6 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
         val cursor = activeCursor ?: return
         val input = activeInput ?: return
         val density = resources.displayMetrics.density
-        // If text exists, shift cursor slightly to the right or hide it
         cursor.translationX = if (input.text.isNotEmpty()) 12f * density else 0f
     }
 
@@ -123,31 +117,25 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
         val activity = requireActivity() as Math4GradeQuestionActivity
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
 
-        // Logic for 3-digit dividend and 2-digit divisor
         while (true) {
             divisor = Random.Default.nextInt(11, 25)
-            val quotient = Random.Default.nextInt(11, 15) // Keeps numbers manageable for 4th grade
+            val quotient = Random.Default.nextInt(11, 15)
             dividend = divisor * quotient
 
             val d1 = dividend / 100
             val d2 = (dividend / 10) % 10
             val d3 = dividend % 10
 
-            // Step 1 subtraction (e.g., 14 - 12)
             val step1Dividend = dividend / 10
             val step1Sub = divisor * 1
-
-            // Step 2 logic
             val remainder1 = step1Dividend - step1Sub
             val step2Dividend = remainder1 * 10 + d3
 
-            // Check if values fit the UI slots (1 digit for inputs)
             if (remainder1 in 1..9 && (step2Dividend / divisor) in 1..9) {
-                correctSub1 = step1Sub % 10 // User inputs the ones digit of the first subtraction
-                correctQuotient = quotient % 10 // User inputs the ones digit of quotient
-                correctSub2 = step2Dividend % 10 // User inputs the ones digit of second subtraction
+                correctSub1 = step1Sub % 10
+                correctQuotient = quotient % 10
+                correctSub2 = step2Dividend % 10
 
-                // Set Static Numbers
                 binding.tvDividend1.text = d1.toString()
                 binding.tvDividend2.text = d2.toString()
                 binding.tvDividend3.text = d3.toString()
@@ -173,7 +161,7 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
         seeBtn.visibility = View.GONE
 
         setFocus(binding.tvInputQuotient, binding.ivBoxQuotient, binding.cursorQuotient)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -221,12 +209,11 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
             activity.playSuccessAnimation()
             setAllBoxes(R.drawable.answer_correct_box)
 
-            // CONSTRUCT DYNAMIC STRING
             val fullDividend = "${binding.tvDividend1.text}${binding.tvDividend2.text}${binding.tvDividend3.text}"
             val fullDivisor = binding.tvDivisor.text
             val fullQuotient = "${binding.tvQuotientStatic.text}${binding.tvInputQuotient.text}"
 
-            answer.text = "$fullDividend ÷ $fullDivisor = $fullQuotient"
+            answer.text = getString(R.string.label_answer_division, fullDividend, fullDivisor, fullQuotient)
             answer.visibility = View.VISIBLE
 
             val isFinished = activity.incrementProgress()
@@ -234,13 +221,13 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
 
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             setAllBoxes(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -256,7 +243,7 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -273,16 +260,15 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
 
-            // CONSTRUCT DYNAMIC STRING
             val fullDividend = "${binding.tvDividend1.text}${binding.tvDividend2.text}${binding.tvDividend3.text}"
             val fullDivisor = binding.tvDivisor.text
-            val result = dividend / divisor // Or calculate from static + correct input
+            val result = dividend / divisor
 
-            answer.text = "$fullDividend ÷ $fullDivisor = $result"
+            answer.text = getString(R.string.label_answer_division, fullDividend, fullDivisor, result.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             setAllBoxes(R.drawable.answer_solution_box)
             binding.tvInputQuotient.text = correctQuotient.toString()
@@ -310,7 +296,7 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
         setAllBoxes(R.drawable.answer_default_box)
         seeBtn.visibility = View.GONE
         setFocus(binding.tvInputQuotient, binding.ivBoxQuotient, binding.cursorQuotient)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -322,14 +308,14 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
         seeBtn.visibility = View.GONE
         setupInitialButtonState()
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
     }
 
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
+        stateAnswer.text = getString(R.string.state_correct)
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
         enableCheckButton()
@@ -338,9 +324,10 @@ class UiColumnDivisionFragment : Fragment(R.layout.fragment_ui_column_division) 
     private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
         enableCheckButton()
     }

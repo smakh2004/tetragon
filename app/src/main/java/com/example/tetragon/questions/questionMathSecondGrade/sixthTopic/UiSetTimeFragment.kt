@@ -19,6 +19,8 @@ import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.core.SMINumber
 import com.example.tetragon.R
 import com.example.tetragon.questions.questionMathSecondGrade.Math2GradeQuestionActivity
+import com.example.tetragon.questions.questionMathSecondGrade.MathGrade2Type
+import com.example.tetragon.questions.questionMathSixthGrade.MathGrade6Type
 
 class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
 
@@ -58,17 +60,14 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
             val currentHr = getRiveValue(INPUT_HOURS)
 
             if (!isUserInteracting) {
-                // Fetch the values we 'locked' during reset
                 val lockedHr = riveClock.getTag() as? Float ?: -1f
                 val lockedMin = riveClock.getTag(R.id.topic12) as? Float ?: -1f
 
-                // We use a slightly larger threshold (0.5) to avoid accidental triggers from Rive float precision
                 if (Math.abs(currentMin - lockedMin) > 0.5f || Math.abs(currentHr - lockedHr) > 0.5f) {
                     isUserInteracting = true
                     enableCheckButton()
                 }
             }
-
             mainHandler.postDelayed(this, 100)
         }
     }
@@ -77,8 +76,6 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
         generateProblem()
-
-        // DELAY the start of the polling to allow Rive to finish its internal setup
         mainHandler.postDelayed(checkRunnable, 500)
     }
 
@@ -107,7 +104,7 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
 
     private fun updateQuestionText() {
         val timeText = String.format("%d:%02d", targetHour, targetMinute)
-        val sentence = "Set this time $timeText."
+        val sentence = getString(R.string.instruction_set_time, timeText)
         val spannable = SpannableString(sentence)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
@@ -135,15 +132,15 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
             playSound(R.raw.correct)
             activity.playSuccessAnimation()
             val isFinished = activity.incrementProgress()
-            if (isFirstAttempt) activity.totalXp += 10
+            if (isFirstAttempt) activity.totalXp += MathGrade2Type.SET_TIME.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -153,9 +150,9 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
             val timeText = String.format("%d:%02d", targetHour, targetMinute)
-            answerDisplay.text = "The correct time is $timeText"
+            answerDisplay.text = getString(R.string.solution_set_time, timeText)
             answerDisplay.visibility = View.VISIBLE
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
@@ -169,7 +166,7 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
             riveClock.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, true)
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
         }
     }
@@ -196,8 +193,7 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    val activity = requireActivity() as Math2GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -216,18 +212,16 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
         isAnswerChecked = false
         isIncorrectAttempt = false
         isUserInteracting = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
 
         riveClock.setBooleanState(STATE_MACHINE, "hour_hand_active", true)
         riveClock.setBooleanState(STATE_MACHINE, "minute_hand_active", true)
 
-        // Set the numbers
         riveClock.setNumberState(STATE_MACHINE, INPUT_HOURS, startHr.toFloat())
         riveClock.setNumberState(STATE_MACHINE, INPUT_MINUTES, startMin.toFloat())
 
-        // Lock exactly what the Rive engine reports as its current values
         riveClock.setTag(startHr.toFloat())
         riveClock.setTag(R.id.topic12, startMin.toFloat())
 
@@ -246,7 +240,6 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
         isIncorrectAttempt = false
         isUserInteracting = false
 
-        // Lock where the hands currently are
         val currentHr = getRiveValue(INPUT_HOURS)
         val currentMin = getRiveValue(INPUT_MINUTES)
 
@@ -258,12 +251,10 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
         answerDisplay.text = ""
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         disableCheckButton()
-
-        // Delay restarting the polling so it doesn't catch a frame jitter
         mainHandler.postDelayed(checkRunnable, 300)
     }
 
@@ -277,8 +268,11 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: ${String.format("%d:%02d", targetHour, targetMinute)}"
+        stateAnswer.text = getString(R.string.state_correct)
+
+        val timeText = String.format("%d:%02d", targetHour, targetMinute)
+        answerDisplay.text = getString(R.string.label_answer, timeText)
+
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -286,9 +280,10 @@ class UiSetTimeFragment : Fragment(R.layout.fragment_ui_set_time) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

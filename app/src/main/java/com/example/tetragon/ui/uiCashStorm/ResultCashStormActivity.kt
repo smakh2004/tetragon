@@ -115,14 +115,14 @@ class ResultCashStormActivity : BaseActivity() {
             }
         }.addOnSuccessListener { isNewRecord ->
             if (isNewRecord) {
-                resultTextShower.text = "New Profit Record!"
+                resultTextShower.text = getString(R.string.new_profit_record)
                 playNewRecordSound()
             } else {
                 resultTextShower.text = getCashStormTierMessage()
                 playNotRecordSound()
             }
         }.addOnFailureListener {
-            resultTextShower.text = "Sync Error"
+            resultTextShower.text = getString(R.string.sync_error)
         }
     }
 
@@ -131,13 +131,13 @@ class ResultCashStormActivity : BaseActivity() {
      */
     private fun getCashStormTierMessage(): String {
         return when {
-            currentScore < 5 -> "Starting Your Business!"
-            currentScore < 15 -> "Smart Spender!"
-            currentScore < 25 -> "Wealth Builder!"
-            currentScore < 35 -> "Profit Master!"
-            currentScore < 45 -> "Cash Tycoon!"
-            currentScore < 55 -> "Financial Genius!"
-            else -> "Market Legend!"
+            currentScore < 5 -> getString(R.string.tier_starting_business)
+            currentScore < 15 -> getString(R.string.tier_smart_spender)
+            currentScore < 25 -> getString(R.string.tier_wealth_builder)
+            currentScore < 35 -> getString(R.string.tier_profit_master)
+            currentScore < 45 -> getString(R.string.tier_cash_tycoon)
+            currentScore < 55 -> getString(R.string.tier_financial_genius)
+            else -> getString(R.string.tier_market_legend)
         }
     }
 

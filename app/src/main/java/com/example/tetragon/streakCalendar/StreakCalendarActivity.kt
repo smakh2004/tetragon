@@ -11,12 +11,13 @@ import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tetragon.R
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
-class StreakCalendarActivity : AppCompatActivity() {
+class StreakCalendarActivity : BaseActivity() {
 
     private lateinit var rvCalendar: RecyclerView
     private lateinit var tvStreakCount: TextView

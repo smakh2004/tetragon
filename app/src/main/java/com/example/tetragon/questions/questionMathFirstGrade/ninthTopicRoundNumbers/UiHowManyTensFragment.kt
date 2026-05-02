@@ -16,7 +16,6 @@ import com.example.tetragon.questions.questionMathFirstGrade.MathGrade1Type
 
 class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
 
-    // UI Components
     private lateinit var questionText: TextView
     private lateinit var options: List<LinearLayout>
     private lateinit var checkBtn: Button
@@ -27,7 +26,6 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
     private lateinit var stateAnswer: TextView
     private lateinit var answer: TextView
 
-    // Question Data
     private var targetNumber = 0
     private var correctTens = 0
     private var selectedOptionIndex: Int? = null
@@ -38,7 +36,6 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initViews(view)
         setupInitialButtonState()
         generateProblem()
@@ -64,44 +61,16 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
         answer = activity.findViewById(R.id.answer)
     }
 
-    private fun setupInitialButtonState() {
-        btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
-        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
-        checkBtn.isEnabled = false
-    }
-
     private fun generateProblem() {
-        // 1. Pick a random round number between 10 and 90
         targetNumber = (1..9).random() * 10
         correctTens = targetNumber / 10
 
-        // 2. Set question text with blue highlight
-        val baseText = "How many tens are in the number $targetNumber?"
-        val spannable = SpannableString(baseText)
-        val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
+        setupSpannableQuestion()
 
-        val tensWord = "tens"
-        val tensStart = baseText.indexOf(tensWord)
-        if (tensStart != -1) {
-            spannable.setSpan(ForegroundColorSpan(blueColor), tensStart, tensStart + tensWord.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-
-        val numberString = targetNumber.toString()
-        val numberStart = baseText.indexOf(numberString)
-        if (numberStart != -1) {
-            spannable.setSpan(ForegroundColorSpan(blueColor), numberStart, numberStart + numberString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-
-        questionText.text = spannable
-
-        // 3. Generate Options
         val optionSet = mutableSetOf<Int>()
         optionSet.add(correctTens)
-
         while (optionSet.size < 3) {
-            val distractor = (1..9).random()
-            optionSet.add(distractor)
+            optionSet.add((1..9).random())
         }
 
         val shuffled = optionSet.toList().shuffled()
@@ -111,36 +80,102 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
             layout.setBackgroundResource(R.drawable.custom_background)
         }
 
-        // --- ADDED RESET LOGIC HERE ---
         resetFragmentState()
     }
 
-    // --- Interaction Logic (Clicks & Check) ---
+    private fun setupSpannableQuestion() {
+        val baseText = getString(R.string.question_how_many_tens, targetNumber)
+        val spannable = SpannableString(baseText)
+        val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-    private fun setupOptionClicks() {
-        options.forEachIndexed { index, layout ->
-            layout.setOnClickListener {
-                if (isAnswerChecked) return@setOnClickListener
-                selectedOptionIndex = index
-                highlightSelectedOption(index)
-                enableCheckButton()
+        // Keywords to highlight in the sentence
+        val keywords = listOf(getString(R.string.keyword_tens), targetNumber.toString())
+
+        keywords.forEach { word ->
+            val start = baseText.indexOf(word)
+            if (start != -1) {
+                spannable.setSpan(
+                    ForegroundColorSpan(blueColor),
+                    start,
+                    start + word.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
         }
+        questionText.text = spannable
     }
 
-    private fun highlightSelectedOption(index: Int) {
-        options.forEachIndexed { i, layout ->
-            layout.setBackgroundResource(
-                if (i == index) R.drawable.option_selected
-                else R.drawable.custom_background
-            )
+    private fun checkAnswer(index: Int, stateContainer: FrameLayout, circleState: ImageView) {
+        isAnswerChecked = true
+        val chosen = (options[index].getChildAt(0) as TextView).text.toString().toInt()
+        val activity = requireActivity() as Math1GradeQuestionActivity
+        activity.isResultCurrentlyVisible = true
+        stateContainer.visibility = View.VISIBLE
+
+        if (chosen == correctTens) {
+            playSound(R.raw.correct)
+            activity.isCorrectAnswerShowing = true
+            activity.playSuccessAnimation()
+
+            val isFinished = activity.incrementProgress()
+            if (isFirstAttempt) activity.totalXp += MathGrade1Type.HOW_MANY_TENS_ROUND_NUMBERS.xp
+            activity.handleCorrectAnswer()
+
+            isIncorrectAttempt = false
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
+            showCorrectState(stateContainer, circleState, index)
+        } else {
+            playSound(R.raw.wrong)
+            isIncorrectAttempt = true
+            checkBtn.text = getString(R.string.btn_try_again)
+            showIncorrectState(stateContainer, circleState, index)
+            setupSeeSolution(stateContainer, circleState)
         }
+        isFirstAttempt = false
     }
 
-    private fun enableCheckButton() {
-        checkBtn.isEnabled = true
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
+    private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
+        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
+        circleState.setImageResource(R.drawable.correct_tick_icon)
+        options[index].setBackgroundResource(R.drawable.option_correct)
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer_tens, correctTens)
+        applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
+    }
+
+    private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
+        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
+        circleState.setImageResource(R.drawable.wrong_circle)
+        options[index].setBackgroundResource(R.drawable.option_incorrect)
+        stateAnswer.text = getString(R.string.state_incorrect)
+        answer.visibility = View.GONE
+        seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
+        applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
+    }
+
+    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
+        seeEnabledButton.setOnClickListener {
+            seeBtn.visibility = View.GONE
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer_tens, correctTens)
+            answer.visibility = View.VISIBLE
+            circleState.setImageResource(R.drawable.solution_lamp_icon)
+            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+
+            options.forEach { layout ->
+                val tv = layout.getChildAt(0) as TextView
+                layout.setBackgroundResource(
+                    if (tv.text.toString().toInt() == correctTens) R.drawable.option_showed
+                    else R.drawable.custom_background
+                )
+            }
+
+            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
+            checkBtn.text = getString(R.string.btn_continue)
+            isIncorrectAttempt = false
+            isAnswerChecked = true
+        }
     }
 
     private fun setupCheckButton() {
@@ -155,12 +190,10 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
                     resetForTryAgain()
                 } else {
                     val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
-                        // GATE: Trigger milestone ONLY after clicking CONTINUE
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
-
                         if (!isMilestoneActive) {
                             resetUIForNext()
                             activity.showRandomQuestion()
@@ -171,106 +204,18 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
         }
     }
 
-    private fun checkAnswer(index: Int, stateContainer: FrameLayout, circleState: ImageView) {
-        isAnswerChecked = true
-        val chosen = (options[index].getChildAt(0) as TextView).text.toString().toInt()
-        val activity = requireActivity() as Math1GradeQuestionActivity
-        activity.isResultCurrentlyVisible = true
-        stateContainer.visibility = View.VISIBLE
-
-        if (chosen == correctTens) {
-            playSound(R.raw.correct)
-            activity.isCorrectAnswerShowing = true
-
-            // 1. Immediate visual celebration
-            activity.playSuccessAnimation()
-
-            val isFinished = activity.incrementProgress()
-            if (isFirstAttempt) activity.totalXp += MathGrade1Type.HOW_MANY_TENS_ROUND_NUMBERS.xp
-
-            // 2. Log the milestone progress
-            activity.handleCorrectAnswer()
-
-            isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
-            showCorrectState(stateContainer, circleState, index)
-        } else {
-            playSound(R.raw.wrong)
-            isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
-            showIncorrectState(stateContainer, circleState, index)
-            setupSeeSolution(stateContainer, circleState)
-        }
-        isFirstAttempt = false
-    }
-
-    // --- State & UI Updates ---
-
-    private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
-        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
-        circleState.setImageResource(R.drawable.correct_tick_icon)
-        options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctTens tens"
-        applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
-    }
-
-    private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
-        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
-        circleState.setImageResource(R.drawable.wrong_circle)
-        options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
-        answer.visibility = View.GONE
-        seeBtn.visibility = View.VISIBLE
-        applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
-    }
-
-    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
-        seeEnabledButton.setOnClickListener {
-            seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctTens tens"
-            answer.visibility = View.VISIBLE
-            circleState.setImageResource(R.drawable.solution_lamp_icon)
-            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
-
-            options.forEach { layout ->
-                val tv = layout.getChildAt(0) as TextView
-                layout.setBackgroundResource(
-                    if (tv.text.toString().toInt() == correctTens) R.drawable.option_showed
-                    else R.drawable.custom_background
-                )
-            }
-
-            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
-            isIncorrectAttempt = false
-            isAnswerChecked = true
-        }
-    }
-
-    private fun applyButtonColors(btn: Int, back: Int, bg: Int) {
-        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), btn)
-        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), back)
-        btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), bg))
-    }
-
     private fun resetFragmentState() {
         selectedOptionIndex = null
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
-
-        // Reset the Button UI to the "Disabled" state
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-
-        setupInitialButtonState() // Resets colors to default white/blue
+        setupInitialButtonState()
     }
 
     private fun resetForTryAgain() {
@@ -280,7 +225,7 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
         isIncorrectAttempt = false
         selectedOptionIndex = null
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -292,16 +237,51 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Ensure character is hidden
-
+        activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
-
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
+        options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
+    }
+
+    private fun setupOptionClicks() {
+        options.forEachIndexed { index, layout ->
+            layout.setOnClickListener {
+                if (isAnswerChecked) return@setOnClickListener
+                selectedOptionIndex = index
+                highlightSelectedOption(index)
+                enableCheckButton()
+            }
+        }
+    }
+
+    private fun highlightSelectedOption(index: Int) {
+        options.forEachIndexed { i, layout ->
+            layout.setBackgroundResource(if (i == index) R.drawable.option_selected else R.drawable.custom_background)
+        }
+    }
+
+    private fun enableCheckButton() {
+        checkBtn.isEnabled = true
+        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
+    }
+
+    private fun applyButtonColors(btn: Int, back: Int, bg: Int) {
+        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), btn)
+        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), back)
+        btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), bg))
+    }
+
+    private fun setupInitialButtonState() {
+        btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
+        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
+        checkBtn.isEnabled = false
     }
 
     private fun playSound(resId: Int) {

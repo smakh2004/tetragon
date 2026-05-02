@@ -41,7 +41,7 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
-    private var isInitialized = false // Added guard
+    private var isInitialized = false
     private var mediaPlayer: MediaPlayer? = null
 
     private val STATE_MACHINE = "State Machine 1"
@@ -66,7 +66,6 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
 
-        // Only initialize once per visit
         if (!isInitialized) {
             riveKettle.post {
                 setupRiveViewModel()
@@ -93,7 +92,7 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
             }
 
             vmi.getStringProperty("liter")?.let { literProp ->
-                literProp.value = "L"
+                literProp.value = getString(R.string.unit_liter_short)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -107,10 +106,11 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
     }
 
     private fun updateQuestionText() {
-        val sentence = "Fill the kettle with $targetLiters liters of water."
+        val targetPhrase = getString(R.string.target_liters_phrase, targetLiters)
+        val sentence = getString(R.string.question_fill_kettle, targetPhrase)
+
         val spannable = SpannableString(sentence)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
-        val targetPhrase = "$targetLiters liters"
 
         val start = sentence.indexOf(targetPhrase)
         if (start != -1) {
@@ -135,12 +135,12 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
             if (isFirstAttempt) activity.totalXp += PhysicsGrade7Type.KETTLE_LITRES.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -158,8 +158,8 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "The correct level is $targetLiters liters"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_kettle_liters, targetLiters)
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -168,7 +168,7 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
             riveKettle.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, true)
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
         }
     }
@@ -195,7 +195,7 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -213,7 +213,7 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
     private fun resetFragmentState() {
         isAnswerChecked = false
         isIncorrectAttempt = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         riveKettle.setNumberState(STATE_MACHINE, INPUT_CHOICE, 0f)
@@ -233,7 +233,7 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         disableCheckButton()
         mainHandler.post(checkRunnable)
@@ -243,16 +243,14 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
         val activity = requireActivity() as Physics7GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
-
-        // STOP the listener but do not reset the Rive state yet
         mainHandler.removeCallbacks(checkRunnable)
     }
 
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $targetLiters L"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.answer_with_liters, targetLiters)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -260,7 +258,8 @@ class UiLiteresFragment : Fragment(R.layout.fragment_ui_literes) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)

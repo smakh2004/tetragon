@@ -1,6 +1,5 @@
 package com.example.tetragon.questions.questionPhysicsNinthGrade.firstTopic
 
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.Spannable
@@ -12,7 +11,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tetragon.R
 import com.example.tetragon.questions.questionPhysicsNinthGrade.Physics9GradeQuestionActivity
-import com.example.tetragon.questions.questionPhysicsNinthGrade.PhysicsGrade9Topic
 import com.example.tetragon.questions.questionPhysicsNinthGrade.PhysicsGrade9Type
 
 class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
@@ -66,14 +64,12 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
     }
 
     private fun generateProblem() {
-        // F = m * a
         massValue = (2..20).random()
         accelerationValue = (2..10).random()
         correctAnswer = massValue * accelerationValue
 
         val optionsSet = mutableSetOf(correctAnswer)
         while (optionsSet.size < 3) {
-            // Create distractors based on common calculation errors (addition or subtraction)
             val wrong = when((1..3).random()) {
                 1 -> massValue + accelerationValue
                 2 -> correctAnswer + (2..10).random()
@@ -85,7 +81,7 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
         val shuffled = optionsSet.toList().shuffled()
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
-            tv.text = "${shuffled[index]} N"
+            tv.text = getString(R.string.unit_newtons, shuffled[index])
             layout.setBackgroundResource(R.drawable.custom_background)
         }
 
@@ -100,7 +96,7 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
 
@@ -112,11 +108,15 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
     }
 
     private fun updateQuestionText() {
-        val fullText = "Find the force F. m = $massValue kg, a = $accelerationValue m/s²"
+        val fLabel = getString(R.string.label_force_f)
+        val mLabel = getString(R.string.label_mass_short)
+        val aLabel = getString(R.string.label_acceleration_short)
+        val fullText = getString(R.string.question_find_force, massValue, accelerationValue)
+
         val spannable = SpannableStringBuilder(fullText)
         val lightBlue = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val keywords = listOf("force F", "m =", "a =")
+        val keywords = listOf(fLabel, "$mLabel =", "$aLabel =")
         keywords.forEach { word ->
             val start = fullText.indexOf(word)
             if (start != -1) {
@@ -148,7 +148,7 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Physics9GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else if (!activity.checkAndTriggerMilestone()) {
                     resetUIForNext()
@@ -172,17 +172,16 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
             activity.playSuccessAnimation()
             val isFinished = activity.incrementProgress()
 
-            // Correct XP allocation for Grade 9 Topic
-            if (isFirstAttempt) activity.totalXp += PhysicsGrade9Type.FIND_FORCE.xp // Or use a constant from your Topic Enum
+            if (isFirstAttempt) activity.totalXp += PhysicsGrade9Type.FIND_FORCE.xp
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -192,10 +191,10 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "F = m × a = $massValue × $accelerationValue = $correctAnswer N"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_force_calculation, massValue, accelerationValue, correctAnswer)
             answerDisplay.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
@@ -228,7 +227,7 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
         stateAnswer.text = ""
         answerDisplay.text = ""
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
@@ -262,8 +261,8 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer N"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer_force, correctAnswer)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -272,9 +271,10 @@ class UiFindForceFragment : Fragment(R.layout.fragment_ui_find_force) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

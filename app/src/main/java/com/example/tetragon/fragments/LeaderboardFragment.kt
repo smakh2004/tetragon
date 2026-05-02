@@ -58,16 +58,22 @@ class LeaderboardFragment : Fragment() {
 
     private fun updateMonthUI() {
         val calendar = Calendar.getInstance()
-        val monthFormat = SimpleDateFormat("MMMM", Locale.ENGLISH)
-        val monthName = monthFormat.format(calendar.time).uppercase()
 
+        // 1. Use default locale to get translated month names automatically
+        val monthFormat = SimpleDateFormat("MMMM", Locale.getDefault())
+        val monthName = monthFormat.format(calendar.time).uppercase()
         monthText.text = monthName
 
         val today = calendar.get(Calendar.DAY_OF_MONTH)
         val maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         val daysLeft = maxDays - today
 
-        daysText.text = if (daysLeft == 1) "1 DAY" else "$daysLeft DAYS"
+        // 2. Localized Days Left
+        daysText.text = if (daysLeft == 1) {
+            getString(R.string.days_left_singular)
+        } else {
+            getString(R.string.days_left_plural, daysLeft)
+        }
     }
 
     private fun loadLeaderboard() {
@@ -115,20 +121,26 @@ class LeaderboardFragment : Fragment() {
     private fun updateHeaderUI(myRank: Int) {
         context?.let { ctx ->
             if (myRank > 0) {
-                val fullText = "You are in $myRank-place"
-                val spannable = SpannableString(fullText)
+                // 3. Localized Rank String: "You are in 5-place"
+                val rankString = getString(R.string.rank_status_format, myRank)
+                val spannable = SpannableString(rankString)
                 val blueColor = ContextCompat.getColor(ctx, R.color.blue_2)
-                val startOfRank = fullText.indexOf(myRank.toString())
 
-                spannable.setSpan(
-                    ForegroundColorSpan(blueColor),
-                    startOfRank,
-                    fullText.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                // Find the start of the number to begin coloring
+                val startOfRank = rankString.indexOf(myRank.toString())
+
+                if (startOfRank != -1) {
+                    spannable.setSpan(
+                        ForegroundColorSpan(blueColor),
+                        startOfRank,
+                        rankString.length, // Colors the number and everything after it
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
                 positionText.text = spannable
             } else {
-                positionText.text = "Start to gain XP!"
+                // 4. Localized "Start to gain XP!"
+                positionText.text = getString(R.string.start_gaining_xp)
             }
         }
     }

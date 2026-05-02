@@ -30,7 +30,7 @@ import kotlin.random.Random
 class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
 
     private lateinit var drawingView: DrawingView
-    private lateinit var drawingOverlay: View // Added Overlay reference
+    private lateinit var drawingOverlay: View
     private lateinit var tvQuestion: TextView
     private var module: Module? = null
 
@@ -65,7 +65,7 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
 
         tvQuestion = view.findViewById(R.id.tvQuestion)
         drawingView = view.findViewById(R.id.drawingView)
-        drawingOverlay = view.findViewById(R.id.drawingOverlay) // Initialize Overlay
+        drawingOverlay = view.findViewById(R.id.drawingOverlay)
         boxIndicator = view.findViewById(R.id.boxIndicator)
         tvAnswerOverlay = view.findViewById(R.id.tvAnswerOverlay)
         undoBtn = view.findViewById(R.id.undoBtn)
@@ -98,7 +98,6 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
         }
 
         drawingView.setOnTouchListener { _, event ->
-            // If the view is disabled via code, ensure sound doesn't play
             if (!drawingView.isEnabled) return@setOnTouchListener false
 
             drawingView.onTouchEvent(event)
@@ -150,7 +149,7 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
 
         drawingView.clearCanvas()
         drawingView.isEnabled = true
-        drawingOverlay.visibility = View.GONE // Ensure drawing is enabled for new question
+        drawingOverlay.visibility = View.GONE
 
         tvAnswerOverlay.visibility = View.GONE
         boxIndicator.setImageResource(R.drawable.answer_blue_box)
@@ -160,7 +159,7 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
 
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -170,11 +169,11 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
         val predictedDigit = getAiPrediction()
 
         if (predictedDigit == -1) {
-            Toast.makeText(context, "Please draw a clear number!", Toast.LENGTH_SHORT).show()
+            // Using localized string for the toast
+            Toast.makeText(context, getString(R.string.toast_clear_number), Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Lock interaction by enabling the overlay
         drawingView.isEnabled = false
         drawingOverlay.visibility = View.VISIBLE
 
@@ -198,14 +197,14 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
             }
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             boxIndicator.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
-            showIncorrectState(stateContainer, circleState, predictedDigit)
+            checkBtn.text = getString(R.string.btn_try_again)
+            showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
         isFirstAttempt = false
@@ -223,7 +222,7 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -240,21 +239,21 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
         enableCheckButton()
     }
 
-    private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView, predicted: Int) {
-        // Drawing remains on canvas but overlay blocks further interaction
+    private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         drawingView.isEnabled = false
         drawingOverlay.visibility = View.VISIBLE
 
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
@@ -266,15 +265,15 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
             seeBtn.visibility = View.GONE
             drawingView.clearCanvas()
             drawingView.isEnabled = false
-            drawingOverlay.visibility = View.VISIBLE // Keep blocked during solution
+            drawingOverlay.visibility = View.VISIBLE
 
             tvAnswerOverlay.text = correctAnswer.toString()
             tvAnswerOverlay.visibility = View.VISIBLE
 
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             boxIndicator.setImageResource(R.drawable.answer_solution_box)
             circleState.setImageResource(R.drawable.solution_lamp_icon)
 
@@ -297,7 +296,7 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
 
         drawingView.clearCanvas()
         drawingView.isEnabled = true
-        drawingOverlay.visibility = View.GONE // Allow writing again for retry
+        drawingOverlay.visibility = View.GONE
 
         tvAnswerOverlay.visibility = View.GONE
         boxIndicator.setImageResource(R.drawable.answer_blue_box)
@@ -308,7 +307,7 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
         answer.visibility = View.VISIBLE
         answer.text = ""
 
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -323,7 +322,7 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         setupInitialButtonState()
     }

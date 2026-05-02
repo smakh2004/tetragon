@@ -74,7 +74,8 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
         val seq = listOf(startNum, startNum + step, startNum + (step * 2))
         val targetNum = startNum + (step * 3)
 
-        firstNumberText.text = "${seq.joinToString(", ")}, "
+        // Using sequence template to ensure correct spacing/formatting
+        firstNumberText.text = getString(R.string.sequence_template, seq.joinToString(", "))
         correctAnswer = targetNum.toString()
 
         problemAnswerText.text = ""
@@ -110,7 +111,6 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
                 highlightSelectedOption(index)
                 enableCheckButton()
 
-                // Update the blue box with the chosen value in real-time
                 val chosenValue = (layout.getChildAt(0) as TextView).text.toString()
                 problemAnswerText.text = chosenValue
                 problemAnswerText.visibility = View.VISIBLE
@@ -129,24 +129,21 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
             playSound(R.raw.correct)
             problemImage.setImageResource(R.drawable.answer_correct_box)
             activity.isCorrectAnswerShowing = true
-
-            // 1. Trigger the celebration animation
             activity.playSuccessAnimation()
 
             val isFinished = activity.incrementProgress()
             if (isFirstAttempt) activity.totalXp += MathGrade1Type.CONTINUE_SEQUENCE_ROUND_NUMBERS.xp
 
-            // 2. Log the correct answer for milestone tracking
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -157,13 +154,12 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
 
-            // Show correct answer in box
             problemAnswerText.text = correctAnswer
             problemAnswerText.visibility = View.VISIBLE
             problemImage.setImageResource(R.drawable.answer_solution_box)
 
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer)
             answer.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -177,7 +173,7 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
             }
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
         }
@@ -190,12 +186,11 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
         isIncorrectAttempt = false
         selectedOptionIndex = null
 
-        // Reset Box
         problemAnswerText.visibility = View.GONE
         problemImage.setImageResource(R.drawable.answer_blue_box)
 
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -209,32 +204,16 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Clear animation for next question
+        activity.hideSuccessAnimation()
 
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-    }
-
-    // --- Helper Methods ---
-
-    private fun highlightSelectedOption(selectedIndex: Int) {
-        options.forEachIndexed { i, layout ->
-            layout.setBackgroundResource(
-                if (i == selectedIndex) R.drawable.option_selected else R.drawable.custom_background
-            )
-        }
-    }
-
-    private fun enableCheckButton() {
-        checkBtn.isEnabled = true
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
     }
 
     private fun setupCheckButton() {
@@ -249,12 +228,10 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
                     resetForTryAgain()
                 } else {
                     val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
-                        // GATE: Intercept the "CONTINUE" click for milestones
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
-
                         if (!isMilestoneActive) {
                             resetUIForNext()
                             activity.showRandomQuestion()
@@ -269,8 +246,8 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer)
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -278,10 +255,39 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
+    }
+
+    private fun resetFragmentState() {
+        selectedOptionIndex = null
+        isAnswerChecked = false
+        isIncorrectAttempt = false
+        isFirstAttempt = true
+        checkBtn.isEnabled = false
+        checkBtn.text = getString(R.string.btn_check)
+        seeBtn.visibility = View.GONE
+        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
+        setupInitialButtonState()
+    }
+
+    // --- Remaining methods (highlight, enableCheckBtn, colors, playSound, onDestroy) same as previous ---
+
+    private fun highlightSelectedOption(selectedIndex: Int) {
+        options.forEachIndexed { i, layout ->
+            layout.setBackgroundResource(if (i == selectedIndex) R.drawable.option_selected else R.drawable.custom_background)
+        }
+    }
+
+    private fun enableCheckButton() {
+        checkBtn.isEnabled = true
+        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
     }
 
     private fun applyButtonColors(buttonColor: Int, backColor: Int, backgroundColor: Int) {
@@ -295,20 +301,6 @@ class UiContinueSequenceRoundNumbersFragment : Fragment(R.layout.fragment_ui_con
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
         checkBtn.isEnabled = false
-    }
-
-    private fun resetFragmentState() {
-        selectedOptionIndex = null
-        isAnswerChecked = false
-        isIncorrectAttempt = false
-        isFirstAttempt = true
-        checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
-        seeBtn.visibility = View.GONE
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
-        setupInitialButtonState()
     }
 
     private fun playSound(resId: Int) {

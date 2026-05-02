@@ -16,6 +16,7 @@
         android:layout_marginEnd="-120dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.548"
         app:layout_constraintStart_toStartOf="parent"
         app:riveAutoPlay="true"
         app:riveResource="@raw/math_storm_mr_square"
@@ -86,7 +87,7 @@
                 android:fontFamily="@font/inter_semibold"
                 android:letterSpacing="0"
                 android:stateListAnimator="@drawable/button_animator"
-                android:text="CONTINUE"
+                android:text="@string/continue_text"
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 app:backgroundTint="@null" />

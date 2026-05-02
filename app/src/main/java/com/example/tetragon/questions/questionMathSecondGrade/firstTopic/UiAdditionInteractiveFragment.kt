@@ -53,7 +53,6 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    // DYNAMIC UI LOGIC: Updates the blue box text immediately when a Rive option is clicked
     private val checkRunnable = object : Runnable {
         override fun run() {
             if (!isAdded || isAnswerChecked || !::riveAnimation.isInitialized) return
@@ -109,8 +108,6 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
         } catch (e: Exception) { e.printStackTrace() }
     }
 
-    // ---------------------- PROBLEM GENERATION ----------------------
-
     private fun generateProblem() {
         currentProblemString = generateArithmeticProblem()
         correctAnswer = evaluateProblem(currentProblemString)
@@ -122,13 +119,12 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
             if (wrong != correctAnswer) optionsSet.add(wrong)
         }
 
-        // --- SEQUENCE LOGIC: Sort the options from smallest to largest ---
         val sortedOptions = optionsSet.toList().sorted()
         optionMapping.clear()
 
         viewModelKeys.forEachIndexed { index, key ->
             val value = sortedOptions[index]
-            optionMapping[index + 1] = value // Mapping: 1 -> Smallest, 4 -> Largest
+            optionMapping[index + 1] = value
             optionProperties[key]?.value = value.toFloat()
         }
 
@@ -150,8 +146,6 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
         val parts = problem.split("+")
         return parts[0].toInt() + parts[1].toInt()
     }
-
-    // ---------------------- CHECKING LOGIC ----------------------
 
     private fun checkAnswer() {
         val selectedIndex = getAnswerChoiceValue().toInt()
@@ -178,13 +172,13 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
 
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -194,8 +188,8 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer, correctAnswer.toString())
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -203,21 +197,22 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.label_answer, correctAnswer.toString())
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
 
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             problemImage.setImageResource(R.drawable.answer_solution_box)
             problemAnswerText.text = correctAnswer.toString()
             problemAnswerText.visibility = View.VISIBLE
@@ -228,7 +223,6 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
-            // Sync Rive selection with the correct answer
             val correctIdx = optionMapping.filterValues { it == correctAnswer }.keys.firstOrNull()
             correctIdx?.let { riveAnimation.setNumberState(STATE_MACHINE, INPUT_CHOICE, it.toFloat()) }
         }
@@ -259,7 +253,7 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
@@ -293,7 +287,7 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
         riveAnimation.setNumberState(STATE_MACHINE, INPUT_CHOICE, 0f)
 
         disableCheckButton()
-        setupInitialButtonState() // This ensures the colors go back to white/blue
+        setupInitialButtonState()
 
         mainHandler.post(checkRunnable)
     }
@@ -307,7 +301,7 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
         answerDisplay.text = ""
         answerDisplay.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 
@@ -330,13 +324,11 @@ class UiAdditionInteractiveFragment : Fragment(R.layout.fragment_ui_addition_int
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
-        // --- RESET COLORS TO ORIGINAL BLUE ---
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-        // --------------------------------------
 
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE

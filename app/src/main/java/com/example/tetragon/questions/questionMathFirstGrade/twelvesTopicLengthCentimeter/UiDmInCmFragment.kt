@@ -43,10 +43,9 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
-    private var isInitialized = false // Guard to prevent re-generation during navigation
+    private var isInitialized = false
     private var mediaPlayer: MediaPlayer? = null
 
-    // Rive Constants
     private val STATE_MACHINE = "State Machine 1"
     private val INPUT_ANSWERED = "answered"
     private val INPUT_CHOICE = "answerChoice"
@@ -67,7 +66,6 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
 
-        // Only generate the problem if it's the first time visiting this fragment instance
         if (!isInitialized) {
             riveAnimation.post {
                 setupRiveViewModel()
@@ -92,8 +90,9 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
                 }
             }
 
+            // Dynamically set the unit based on the system language
             vmi.getStringProperty("unit")?.let { unitProp ->
-                unitProp.value = "cm"
+                unitProp.value = getString(R.string.keyword_cm)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -152,12 +151,12 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
             if (isFirstAttempt) activity.totalXp += MathGrade1Type.DM_IN_CM.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -165,17 +164,18 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
     }
 
     private fun updateQuestionText() {
-        val sentence = "Show $targetDm dm in cm."
+        val targetDmText = getString(R.string.dm_unit_template, targetDm)
+        val cmTarget = getString(R.string.keyword_cm)
+        val sentence = getString(R.string.question_show_dm_in_cm, targetDmText, cmTarget)
+
         val spannable = SpannableString(sentence)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val targetDmText = "$targetDm dm"
         val dmStart = sentence.indexOf(targetDmText)
         if (dmStart != -1) {
             spannable.setSpan(ForegroundColorSpan(blueColor), dmStart, dmStart + targetDmText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        val cmTarget = "cm"
         val cmStart = sentence.lastIndexOf(cmTarget)
         if (cmStart != -1) {
             spannable.setSpan(ForegroundColorSpan(blueColor), cmStart, cmStart + cmTarget.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -202,19 +202,17 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
         checkBtn.setOnClickListener {
             if (!isAnswerChecked) {
                 checkAnswer()
+            } else if (isIncorrectAttempt) {
+                resetForTryAgain()
             } else {
-                if (isIncorrectAttempt) {
-                    resetForTryAgain()
+                val activity = requireActivity() as Math1GradeQuestionActivity
+                if (checkBtn.text == getString(R.string.btn_finish)) {
+                    activity.navigateToXpGained()
                 } else {
-                    val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
-                        activity.navigateToXpGained()
-                    } else {
-                        val isMilestoneActive = activity.checkAndTriggerMilestone()
-                        if (!isMilestoneActive) {
-                            resetUIForNext()
-                            activity.showRandomQuestion()
-                        }
+                    val isMilestoneActive = activity.checkAndTriggerMilestone()
+                    if (!isMilestoneActive) {
+                        resetUIForNext()
+                        activity.showRandomQuestion()
                     }
                 }
             }
@@ -226,8 +224,8 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "$targetDm dm = $correctAnswerCm cm"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_dm_to_cm_result, targetDm, correctAnswerCm)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -235,17 +233,18 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "1 dm = 10 cm, so $targetDm dm = $correctAnswerCm cm"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_dm_to_cm, targetDm, correctAnswerCm)
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -257,7 +256,7 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
             }
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
         }
@@ -266,7 +265,7 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
     private fun resetFragmentState() {
         isAnswerChecked = false
         isIncorrectAttempt = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
@@ -283,31 +282,25 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
 
-        // 1. Stop the polling temporarily to avoid race conditions
         mainHandler.removeCallbacks(checkRunnable)
 
         isAnswerChecked = false
         isIncorrectAttempt = false
 
-        // 2. Reset Rive states
         riveAnimation.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, false)
         riveAnimation.setNumberState(STATE_MACHINE, INPUT_CHOICE, 0f)
 
-        // 3. Reset UI visibility
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
         answerDisplay.text = ""
         answerDisplay.visibility = View.VISIBLE
 
-        // 4. Reset Button Text and Main Background
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
-        // 5. CRITICAL: Force the disabled UI state immediately
         disableCheckButton()
 
-        // 6. Restart polling after a short delay so Rive has time to update its inputs
         mainHandler.postDelayed(checkRunnable, 200)
     }
 
@@ -315,12 +308,7 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
-
-        // STOP the listener immediately
         mainHandler.removeCallbacks(checkRunnable)
-
-        // DO NOT reset Rive animation here.
-        // We let the fragment destruction/replacement handle the cleanup.
     }
 
     private fun disableCheckButton() {

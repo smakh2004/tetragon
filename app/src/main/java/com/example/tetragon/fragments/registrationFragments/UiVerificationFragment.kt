@@ -55,23 +55,30 @@ class UiVerificationFragment : Fragment() {
 
         val textViewInstructions = view.findViewById<TextView>(R.id.textViewInstructions)
 
+        // 1. Get the email from activity
         val email = (activity as? RegisterActivity)?.userData?.email ?: "your email"
 
-        val fullText = "We've sent a verification link to $email."
+        // 2. Get the localized string and format it with the email
+        // This inserts the email into the %1$s position
+        val fullText = getString(R.string.verify_email_instructions, email)
 
         val spannable = SpannableString(fullText)
 
+        // 3. Find the email position within the translated text
         val start = fullText.indexOf(email)
-        val end = start + email.length
 
-        val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
+        // Safety check: only apply span if email string was found
+        if (start != -1) {
+            val end = start + email.length
+            val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        spannable.setSpan(
-            ForegroundColorSpan(blueColor),
-            start,
-            end,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+            spannable.setSpan(
+                ForegroundColorSpan(blueColor),
+                start,
+                end,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
 
         textViewInstructions.text = spannable
 

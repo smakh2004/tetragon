@@ -6,100 +6,154 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     tools:context=".reward.BagTapActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true">
+            android:id="@+id/currentBalanceContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_background"
+            android:padding="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <app.rive.runtime.kotlin.RiveAnimationView
-                android:id="@+id/bag"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:riveAutoPlay="true"
-                app:riveResource="@raw/bag"
-                app:riveStateMachine="State Machine 1" />
-
-            <!-- CONTINUE BUTTON -->
-            <FrameLayout
-                android:id="@+id/continue_btn_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clipChildren="false"
-                android:clipToPadding="false"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
                 android:paddingBottom="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <!-- ENABLED CONTINUE BUTTON -->
-                <FrameLayout
-                    android:id="@+id/continue_enabled_btn_container"
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/coin" />
+
+                <TextView
+                    android:id="@+id/currentCoinCountText"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="invisible">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:backgroundTint="@color/black_2"
-                        android:translationY="5dp" />
-
-                    <Button
-                        android:id="@+id/continue_enabled_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:fontFamily="@font/inter_semibold"
-                        android:stateListAnimator="@drawable/button_animator"
-                        android:text="@string/continue_text"
-                        android:textColor="@color/white"
-                        android:textSize="17sp"
-                        app:backgroundTint="@color/black_3" />
-                </FrameLayout>
-
-                <!-- DISABLED CONTINUE BUTTON -->
-                <FrameLayout
-                    android:id="@+id/continue_disabled_btn_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="visible">
-
-                    <!-- shadow -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:backgroundTint="@color/gray_2"
-                        android:translationY="5dp" />
-
-                    <!-- text over shadow -->
-                    <TextView
-                        android:id="@+id/continue_disabled_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:fontFamily="@font/inter_semibold"
-                        android:gravity="center"
-                        android:text="@string/continue_text"
-                        android:textColor="@color/gray_1"
-                        android:textSize="17sp"
-                        android:translationY="5dp" />
-                </FrameLayout>
-            </FrameLayout>
-
+                    android:layout_marginStart="5dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="0"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp" />
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:id="@+id/coinRewardContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:visibility="gone"
+            android:translationY="10dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="@+id/currentBalanceContainer"
+            app:layout_constraintStart_toStartOf="@+id/currentBalanceContainer"
+            app:layout_constraintBottom_toTopOf="@+id/currentBalanceContainer">
 
+            <TextView
+                android:id="@+id/coinRewardText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+20"
+                android:textColor="#FFCC00"
+                android:textSize="18sp"
+                android:fontFamily="@font/inter_bold"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/bag"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:maxWidth="600dp"
+            app:layout_constraintWidth_max="600dp"
+            app:layout_constraintDimensionRatio="H, 1:1"
+            app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:riveAutoPlay="true"
+            app:riveResource="@raw/bag"
+            app:riveStateMachine="State Machine 1" />
+
+        <FrameLayout
+            android:id="@+id/continue_btn_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingBottom="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <FrameLayout
+                android:id="@+id/continue_enabled_btn_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_2"
+                    android:translationY="5dp" />
+                <Button
+                    android:id="@+id/continue_enabled_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/custom_button"
+                    android:fontFamily="@font/inter_semibold"
+                    android:stateListAnimator="@drawable/button_animator"
+                    android:text="@string/continue_text"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    app:backgroundTint="@color/black_3" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/continue_disabled_btn_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:translationY="5dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="@string/continue_text"
+                    android:textColor="@color/gray_1"
+                    android:textSize="17sp"
+                    android:translationY="5dp" />
+            </FrameLayout>
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -42,7 +42,7 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
-    private var isInitialized = false // Added guard
+    private var isInitialized = false
     private var mediaPlayer: MediaPlayer? = null
 
     private val STATE_MACHINE = "State Machine 1"
@@ -110,16 +110,18 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
     }
 
     private fun updateQuestionText() {
-        val sentence = "Show $targetTemp°C in the thermometer."
+        val tempString = getString(R.string.temp_celsius_format, targetTemp)
+        val thermoString = getString(R.string.unit_thermometer)
+        val sentence = getString(R.string.question_show_temperature, tempString, thermoString)
+
         val spannable = SpannableString(sentence)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val tempString = "$targetTemp°C"
         val tempStart = sentence.indexOf(tempString)
         if (tempStart != -1) {
             spannable.setSpan(ForegroundColorSpan(blueColor), tempStart, tempStart + tempString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-        val thermoString = "thermometer"
+
         val thermoStart = sentence.indexOf(thermoString)
         if (thermoStart != -1) {
             spannable.setSpan(ForegroundColorSpan(blueColor), thermoStart, thermoStart + thermoString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -145,12 +147,12 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
             if (isFirstAttempt) activity.totalXp += PhysicsGrade7Type.TEMPERATURE.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -160,8 +162,8 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "The temperature is exactly $targetTemp°C"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.solution_temp_correct, targetTemp)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -169,7 +171,8 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
@@ -178,8 +181,8 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "Look for the marker labeled $targetTemp°C."
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_temp_explanation, targetTemp)
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -191,7 +194,7 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
             }
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
         }
@@ -220,7 +223,7 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
                     resetForTryAgain()
                 } else {
                     val act = requireActivity() as Physics7GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         act.navigateToXpGained()
                     } else {
                         val isMilestoneActive = act.checkAndTriggerMilestone()
@@ -277,17 +280,13 @@ class UiTemperatureFragment : Fragment(R.layout.fragment_ui_temperature) {
     private fun resetUIForNext() {
         val act = requireActivity() as Physics7GradeQuestionActivity
         act.hideSuccessAnimation()
-
-        // Stop the listener
         mainHandler.removeCallbacks(checkRunnable)
-
-        // Leave the result UI visible for a clean fragment swap
         act.isResultCurrentlyVisible = false
     }
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }

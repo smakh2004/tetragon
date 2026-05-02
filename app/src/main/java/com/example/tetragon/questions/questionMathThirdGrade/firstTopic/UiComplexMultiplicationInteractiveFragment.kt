@@ -144,7 +144,7 @@ class UiComplexMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui
         isIncorrectAttempt = false
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -172,13 +172,13 @@ class UiComplexMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             complexMultInteractiveAnswerBox.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -208,7 +208,7 @@ class UiComplexMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         if (!activity.checkAndTriggerMilestone()) {
                             resetUIForNext()
@@ -242,10 +242,10 @@ class UiComplexMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.label_answer, correctAnswer.toString())
             answerDisplay.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             complexMultInteractiveAnswerBox.setImageResource(R.drawable.answer_solution_box)
             complexMultInteractiveAnswerText.text = correctAnswer.toString()
@@ -264,8 +264,8 @@ class UiComplexMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui
     private fun showCorrectState(container: FrameLayout, circle: ImageView) {
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circle.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer, correctAnswer.toString())
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -273,9 +273,10 @@ class UiComplexMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui
     private fun showIncorrectState(container: FrameLayout, circle: ImageView) {
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circle.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
@@ -311,25 +312,18 @@ class UiComplexMultiplicationInteractiveFragment : Fragment(R.layout.fragment_ui
         activity.hideSuccessAnimation()
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 
     private fun applyButtonColors(buttonColor: Int, backColor: Int, backgroundColor: Int) {
         val context = requireContext()
-
-        // Main Button
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(context, buttonColor)
-
-        // Shadow/Back View
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(context, backColor)
-
-        // Bottom Bar Background
         btnBack.setBackgroundColor(ContextCompat.getColor(context, backgroundColor))
-
-        // Force refresh if needed
         checkBtnBack.invalidate()
     }
+
     private fun playSound(resId: Int) {
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer.create(requireContext(), resId)

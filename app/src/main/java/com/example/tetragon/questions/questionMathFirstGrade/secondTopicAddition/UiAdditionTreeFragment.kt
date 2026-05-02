@@ -67,7 +67,7 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
         stateAnswer = activity.findViewById(R.id.stateAnswer)
         answer = activity.findViewById(R.id.answer)
 
-        // Apply blue styling to the first word
+        // Apply blue styling to the first word of the instruction
         setupInstructionText()
 
         setupInitialButtonState()
@@ -77,15 +77,20 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
     }
 
     private fun setupInstructionText() {
-        val fullText = "Add two numbers to find the answer."
+        val fullText = getString(R.string.instruction_addition_tree)
         val spannable = SpannableString(fullText)
 
-        // Apply blue color to "Add" (indices 0 to 3)
-        spannable.setSpan(
-            ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.blue_2)),
-            0, 3,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        // Find the index of the first space to color the first word dynamically
+        val firstSpace = fullText.indexOf(" ")
+        val end = if (firstSpace != -1) firstSpace else fullText.length
+
+        if (end > 0) {
+            spannable.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.blue_2)),
+                0, end,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
         instructionText.text = spannable
     }
 
@@ -122,7 +127,7 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -167,15 +172,15 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
-            setupSeeSolution(stateContainer, circleState, index)
+            setupSeeSolution(stateContainer, circleState)
         }
         isFirstAttempt = false
     }
@@ -198,7 +203,7 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
                     resetForTryAgain()
                 } else {
                     val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -225,7 +230,7 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
 
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
 
         setupInitialButtonState()
@@ -238,7 +243,7 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
         activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
     }
 
     private fun updateCheckButtonVisibility(enabled: Boolean) {
@@ -268,8 +273,8 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -277,19 +282,20 @@ class UiAdditionTreeFragment : Fragment(R.layout.fragment_ui_addition_tree) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
-    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView, wrongIndex: Int) {
+    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             problemImage.setImageResource(R.drawable.answer_solution_box)
             problemAnswerText.text = correctAnswer.toString()
             circleState.setImageResource(R.drawable.solution_lamp_icon)

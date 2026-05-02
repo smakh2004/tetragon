@@ -37,7 +37,7 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
     private lateinit var frameInputHundredsSecond: FrameLayout
     private lateinit var frameOnesSecond: FrameLayout
 
-    // Visual Feedback (Boxes and Cursors)
+    // Visual Feedback
     private lateinit var boxThousFirst: ImageView
     private lateinit var boxTensFirst: ImageView
     private lateinit var boxHundSecond: ImageView
@@ -48,7 +48,7 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
     private lateinit var cursorHundSecond: View
     private lateinit var cursorOnesSecond: View
 
-    // Global UI components from Activity
+    // Shared UI
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
     private lateinit var btnBack: View
@@ -74,15 +74,20 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
-    private var isSolutionShown = false
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val activity = requireActivity() as Math4GradeQuestionActivity
 
-        // Initialize Display Views
+        initViews(view, activity)
+        setupFocusLogic()
+        setupKeyboard(view)
+        generateProblem()
+        setupCheckButton()
+    }
+
+    private fun initViews(view: View, activity: Math4GradeQuestionActivity) {
         tvTopHundred = view.findViewById(R.id.tvTopHundred)
         tvTopOnes = view.findViewById(R.id.tvTopOnes)
         tvBottomThousand = view.findViewById(R.id.tvBottomThousand)
@@ -92,7 +97,6 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         tvResTens = view.findViewById(R.id.tvResTens)
         tvResOnes = view.findViewById(R.id.tvResOnes)
 
-        // Initialize Inputs
         tvInputThousandsFirstText = view.findViewById(R.id.tvInputThousandsFirstText)
         tvInputTensFirstText = view.findViewById(R.id.tvInputTensFirstText)
         tvInputHundredsSecondText = view.findViewById(R.id.tvInputHundredsSecondText)
@@ -103,7 +107,6 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         frameInputHundredsSecond = view.findViewById(R.id.frameInputHundredsSecond)
         frameOnesSecond = view.findViewById(R.id.frameOnesSecond)
 
-        // Initialize Visuals (Ensure these IDs exist in your XML inside the FrameLayouts)
         boxThousFirst = view.findViewById(R.id.boxThousFirst)
         boxTensFirst = view.findViewById(R.id.boxTensFirst)
         boxHundSecond = view.findViewById(R.id.boxHundSecond)
@@ -114,7 +117,6 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         cursorHundSecond = view.findViewById(R.id.cursorHundSecond)
         cursorOnesSecond = view.findViewById(R.id.cursorOnesSecond)
 
-        // Activity UI
         checkBtn = activity.findViewById(R.id.check_enabled_btn)
         checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
         btnBack = activity.findViewById(R.id.btnBackground)
@@ -122,11 +124,6 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
         stateAnswer = activity.findViewById(R.id.stateAnswer)
         answer = activity.findViewById(R.id.answer)
-
-        setupFocusLogic()
-        setupKeyboard(view)
-        generateProblem()
-        setupCheckButton()
     }
 
     private fun setupFocusLogic() {
@@ -139,8 +136,6 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
 
     private fun setFocus(targetTextView: TextView, targetBox: ImageView, targetCursor: View) {
         if (isAnswerChecked) return
-
-        // Reset all boxes/cursors
         listOf(boxThousFirst, boxTensFirst, boxHundSecond, boxOnesSecond).forEach { it.setImageResource(R.drawable.answer_default_box) }
         cursorAnimator?.cancel()
         listOf(cursorThousFirst, cursorTensFirst, cursorHundSecond, cursorOnesSecond).forEach { it.visibility = View.GONE }
@@ -148,7 +143,6 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         activeInput = targetTextView
         activeBox = targetBox
         activeCursor = targetCursor
-
         activeBox?.setImageResource(R.drawable.answer_blue_box)
         updateCursorPosition()
         activeCursor?.visibility = View.VISIBLE
@@ -228,11 +222,10 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
-        isSolutionShown = false
         seeBtn.visibility = View.GONE
 
         setFocus(tvInputThousandsFirstText, boxThousFirst, cursorThousFirst)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -254,25 +247,19 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
 
         if (u1 == correctThousandsFirst && u2 == correctTensFirst && u3 == correctHundredsSecond && u4 == correctOnesSecond) {
             playSound(R.raw.correct)
-            activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
-
             setAllBoxes(R.drawable.answer_correct_box)
-
             val isFinished = activity.incrementProgress()
-            if (isFirstAttempt) {
-                // Assuming you use same XP logic
-                activity.totalXp += MathGrade4Type.ADDITION.xp
-            }
+            if (isFirstAttempt) activity.totalXp += MathGrade4Type.ADDITION.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             setAllBoxes(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -298,7 +285,7 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -314,20 +301,16 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
-            isSolutionShown = true
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $fullNum1 + $fullNum2 = $targetSum"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer_complex_addition, fullNum1, fullNum2, targetSum)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
-
+            checkBtn.text = getString(R.string.btn_continue)
             setAllBoxes(R.drawable.answer_solution_box)
-
             tvInputThousandsFirstText.text = correctThousandsFirst.toString()
             tvInputTensFirstText.text = correctTensFirst.toString()
             tvInputHundredsSecondText.text = correctHundredsSecond.toString()
             tvBottomOnesInputText.text = correctOnesSecond.toString()
-
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isIncorrectAttempt = false
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
@@ -339,18 +322,16 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         val activity = requireActivity() as Math4GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
-
         isAnswerChecked = false
         isIncorrectAttempt = false
         tvInputThousandsFirstText.text = ""
         tvInputTensFirstText.text = ""
         tvInputHundredsSecondText.text = ""
         tvBottomOnesInputText.text = ""
-
         setAllBoxes(R.drawable.answer_default_box)
         seeBtn.visibility = View.GONE
         setFocus(tvInputThousandsFirstText, boxThousFirst, cursorThousFirst)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -358,21 +339,20 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $fullNum1 + $fullNum2 = $targetSum"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer_complex_addition, fullNum1, fullNum2, targetSum)
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
-        enableCheckButton()
     }
 
     private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
-        enableCheckButton()
     }
 
     private fun resetUIForNext() {
@@ -382,7 +362,7 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
         seeBtn.visibility = View.GONE
         setupInitialButtonState()
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
     }
 
@@ -408,10 +388,10 @@ class UiComplexAdditionFragment : Fragment(R.layout.fragment_ui_complex_addition
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
 
-    private fun applyButtonColors(buttonColor: Int, backColor: Int, backgroundColor: Int) {
-        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), buttonColor)
-        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), backColor)
-        btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), backgroundColor))
+    private fun applyButtonColors(btnC: Int, backC: Int, bgC: Int) {
+        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), btnC)
+        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), backC)
+        btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), bgC))
     }
 
     private fun playSound(soundResId: Int) {

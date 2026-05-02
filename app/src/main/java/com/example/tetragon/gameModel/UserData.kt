@@ -11,10 +11,17 @@ data class UserData(
     var online: Boolean = false,
     var lastOnline: Timestamp? = null,
     var registeredAt: Timestamp? = null,
-    var xp: Long = 0,          // total XP (never resets)
-    var monthlyXP: Long = 0,   // leaderboard XP (resets monthly)
+    var xp: Long = 0,
+    var monthlyXP: Long = 0,
     var level: Int = 1,
     var streak: Int = 0,
-    var subscription: Boolean = false, // Default is False (Infinity mode off)
-    var stars: Long = 15               // Default starting stars
+
+    // --- UPDATED SUBSCRIPTION LOGIC ---
+    // Instead of Boolean, we store the end date.
+    // If null or time has passed, they are a free user.
+    var subscriptionUntil: Timestamp? = null,
+
+    // --- NEW VALUES ---
+    var coins: Long = 30,         // To store the currency for the shop
+    var stars: Long = 15         // Default starting stars (attempts)
 )

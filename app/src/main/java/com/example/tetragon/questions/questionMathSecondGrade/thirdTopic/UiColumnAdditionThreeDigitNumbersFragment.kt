@@ -209,7 +209,7 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
         seeBtn.visibility = View.GONE
 
         setFocus(tvInputTensFirstNumText, boxTensFirst, cursorTensFirst)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -243,7 +243,7 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
             }
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
@@ -252,7 +252,7 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
             boxOnesSecond.setImageResource(R.drawable.answer_incorrect_box)
 
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -271,7 +271,7 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -289,10 +289,11 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
         seeEnabledButton.setOnClickListener {
             isSolutionShown = true
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $fullNum1 + $fullNum2 = $targetSum"
+            stateAnswer.text = getString(R.string.state_solution)
+            val solutionText = "$fullNum1 + $fullNum2 = $targetSum"
+            answer.text = getString(R.string.label_answer, solutionText)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             boxTensFirst.setImageResource(R.drawable.answer_solution_box)
             boxHundredsSecond.setImageResource(R.drawable.answer_solution_box)
@@ -326,7 +327,7 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
 
         seeBtn.visibility = View.GONE
         setFocus(tvInputTensFirstNumText, boxTensFirst, cursorTensFirst)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -334,24 +335,24 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $fullNum1 + $fullNum2 = $targetSum"
+        stateAnswer.text = getString(R.string.state_correct)
+        val solutionText = "$fullNum1 + $fullNum2 = $targetSum"
+        answer.text = getString(R.string.label_answer, solutionText)
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
 
-        // Ensure buttons stay visible in correct state
         enableCheckButton()
     }
 
     private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
 
-        // Ensure buttons stay visible in incorrect state
         enableCheckButton()
     }
 
@@ -362,9 +363,8 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
         seeBtn.visibility = View.GONE
         setupInitialButtonState()
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
-        // Keep button container visible, but disable logic
         disableCheckButton()
     }
 
@@ -378,7 +378,6 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
         checkBtn.isEnabled = true
         val activity = requireActivity() as Math2GradeQuestionActivity
 
-        // Always show the container when we want the button to be seen
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
         checkBtnBack.visibility = View.VISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
@@ -388,10 +387,8 @@ class UiColumnAdditionThreeDigitNumbersFragment : Fragment(R.layout.fragment_ui_
         checkBtn.isEnabled = false
         val activity = requireActivity() as Math2GradeQuestionActivity
 
-        // Logic: Show the DISABLED container so the user sees a greyed out button,
-        // instead of making the button disappear entirely.
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        checkBtnBack.visibility = View.INVISIBLE // Hide the 3D shadow for disabled look
+        checkBtnBack.visibility = View.INVISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
 

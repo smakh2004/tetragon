@@ -15,7 +15,7 @@ import com.example.tetragon.questions.questionMathSeventhGrade.Math7GradeQuestio
 import com.example.tetragon.questions.questionMathSeventhGrade.MathGrade7Type
 import kotlin.random.Random
 
-class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arithmetics) {
+class UiIntegerArithmeticsFragment : Fragment(R.layout.fragment_ui_integer_arithmetics) {
 
     private lateinit var firstNumberText: TextView
     private lateinit var problemImage: ImageView
@@ -66,19 +66,16 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
     }
 
     private fun generateProblem() {
-        // Generate two numbers between -15 and 15
         val num1 = Random.nextInt(-15, 15)
         val num2 = Random.nextInt(-15, 15)
         correctAnswer = num1 + num2
 
-        // Format problem text: e.g., "-8 + 5 ="
         val operator = if (num2 >= 0) "+" else "-"
         val problemString = "$num1 $operator ${kotlin.math.abs(num2)} ="
         firstNumberText.text = colorMinusSigns(problemString)
 
         problemImage.setImageResource(R.drawable.answer_blue_box)
 
-        // Options logic
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 3) {
             val distractor = correctAnswer + Random.nextInt(-5, 6)
@@ -100,7 +97,6 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
         val spannable = SpannableString(text)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_1)
 
-        // Find all minus characters and color them blue
         text.forEachIndexed { index, char ->
             if (char == '-' || char == '−') {
                 spannable.setSpan(
@@ -140,7 +136,7 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
                     resetForTryAgain()
                 } else {
                     val activity = requireActivity() as Math7GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -173,13 +169,13 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
 
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -189,10 +185,10 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             problemImage.setImageResource(R.drawable.answer_solution_box)
 
             problemAnswerText.text = colorMinusSigns(correctAnswer.toString())
@@ -215,8 +211,6 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
         }
     }
 
-    // --- Helper Methods (Standard reset/UI logic) ---
-
     private fun resetInternalState() {
         selectedOptionIndex = null
         isAnswerChecked = false
@@ -224,7 +218,7 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
@@ -245,8 +239,8 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
         sc.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         cs.setImageResource(R.drawable.correct_tick_icon)
         options[idx].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -254,9 +248,10 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
         sc.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         cs.setImageResource(R.drawable.wrong_circle)
         options[idx].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
@@ -290,7 +285,7 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
         problemAnswerText.visibility = View.GONE
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -303,7 +298,7 @@ class UiIntegerArithmeticsFragment  : Fragment(R.layout.fragment_ui_integer_arit
         activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 

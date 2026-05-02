@@ -19,7 +19,7 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
 
     private lateinit var firstNumber: TextView
     private lateinit var secondNumber: TextView
-    private lateinit var instructionText: TextView // New reference
+    private lateinit var instructionText: TextView
     private lateinit var options: List<LinearLayout>
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
@@ -41,10 +41,7 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
-
-        // Apply blue styling to "sign"
         setupInstructionText()
-
         setupInitialButtonState()
         generateProblem()
         setupOptionClicks()
@@ -75,18 +72,16 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
     }
 
     private fun setupInstructionText() {
-        val fullText = "Put the correct sign."
+        val fullText = getString(R.string.instruction_comparison)
         val spannable = SpannableString(fullText)
+        val wordToStyle = getString(R.string.instruction_comparison_keyword)
 
-        val wordToStyle = "sign"
         val start = fullText.indexOf(wordToStyle)
-        val end = start + wordToStyle.length
-
         if (start != -1) {
             spannable.setSpan(
                 ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.blue_2)),
                 start,
-                end,
+                start + wordToStyle.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
@@ -103,23 +98,23 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
                 leftValue = Random.nextInt(2, 101)
                 val a = Random.nextInt(1, leftValue)
                 val b = leftValue - a
-                firstNumber.text = "$a+$b"
+                firstNumber.text = getString(R.string.arithmetic_plus_template, a, b)
 
                 rightValue = Random.nextInt(2, 101)
                 val c = Random.nextInt(1, rightValue)
                 val d = rightValue - c
-                secondNumber.text = "$c+$d"
+                secondNumber.text = getString(R.string.arithmetic_plus_template, c, d)
             }
             1 -> { // SUBTRACTION
                 val a = Random.nextInt(1, 101)
                 val b = Random.nextInt(0, a + 1)
                 leftValue = a - b
-                firstNumber.text = "$a-$b"
+                firstNumber.text = getString(R.string.arithmetic_minus_template, a, b)
 
                 val c = Random.nextInt(1, 101)
                 val d = Random.nextInt(0, c + 1)
                 rightValue = c - d
-                secondNumber.text = "$c-$d"
+                secondNumber.text = getString(R.string.arithmetic_minus_template, c, d)
             }
             else -> { // SIMPLE NUMBERS
                 leftValue = Random.nextInt(1, 101)
@@ -149,13 +144,11 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
         selectedOptionIndex = null
         isAnswerChecked = false
         isIncorrectAttempt = false
-        checkBtn.isEnabled = false
         seeBtn.visibility = View.GONE
         isFirstAttempt = true
 
-        checkBtn.text = "CHECK"
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+        checkBtn.text = getString(R.string.btn_check)
+        setupInitialButtonState()
     }
 
     private fun setupOptionClicks() {
@@ -181,9 +174,6 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
         activity.isResultCurrentlyVisible = true
         stateContainer.visibility = View.VISIBLE
 
-        problemAnswerText.text = chosen
-        problemAnswerText.visibility = View.VISIBLE
-
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
             problemImage.setImageResource(R.drawable.answer_correct_box)
@@ -191,52 +181,49 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
             activity.playSuccessAnimation()
 
             val isFinished = activity.incrementProgress()
-            if (isFirstAttempt) {
-                activity.totalXp += MathGrade1Type.COMPARISON_TWO_DIGITS.xp
-            }
-
+            if (isFirstAttempt) activity.totalXp += MathGrade1Type.COMPARISON_TWO_DIGITS.xp
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
-            setupSeeSolution(stateContainer, circleState, index)
+            setupSeeSolution(stateContainer, circleState)
         }
         isFirstAttempt = false
     }
 
-    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView, wrongIndex: Int) {
+    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             problemAnswerText.text = correctAnswer
             problemAnswerText.visibility = View.VISIBLE
             problemImage.setImageResource(R.drawable.answer_solution_box)
-
-            checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_3)
-            checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_2)
-            btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
-            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
             circleState.setImageResource(R.drawable.solution_lamp_icon)
 
-            options.forEachIndexed { _, layout ->
-                val tv = layout.getChildAt(0) as TextView
-                layout.setBackgroundResource(
-                    if (tv.text.toString() == correctAnswer) R.drawable.option_showed else R.drawable.custom_background
-                )
-            }
             isAnswerChecked = true
             isIncorrectAttempt = false
+
+            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
+            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+
+            options.forEach { layout ->
+                val tv = layout.getChildAt(0) as TextView
+                layout.setBackgroundResource(
+                    if (tv.text.toString() == correctAnswer) R.drawable.option_showed
+                    else R.drawable.custom_background
+                )
+            }
         }
     }
 
@@ -252,16 +239,11 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
         problemImage.setImageResource(R.drawable.answer_blue_box)
         problemAnswerText.visibility = View.GONE
 
-        checkBtn.text = "CHECK"
-        checkBtn.isEnabled = false
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
-        answer.visibility = View.VISIBLE
         answer.text = ""
     }
 
@@ -273,9 +255,8 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
-        answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
@@ -292,7 +273,7 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Math1GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else {
                     val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -317,6 +298,8 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
         checkBtn.isEnabled = false
+        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
 
     private fun highlightSelectedOption(selectedIndex: Int) {
@@ -335,8 +318,9 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer)
+        answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -344,9 +328,10 @@ class UiComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_compar
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
-        stateAnswer.text = "Incorrect!"
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

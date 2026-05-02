@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_semibold"
             android:gravity="center"
-            android:text="Subjects"
+            android:text="@string/subjects"
             android:textColor="@color/text_color"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -79,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="MATH"
+                    android:text="@string/math"
                     android:fontFamily="@font/inter_semibold"
                     android:textColor="#21CBF3"/>
             </LinearLayout>
@@ -105,7 +105,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="PHYSICS"
+                    android:text="@string/physics"
                     android:fontFamily="@font/inter_semibold"
                     android:textColor="#C4C4C4"/>
             </LinearLayout>

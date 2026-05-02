@@ -45,14 +45,14 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
             view.findViewById(R.id.option3)
         )
 
-        // Activity UI components from Math9GradeQuestionActivity
-        checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
-        checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
-        btnBack = requireActivity().findViewById(R.id.btnBackground)
-        seeBtn = requireActivity().findViewById(R.id.see_btn_container)
-        seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
-        stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
-        answer = requireActivity().findViewById(R.id.answer)
+        val activity = requireActivity() as Math9GradeQuestionActivity
+        checkBtn = activity.findViewById(R.id.check_enabled_btn)
+        checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
+        btnBack = activity.findViewById(R.id.btnBackground)
+        seeBtn = activity.findViewById(R.id.see_btn_container)
+        seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
+        stateAnswer = activity.findViewById(R.id.stateAnswer)
+        answer = activity.findViewById(R.id.answer)
 
         setupInitialButtonState()
         generateProblem()
@@ -61,23 +61,20 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
     }
 
     private fun generateProblem() {
-        // Generate a random root between 2 and 10
         val root = Random.nextInt(2, 11)
         val perfectSquare = root * root
         correctAnswerString = "-$root, $root"
 
-        // Format: x² - 9 = 0
         val problemString = "x² − $perfectSquare = 0"
         equationText.text = colorXSymbol(problemString)
 
-        // Generate distractors
         val optionSet = mutableSetOf(correctAnswerString)
         while (optionSet.size < 3) {
             val wrongRoot = Random.nextInt(2, 15)
             val distractor = if (Random.nextBoolean()) {
-                "$wrongRoot" // Only one root
+                "$wrongRoot"
             } else {
-                "-${Random.nextInt(2, 11)}, ${Random.nextInt(12, 20)}" // Mismatched pair
+                "-${Random.nextInt(2, 11)}, ${Random.nextInt(12, 20)}"
             }
             if (distractor != correctAnswerString) optionSet.add(distractor)
         }
@@ -96,7 +93,6 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
         val spannable = SpannableString(text)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_1)
 
-        // Find the 'x' character and color it blue
         text.forEachIndexed { index, char ->
             if (char == 'x') {
                 spannable.setSpan(
@@ -122,8 +118,9 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
 
     private fun setupCheckButton() {
         checkBtn.setOnClickListener {
-            val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
-            val circleState = requireActivity().findViewById<ImageView>(R.id.circleState)
+            val activity = requireActivity() as Math9GradeQuestionActivity
+            val stateContainer = activity.findViewById<FrameLayout>(R.id.stateContainer)
+            val circleState = activity.findViewById<ImageView>(R.id.circleState)
 
             if (!isAnswerChecked) {
                 selectedOptionIndex?.let { checkAnswer(it, stateContainer, circleState) }
@@ -131,8 +128,7 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    val activity = requireActivity() as Math9GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -164,12 +160,12 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
 
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -179,10 +175,10 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswerString"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswerString)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
 
@@ -218,8 +214,8 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
         sc.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         cs.setImageResource(R.drawable.correct_tick_icon)
         options[idx].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswerString"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswerString)
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -228,9 +224,10 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
         sc.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         cs.setImageResource(R.drawable.wrong_circle)
         options[idx].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
@@ -254,7 +251,7 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
@@ -274,7 +271,7 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -287,7 +284,7 @@ class UiQuadraticEquationOneFragment : Fragment(R.layout.fragment_ui_quadratic_e
         activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 

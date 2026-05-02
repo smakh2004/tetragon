@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -21,11 +22,12 @@ import com.example.tetragon.questions.FiveCorrectAnswerFragment
 import com.example.tetragon.questions.SubjectConstants
 import com.example.tetragon.questions.XpGainedActivity
 import com.example.tetragon.questions.questionPhysicsEleventhGrade.firstTopic.UiFindEinsteinFragment
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class Physics11GradeQuestionActivity : AppCompatActivity() {
+class Physics11GradeQuestionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPhysics11GradeQuestionBinding
     private lateinit var selectedTopic: PhysicsGrade11Topic
@@ -209,10 +211,23 @@ class Physics11GradeQuestionActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        view.findViewById<Button>(R.id.noButton).setOnClickListener { dialog.dismiss() }
-        view.findViewById<Button>(R.id.finishButton).setOnClickListener {
-            finish()
-            dialog.dismiss()
+        // Localized Title and Message
+        view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
+        view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
+
+        // Localized "CONTINUE" button
+        view.findViewById<Button>(R.id.noButton).apply {
+            text = getString(R.string.continue_text)
+            setOnClickListener { dialog.dismiss() }
+        }
+
+        // Localized "EXIT" button
+        view.findViewById<Button>(R.id.finishButton).apply {
+            text = getString(R.string.exit_btn)
+            setOnClickListener {
+                finish()
+                dialog.dismiss()
+            }
         }
         dialog.show()
     }

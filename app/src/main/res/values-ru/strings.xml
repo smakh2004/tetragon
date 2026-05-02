@@ -63,4 +63,507 @@
     <string name="confirm_password">Подтвердите пароль</string>
     <string name="delete">УДАЛИТЬ</string>
     <string name="age">Возраст</string>
+    <string name="chat">ЧАТ</string>
+    <string name="bot_greeting">Привет! Я Мистер Квадрат. Я ваш личный репетитор по математике.</string>
+    <string name="bot_thinking">Мистер Квадрат думает...</string>
+    <string name="bot_error_generic">У Мистера Квадрата перепутались углы! Попробуйте еще раз чуть позже.</string>
+    <string name="bot_error_429">Мистер Квадрат взял небольшой перерыв, чтобы заточить карандаши. Пожалуйста, подождите!</string>
+    <string name="bot_no_answer">Извините, я не смог это обработать.</string>
+    <string name="write_your_question">Напишите свой вопрос...</string>
+    <string name="send">ОТПРАВИТЬ</string>
+    <string name="verify_your_email_address">Подтвердите ваш адрес электронной почты.</string>
+    <string name="we_ve_sent_a_verification_link_to">Мы отправили ссылку для подтверждения на</string>
+    <string name="nplease_check_your_inbox_and_click_the_link_n_nthe_continue_button_will_unlock_automatically_once_you_verify">\nПожалуйста, проверьте почту и перейдите по ссылке. \n\nКнопка «Продолжить» разблокируется автоматически после подтверждения.</string>
+    <string name="verify_email_instructions">Мы отправили ссылку для подтверждения на %1$s.</string>
+    <string name="error_prefix">Ошибка: %1$s</string>
+    <string name="creating_account">СОЗДАНИЕ АККАУНТА...</string>
+    <string name="verify_email_first">Пожалуйста, сначала подтвердите email!</string>
+    <string name="enter_email">Введите email</string>
+    <string name="enter_password">Введите пароль</string>
+    <string name="loading_caps">ЗАГРУЗКА..</string>
+    <string name="login_successful">Вход выполнен успешно.</string>
+    <string name="auth_failed">Ошибка аутентификации.</string>
+    <string name="first_grade">1 КЛАСС</string>
+    <string name="second_grade">2 КЛАСС</string>
+    <string name="third_grade">3 КЛАСС</string>
+    <string name="fourth_grade">4 КЛАСС</string>
+    <string name="fifth_grade">5 КЛАСС</string>
+    <string name="sixth_grade">6 КЛАСС</string>
+    <string name="seventh_grade">7 КЛАСС</string>
+    <string name="eighth_grade">8 КЛАСС</string>
+    <string name="ninth_grade">9 КЛАСС</string>
+    <string name="tenth_grade">10 КЛАСС</string>
+    <string name="eleventh_grade">11 КЛАСС</string>
+    <string name="_12_topics">12 тем</string>
+    <string name="_8_topics">8 тем</string>
+    <string name="_4_topics">4 темы</string>
+    <string name="_5_topics">5 тем</string>
+    <string name="_1_topic">1 тема</string>
+    <string name="_3_topics">3 темы</string>
+    <string name="grade_label_format">%1$s - %2$d КЛАСС</string>
+    <string name="timer_format">%1$02dм %2$02dс</string>
+    <string name="leaderboard">ТАБЛИЦА ЛИДЕРОВ</string>
+    <string name="get_a_reward_at_the_end_of_the_month">Получите награду в конце месяца</string>
+    <string name="days_left_singular">ОСТАЛСЯ 1 ДЕНЬ</string>
+    <string name="days_left_plural">ОСТАЛОСЬ %1$d ДНЕЙ</string>
+    <string name="rank_status_format">Вы на %1$d-м месте</string>
+    <string name="start_gaining_xp">Начните набирать ОЧКИ!</string>
+    <string name="math_games">ИГРЫ ПО МАТЕМАТИКЕ</string>
+    <string name="cash_storm">КЭШ ШТОРМ</string>
+    <string name="start_10xp">СТАРТ +10 ОЧКОВ</string>
+    <string name="online_count">%1$d в сети</string>
+    <string name="no_attempts_caps">НЕТ ПОПЫТОК</string>
+    <string name="record_format">Рекорд: %1$d</string>
+    <string name="wins_format">Побед: %1$d</string>
+    <string name="refresh_page">Обновите страницу</string>
+    <string name="start_xp_format">СТАРТ +%1$d ОЧКОВ</string>
+    <string name="play_online_xp">ИГРАТЬ ОНЛАЙН +30 ОЧКОВ</string>
+    <string name="private_game_caps">ПРИВАТНАЯ ИГРА</string>
+    <string name="_5_attempts_left"> / 5 попыток осталось</string>
+    <string name="max_streak">Лучшая серия</string>
+    <string name="total_xp">Всего очков</string>
+    <string name="unlock_the_tetragon_infinity">Разблокируйте Tetragon Infinity</string>
+    <string name="premium_gives_you_full_access_to_every_features_and_more">Премиум дает полный доступ ко всем функциям и даже больше</string>
+    <string name="subscribe_now">ПОДПИСАТЬСЯ</string>
+    <string name="mo">Пн</string>
+    <string name="tu">Вт</string>
+    <string name="we">Ср</string>
+    <string name="th">Чт</string>
+    <string name="fr">Пт</string>
+    <string name="sa">Сб</string>
+    <string name="su">Вс</string>
+    <string name="joined_format">Присоединился в %1$s</string>
+    <string name="level_format">Уровень %1$d</string>
+    <string name="day_streak_format">Серия дней: %1$d</string>
+    <string name="streak_beast">ТЫ ПРОСТО ЗВЕРЬ!</string>
+    <string name="streak_good">ОТЛИЧНАЯ РАБОТА!</string>
+    <string name="streak_practice">ПОРА ПОТРЕНИРОВАТЬСЯ!</string>
+    <string name="xp_format">%1$d ОЧКОВ</string>
+    <string name="shop">Магазин</string>
+    <string name="attempts">Попытки</string>
+    <string name="infinity">Бесконечность</string>
+    <string name="with_full_of_stars_you_can_solve_more_math_problems">С полным запасом звёзд вы сможете решить больше задач</string>
+    <string name="star">Звезда</string>
+    <string name="refill_your_stars_to_continue_your_learning_journey">Пополните запас звёзд, чтобы продолжить обучение</string>
+    <string name="coins">Монеты</string>
+    <string name="_0_29">0.49 $</string>
+    <string name="_0_99">0.99 $</string>
+    <string name="_2_29">1.99 $</string>
+    <string name="refill_stars_label">Пополнить звёзды</string>
+    <string name="monthly_infinity_label">Премиум на месяц</string>
+    <string name="full_caps">ПОЛНО</string>
+    <string name="active_caps">АКТИВНО</string>
+
+    <string name="stars_full_toast">Звёзды уже полные!</string>
+    <string name="stars_refilled_toast">Запас звёзд пополнен!</string>
+    <string name="infinity_activated_toast">Бесконечность активирована!</string>
+    <string name="not_enough_coins">Недостаточно монет!</string>
+    <string name="transaction_failed">Ошибка транзакции. Попробуйте снова.</string>
+    <string name="buy_for">КУПИТЬ ЗА</string>
+    <string name="of_the_month">МЕСЯЦА</string>
+    <string name="claim_reward">ПОЛУЧИТЬ НАГРАДУ</string>
+    <string name="streak">Серия</string>
+    <string name="year">ГОД</string>
+    <string name="benefits">Преимущества</string>
+    <string name="daily_lessons">Ежедневные уроки</string>
+    <string name="unlimited_learning">Безграничное обучение</string>
+    <string name="no_ads">Без рекламы</string>
+    <string name="unlimited_mini_games">Безлимитные мини-игры</string>
+    <string name="free">Бесплатно</string>
+    <string name="subscribe_for_1_33">ПОДПИСАТЬСЯ ЗА 1.99 $</string>
+    <string name="unlock_the_ntetragon_infinity">Разблокируйте\nTetragon Infinity</string>
+    <string name="premium_gives_you_full_access_nto_every_features_and_more">Премиум дает полный доступ\nко всем функциям и не только</string>
+    <string name="annual">Годовой</string>
+    <string name="_12_month_15">12 месяцев = 24 $</string>
+    <string name="_1_33_mo">1.99 $/мес*</string>
+    <string name="monthly">Месячный</string>
+    <string name="_3_mo">2.99 $/мес*</string>
+    <string name="subscribe">ПОДПИСАТЬСЯ</string>
+    <string name="math">МАТЕМАТИКА</string>
+    <string name="physics">ФИЗИКА</string>
+    <string name="subjects">Предметы</string>
+    <string name="tetragon2">Тетрагон</string>
+    <string name="app_is_currently_unavailable">Приложение временно недоступно.</string>
+    <string name="check_your_connection_or_try_again_later">Проверьте соединение или попробуйте позже!</string>
+    <string name="learn_with_joy">учись с удовольствием</string>
+    <string name="new_profit_record">Новый рекорд прибыли!</string>
+    <string name="sync_error">Ошибка синхронизации</string>
+    <string name="tier_starting_business">Начало бизнеса!</string>
+    <string name="tier_smart_spender">Разумный инвестор!</string>
+    <string name="tier_wealth_builder">Создатель капитала!</string>
+    <string name="tier_profit_master">Мастер прибыли!</string>
+    <string name="tier_cash_tycoon">Денежный магнат!</string>
+    <string name="tier_financial_genius">Финансовый гений!</string>
+    <string name="tier_market_legend">Легенда рынка!</string>
+    <string name="select_the_better_option">Выберите лучший вариант.</string>
+    <string name="new_record_caps">Новый рекорд!</string>
+    <string name="error_saving_progress">Ошибка сохранения прогресса</string>
+    <string name="tier_starting_out">Начало положено!</string>
+    <string name="tier_keep_going">Продолжай в том же духе!</string>
+    <string name="tier_nice_work">Хорошая работа!</string>
+    <string name="tier_getting_better">Становится всё лучше!</string>
+    <string name="tier_strong_effort">Отличные старания!</string>
+    <string name="tier_good_job">Молодец!</string>
+    <string name="tier_math_master">Мастер математики!</string>
+    <string name="tier_you_rock">Ты супер!</string>
+    <string name="draw">НИЧЬЯ</string>
+    <string name="player_default">Игрок</string>
+    <string name="opponent_default">Противник</string>
+    <string name="searching">Поиск..</string>
+    <string name="you_caps">Вы</string>
+    <string name="opponent_caps">Противник</string>
+    <string name="unknown_player">Неизвестно</string>
+    <string name="room_id_prefix">ID комнаты:</string>
+    <string name="waiting_opponent">Ожидание противника...</string>
+    <string name="connecting_caps">ПОДКЛЮЧЕНИЕ...</string>
+    <string name="error_enter_id">Пожалуйста, введите ID комнаты</string>
+    <string name="error_invalid_id">Неверный ID игры</string>
+    <string name="error_connection">Ошибка подключения. Попробуйте еще раз.</string>
+    <string name="delete_account_caps">УДАЛИТЬ АККАУНТ (%d)</string>
+    <string name="delete_caps">УДАЛИТЬ</string>
+    <string name="error_no_user">Пользователь не найден</string>
+    <string name="account_deleted">Аккаунт удален</string>
+    <string name="reauth_failed">Ошибка аутентификации: %s</string>
+    <string name="saving_caps">СОХРАНЕНИЕ..</string>
+    <string name="error_empty_fields">Поля не могут быть пустыми</string>
+    <string name="name_updated">Имя успешно обновлено</string>
+    <string name="name_update_failed">Не удалось обновить имя</string>
+    <string name="error_password_length">Пароль должен состоять минимум из 6 символов</string>
+    <string name="password_updated">Пароль успешно обновлен</string>
+    <string name="password_update_failed">Не удалось обновить пароль: %s</string>
+    <string name="error_incorrect_password">Текущий пароль неверный</string>
+    <string name="session_expired">Сессия истекла</string>
+    <string name="session_expired_message">Ваш аккаунт был открыт на другом устройстве.</string>
+    <string name="refresh">Обновить</string>
+    <string name="math_label">МАТЕМАТИКА</string>
+    <string name="physics_label">ФИЗИКА</string>
+    <string name="topic_square_roots">Квадратные корни</string>
+    <string name="topic_quadratic_functions">Квадратичные функции</string>
+    <string name="reward_label">Награда: %s</string>
+    <string name="topic_label">%1$d Тема: %2$s</string>
+    <string name="topic_preview_format">Тема %1$d: %2$s</string>
+    <string name="not_available">НЕДОСТУПНО</string>
+    <string name="out_of_stars_label">Звезды закончились!</string>
+    <string name="processing">ЗАГРУЗКА...</string>
+    <string name="jump_ahead">ПЕРЕЙТИ ВПЕРЕД</string>
+    <string name="previous_grade">Предыдущий класс</string>
+    <string name="quit_title">Вы уверены?</string>
+    <string name="quit_message">Если вы выйдете, весь прогресс этого урока будет потерян.</string>
+    <string name="continue_btn">ПРОДОЛЖИТЬ</string>
+    <string name="exit_btn">ВЫХОД</string>
+    <string name="processing_btn">ОБРАБОТКА...</string>
+    <string name="state_correct">Правильно!</string>
+    <string name="state_incorrect">Неправильно!</string>
+    <string name="state_solution">Решение</string>
+    <string name="label_answer">Ответ: %1$s</string>
+    <string name="btn_check">ПРОВЕРИТЬ</string>
+    <string name="btn_continue">ДАЛЕЕ</string>
+    <string name="btn_finish">ЗАВЕРШИТЬ</string>
+    <string name="btn_try_again">ПОПРОБОВАТЬ СНОВА</string>
+    <string name="find_the_square_root">Найдите квадратный корень.</string>
+    <string name="review_text">ПОВТОРИТЬ</string>
+    <string name="btn_see_solution">ПОСМОТРЕТЬ РЕШЕНИЕ</string>
+    <string name="reward_text_rive">НАГРАДА</string>
+    <string name="_5_correct">5 ПРАВИЛЬНО!</string>
+    <string name="xp_topic_mastered">Тема освоена! Максимум XP получен.</string>
+    <string name="xp_collected_desc">Очки опыта собраны!</string>
+    <string name="days_of_mindful_problem_solving">Дней осознанного решения задач</string>
+    <string name="topic_derivatives">Производные</string>
+    <string name="finish_caps">ЗАВЕРШИТЬ</string>
+    <string name="claim_reward_btn">ЗАБРАТЬ</string>
+    <string name="subscribe_caps">ПОДПИСАТЬСЯ</string>
+    <string name="processing_caps">ОБРАБОТКА...</string>
+    <string name="find_the_derivative">Найдите производную.</string>
+    <string name="topic_natural_numbers">Натуральные числа</string>
+    <string name="topic_fractions">Дроби</string>
+    <string name="find_missed_numbers">Найдите пропущенные числа.</string>
+    <string name="choose_your_language">Выберите ваш язык</string>
+    <string name="privacy_policy">ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</string>
+    <!-- Grade 1 Math Topics -->
+    <string name="counting_numbers">Счет чисел</string>
+    <string name="addition">Сложение</string>
+    <string name="subtraction">Вычитание</string>
+    <string name="odd_or_even">Четное или нечетное</string>
+    <string name="comparison">Сравнение</string>
+    <string name="parentheses">Скобки</string>
+    <string name="addition_up_to_20">Сложение до 20</string>
+    <string name="subtraction_up_to_20">Вычитание до 20</string>
+    <string name="round_numbers">Круглые числа</string>
+    <string name="two_digit_numbers">Двузначные числа</string>
+    <string name="problem_solving">Решение задач</string>
+    <string name="length_centimeter">Длина. Сантиметр.</string>
+
+    <!-- Grade 2 Math Topics -->
+    <string name="arithmetic_basics">Основы арифметики</string>
+    <string name="column_method">Метод столбиком</string>
+    <string name="three_digit_numbers">Трехзначные числа</string>
+    <string name="comparison_grade2">Сравнение</string>
+    <string name="length_measurement">Измерение длины</string>
+    <string name="multiplication_table">Таблица умножения</string>
+    <string name="division">Деление</string>
+    <string name="time">Время</string>
+
+    <!-- Grade 4 Topics -->
+    <string name="complex_arithmetics">Сложные вычисления</string>
+    <string name="column_multiplication">Умножение столбиком</string>
+    <string name="column_division">Деление столбиком</string>
+    <string name="fraction_arithmetics">Арифметика дробей</string>
+    <string name="mixed_numbers">Смешанные числа</string>
+
+    <!-- Grade 5 Topics -->
+    <string name="natural_numbers">Натуральные числа</string>
+    <!-- Grade 9 Topics -->
+    <string name="quadratic_equations">Квадратные уравнения</string>
+
+    <!-- Grade 10 Topics -->
+    <string name="trigonometry">Тригонометрия</string>
+
+    <string name="arithmetics_basics">Основы арифметики</string>
+
+    <string name="complex_multiplication">Сложное умножение</string>
+    <string name="complex_division">Сложное деление</string>
+    <string name="fractions">Дроби</string>
+    <string name="perimeter_area">Периметр и площадь</string>
+
+    <string name="si_units">Единицы СИ</string>
+    <string name="density">Плотность</string>
+    <string name="simple_machines">Простые механизмы</string>
+    <string name="force_and_motion">Сила и движение</string>
+    <string name="newtons_laws">Законы Ньютона</string>
+    <string name="magnetism">Магнетизм</string>
+    <string name="modern_physics">Современная физика</string>
+    <string name="how_many_apples">Сколько яблок изображено?</string>
+    <string name="find_the_missed_number">Найдите пропущенное число.</string>
+    <string name="question_next_after">Какое число идет следующим после %1$s?</string>
+    <string name="question_before">Какое число идет перед %1$s?</string>
+    <string name="question_how_many_angles">Сколько углов у фигуры %1$s?</string>
+    <string name="shape_circle">круг</string>
+    <string name="shape_triangle">треугольник</string>
+    <string name="shape_rectangle">прямоугольник</string>
+    <string name="shape_square">квадрат</string>
+    <string name="find_the_answer">Найдите решение.</string>
+    <string name="toast_clear_number">Пожалуйста, напишите ответ четче!</string>
+    <string name="write_the_answer">Напишите ответ.</string>
+    <string name="undo">ОТМЕНИТЬ</string>
+    <string name="instruction_addition_tree">Сложите два числа, чтобы найти ответ.</string>
+    <string name="instruction_find_missed">Найдите пропущенное число.</string>
+    <string name="keyword_missed">пропущенное</string>
+    <string name="instruction_represent_sum">Представьте %1$s как сумму %2$s.</string>
+    <string name="keyword_three_numbers">трех чисел</string>
+    <string name="instruction_represent_sum_two">Представьте %1$s как сумму %2$s.</string>
+    <string name="keyword_two_numbers">двух чисел</string>
+    <string name="instruction_find_missed_number">Найдите %1$s число.</string>
+    <string name="instruction_represent_as_subtraction">Представь %1$s как %2$s двух чисел.</string>
+    <string name="keyword_subtraction">вычитание</string>
+    <string name="label_answer_subtraction">Ответ: %1$s - %2$s</string>
+    <string name="instruction_find_type_numbers">Найди %1$s числа.</string>
+    <string name="type_even">чётные</string>
+    <string name="type_odd">нечётные</string>
+    <string name="question_is_odd_or_even">Число %1$s — %2$s или %3$s?</string>
+    <string name="question_numbers_upto">Какие числа являются %1$s до %2$s?</string>
+    <string name="question_comparison_strawberry_grape">Чего больше: %1$s или %2$s?</string>
+    <string name="item_strawberries">клубники</string>
+    <string name="item_grapes">винограда</string>
+    <string name="option_strawberry">Клубника</string>
+    <string name="option_grape">Виноград</string>
+    <string name="option_same">Одинаково</string>
+    <string name="instruction_put_sign">Поставь правильный %1$s.</string>
+    <string name="instruction_sign_word">знак</string>
+    <string name="math_format_addition">%1$d + %2$d</string>
+    <string name="math_format_subtraction">%1$d - %2$d</string>
+    <string name="question_true_or_false">Это %1$s или %2$s?</string>
+    <string name="option_true">Верно</string>
+    <string name="option_false">Неверно</string>
+    <string name="math_problem_equal_template">%1$s =</string>
+    <string name="instruction_missed_word">пропущенное</string>
+    <string name="instruction_find_missed2">Найди %1$s число.</string>
+    <string name="triple_sum_template">%1$d + %2$d + %3$d</string>
+    <string name="keyword_sum">сумму</string>
+    <string name="double_sum_template">%1$d + %2$d</string>
+    <string name="subtraction_first_part">%1$d -</string>
+    <string name="subtraction_result_part">= %1$d</string>
+    <string name="instruction_represent_sub_two">Представь число %1$s как %2$s %3$s.</string>
+    <string name="double_sub_template">%1$d - %2$d</string>
+    <string name="subtraction_problem_template">%1$d - %2$d =</string>
+    <string name="arithmetic_problem_template">%1$d %2$s %3$d =</string>
+    <string name="sequence_template">%1$s, </string>
+    <string name="question_round_closest">Округли %1$d до ближайшего круглого числа.</string>
+    <string name="keyword_round_up">Округли</string>
+    <string name="keyword_closest">ближайшего</string>
+    <string name="question_how_many_tens">Сколько десятков в числе %1$d?</string>
+    <string name="keyword_tens">десятков</string>
+    <string name="label_answer_tens">Ответ: %1$d десятков</string>
+    <string name="arithmetic_problem_template_simple">%1$s =</string>
+    <string name="instruction_comparison">Поставь правильный знак.</string>
+    <string name="instruction_comparison_keyword">знак</string>
+    <string name="arithmetic_plus_template">%1$d + %2$d</string>
+    <string name="arithmetic_minus_template">%1$d - %2$d</string>
+    <string name="problem_equals_template">%1$s =</string>
+    <string name="instruction_represent_sum2">Представь число %1$d как сумму двух чисел.</string>
+    <string name="label_answer_sum">Ответ: %1$d + %2$d</string>
+    <string name="instruction_true_false">Это правда или ложь?</string>
+    <string name="visual_value_template">=%1$d</string>
+    <string name="problem_aziz_apples">У Азиза было %1$d яблок, ему дали еще %2$d. Сколько яблок у него стало?</string>
+    <string name="keyword_apples">яблок</string>
+    <string name="problem_fish_arithmetic">Азиз съел %1$d рыб из %2$d. Сколько рыб осталось?</string>
+    <string name="keyword_fish">рыб</string>
+    <string name="question_show_cm_ruler">Покажи %1$s на линейке.</string>
+    <string name="cm_unit_template">%1$d см</string>
+    <string name="label_correct_length">Правильная длина — %1$s</string>
+    <string name="question_show_dm_in_cm">Вырази %1$s в %2$s.</string>
+    <string name="dm_unit_template">%1$d дм</string>
+    <string name="keyword_cm">см</string>
+    <string name="label_dm_to_cm_result">%1$d дм = %2$d см</string>
+    <string name="solution_dm_to_cm">1 дм = 10 см, значит %1$d дм = %2$d см</string>
+    <string name="label_answer_complex_addition">Ответ: %1$d + %2$d = %3$d</string>
+    <string name="label_answer_complex_subtraction">Ответ: %1$d - %2$d = %3$d</string>
+    <string name="label_answer_multiplication">Ответ: %1$d × %2$d = %3$d</string>
+    <string name="title_multiply_numbers">Перемножь числа.</string>
+    <string name="label_answer_division">Ответ: %1$s ÷ %2$s = %3$s</string>
+    <string name="title_divide_numbers">Раздели числа.</string>
+    <string name="title_fraction_arithmetics">Создай дробь, чтобы найти ответ.</string>
+    <string name="highlight_fraction">дробь</string>
+    <string name="label_answer_fraction">Ответ: %1$s</string>
+    <string name="piece">ЧАСТЬ</string>
+    <string name="solve_the_equation">Решите уравнение.</string>
+    <string name="match_the_pairs">Сопоставьте пары.</string>
+    <string name="instruction_comparison_sign">Поставьте правильный знак.</string>
+    <string name="highlight_word_sign">знак</string>
+    <string name="instruction_meter_to_cm">Переведите метр в сантиметр.</string>
+    <string name="unit_meter_full">метр</string>
+    <string name="unit_centimeter_full">сантиметр</string>
+    <string name="solution_meter_to_cm">1 м = 100 см, значит %1$d м = %2$d см</string>
+    <string name="unit_m">м</string>
+    <string name="unit_cm">см</string>
+    <string name="instruction_set_time">Установите это время %1$s.</string>
+    <string name="solution_set_time">Правильное время: %1$s</string>
+    <string name="unit_h">ч</string>
+    <string name="unit_min">мин</string>
+    <string name="solve_the_multiplication">Решите умножение.</string>
+    <string name="solve_the_division">Решите деление.</string>
+    <string name="question_fraction_pizza">Покажите %1$s пиццы.</string>
+    <string name="label_fraction_solution_pizza">Ответ: %1$d из 6 кусочков.</string>
+    <string name="state_praise_great_job">Отличная работа!</string>
+    <string name="question_fraction_shape">Покажите %1$s фигуры.</string>
+    <string name="label_answer_fraction2">Ответ: %1$d/%2$d</string>
+    <string name="label_fraction_solution_general">Правильный ответ: %1$d/%2$d</string>
+
+    <string name="label_square">квадрат</string>
+    <string name="label_rectangle">прямоугольник</string>
+    <string name="label_area">площадью</string>
+    <string name="question_create_shape_area">Создайте %1$s с площадью:</string>
+    <string name="label_area_units">%1$d квадратов</string>
+    <string name="label_area_formula">Формула: Площадь = w × h</string>
+    <string name="label_area_calculation">Площадь: %1$d × %2$d = %3$d</string>
+    <string name="state_almost_square">Почти! Сделайте квадрат.</string>
+
+    <string name="label_perimeter">периметром</string>
+    <string name="question_create_shape_perimeter">Создайте %1$s с периметром:</string>
+    <string name="label_perimeter_units">%1$d единиц</string>
+    <string name="label_perimeter_formula">Формула: P = 2 × (w + h)</string>
+    <string name="label_perimeter_calculation">2 × (%1$d + %2$d) = %3$d</string>
+
+    <string name="label_speed_v">скорость v</string>
+    <string name="label_distance_short">s</string>
+    <string name="label_time_short">t</string>
+    <string name="unit_meters_per_second">%1$d м/с</string>
+
+    <string name="question_find_speed">Найдите скорость v. s = %1$d м, t = %2$d с</string>
+    <string name="label_answer_speed">Ответ: %1$d м/с</string>
+    <string name="solution_speed_calculation">v = s / t = %1$d / %2$d = %3$d м/с</string>
+
+    <string name="label_energy_e">энергия E</string>
+    <string name="label_mass_short">m</string>
+    <string name="label_speed_light_short">c</string>
+    <string name="scientific_notation_16">%1$d × 10¹⁶ Дж</string>
+    <string name="question_einstein_energy">Найдите энергию E. Дано: m = %1$d кг, c = 3×10⁸ м/с</string>
+    <string name="label_answer_energy">Ответ: %1$s</string>
+    <string name="solution_einstein_calculation">E = mc² = %1$d × (3×10⁸)² = %2$s</string>
+
+    <string name="label_force_f">сила F</string>
+    <string name="label_acceleration_short">a</string>
+    <string name="unit_newtons">%1$d Н</string>
+
+    <string name="question_find_force">Найдите силу F. m = %1$d кг, a = %2$d м/с²</string>
+    <string name="label_answer_force">Ответ: %1$d Н</string>
+    <string name="solution_force_calculation">F = m × a = %1$d × %2$d = %3$d Н</string>
+
+    <string name="label_answer_with_value">Ответ: %1$d Н</string>
+    <string name="question_find_ampere_force">Найдите силу Ампера F. B = %1$d Тл, I = %2$d А, L = %3$d м</string>
+    <string name="solution_bil_formula">F = B × I × L = %1$d × %2$d × %3$d = %4$d Н</string>
+
+    <string name="question_convert_length">Переведите %1$d %2$s в %3$s.</string>
+    <string name="unit_meters_full">метры</string>
+    <string name="unit_kilometers_full">километры</string>
+    <string name="unit_centimeters_full">сантиметры</string>
+
+    <string name="label_conversion_result">%1$d %2$s = %3$d %4$s</string>
+    <string name="solution_m_to_cm">1 м = 100 см, правильный ответ: %1$d см</string>
+    <string name="solution_km_to_m">1 км = 1000 м, правильный ответ: %1$d м</string>
+
+    <string name="unit_liter_short">л</string>
+    <string name="target_liters_phrase">%1$d литров</string>
+    <string name="question_fill_kettle">Наполните чайник %1$s воды.</string>
+    <string name="solution_kettle_liters">Правильный уровень: %1$d литров</string>
+    <string name="answer_with_liters">Ответ: %1$d л</string>
+
+    <string name="unit_kg_uppercase">КГ</string>
+    <string name="unit_kg_lowercase">кг</string>
+    <string name="unit_grams_full">граммы</string>
+    <string name="unit_kilograms_full">килограммы</string>
+
+    <string name="question_mass_conversion">Сколько будет %1$s %2$s в %3$s?</string>
+    <string name="solution_mass_correct">Масса равна %1$d кг</string>
+    <string name="solution_mass_explanation">1000 грамм = 1 кг, значит ответ: %1$d кг</string>
+
+    <string name="temp_celsius_format">%1$d°C</string>
+    <string name="unit_thermometer">термометр</string>
+    <string name="question_show_temperature">Покажите %1$s на %2$s.</string>
+    <string name="solution_temp_correct">Температура точно %1$d°C</string>
+    <string name="solution_temp_explanation">Найдите отметку %1$d°C.</string>
+
+    <string name="density_unit_value">%1$d кг/м³</string>
+    <string name="question_density_find">Найдите плотность ρ. m = %1$d кг, v = %2$d м³</string>
+    <string name="keyword_density">плотность ρ</string>
+    <string name="keyword_mass_label">m =</string>
+    <string name="keyword_volume_label">v =</string>
+    <string name="answer_density_display">Ответ: %1$d кг/м³</string>
+    <string name="solution_density_calc">ρ = m / V = %1$d / %2$d = %3$d кг/м³</string>
+
+    <string name="unit_kg_value">%1$d кг</string>
+    <string name="question_find_mass">Найдите массу m. ρ = %1$d кг/м³, v = %2$d м³</string>
+    <string name="keyword_mass_m">масса m</string>
+    <string name="keyword_rho_equals">ρ =</string>
+    <string name="keyword_v_equals">v =</string>
+    <string name="answer_mass_display">Ответ: %1$d кг</string>
+    <string name="solution_mass_calc">m = ρ × V = %1$d × %2$d = %3$d кг</string>
+
+    <string name="question_find_ma">Найдите механическое преимущество (MA). Нагрузка = %1$d Н, Усилие = %2$d Н</string>
+    <string name="keyword_ma">(MA)</string>
+    <string name="keyword_load_equals">Нагрузка =</string>
+    <string name="keyword_effort_equals">Усилие =</string>
+    <string name="answer_ma_display">Ответ: %1$d</string>
+    <string name="solution_ma_calc">MA = Нагрузка / Усилие = %1$d / %2$d = %3$d</string>
+
+    <string name="unit_joule_value">%1$d Дж</string>
+    <string name="question_calculate_work">Вычислите работу (A). F = %1$d Н, s = %2$d м</string>
+    <string name="keyword_work_a">(A)</string>
+    <string name="keyword_f_equals">F =</string>
+    <string name="keyword_s_equals">s =</string>
+    <string name="answer_work_display">Ответ: %1$d Дж</string>
+    <string name="solution_work_calc">A = F × s = %1$d × %2$d = %3$d Дж</string>
+
+    <string name="notif_title">Тетрагон</string>
+    <string name="notif_message">Пришло время для вашего ежедневного урока!</string>
+    <string name="notif_channel_name">Ежедневный напоминания</string>
+    <string name="notif_permission_denied">Пожалуйста, разрешите уведомления в настройках системы, чтобы получать напоминания.</string>
+    <string name="current_plan">Текущий план</string>
+    <string name="go_premium">Перейти на премиум</string>
+
+    <string name="premium_plan_free">Бесплатный</string>
+    <string name="premium_plan_premium">Премиум</string>
+    <string name="premium_go_premium">Перейти на Премиум</string>
+    <string name="premium_nav_title">Настройки подписки</string>
+    <string name="full_stars">ЗАПАС ПОЛНЫЙ</string>
+    <string name="activated">АКТИВИРОВАНО</string>
 </resources>

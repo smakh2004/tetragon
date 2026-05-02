@@ -32,10 +32,11 @@ import com.example.tetragon.questions.questionMathFirstGrade.tenthTopicTwoDigitN
 import com.example.tetragon.questions.questionMathFirstGrade.eleventhTopicProblemSolving.*
 import com.example.tetragon.questions.questionMathFirstGrade.twelvesTopicLengthCentimeter.ShowCmInRullerFragment
 import com.example.tetragon.questions.questionMathFirstGrade.twelvesTopicLengthCentimeter.UiDmInCmFragment
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 
-class Math1GradeQuestionActivity : AppCompatActivity() {
+class Math1GradeQuestionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityQuestionQctivityBinding
     private lateinit var selectedTopic: MathGrade1Topic
@@ -380,14 +381,8 @@ class Math1GradeQuestionActivity : AppCompatActivity() {
     }
 
     private fun showQuitBottomSheet() {
-
         val dialog = BottomSheetDialog(this)
-
-        val view = layoutInflater.inflate(
-            R.layout.dialog_quit,
-            null
-        )
-
+        val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
         val titleText = view.findViewById<TextView>(R.id.titleText)
@@ -395,12 +390,12 @@ class Math1GradeQuestionActivity : AppCompatActivity() {
         val continueButton = view.findViewById<Button>(R.id.noButton)
         val finishButton = view.findViewById<Button>(R.id.finishButton)
 
-        titleText.text = "Are you sure?"
-        messageText.text =
-            "If you exit, you will lose all the points you gained in this lesson."
+        // Using your existing XML string keys
+        titleText.text = getString(R.string.quit_title)
+        messageText.text = getString(R.string.quit_message)
 
-        continueButton.text = "CONTINUE LESSON"
-        finishButton.text = "EXIT"
+        continueButton.text = getString(R.string.continue_btn)
+        finishButton.text = getString(R.string.exit_btn)
 
         continueButton.setOnClickListener {
             dialog.dismiss()

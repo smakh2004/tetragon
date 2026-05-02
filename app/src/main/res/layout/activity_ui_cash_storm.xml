@@ -240,7 +240,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:fontFamily="@font/inter_semibold"
-                        android:text="Select the better option."
+                        android:text="@string/select_the_better_option"
                         android:textColor="@color/text_color"
                         android:textSize="21sp" />
 

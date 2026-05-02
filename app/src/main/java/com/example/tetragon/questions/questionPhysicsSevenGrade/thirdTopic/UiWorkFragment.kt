@@ -77,7 +77,7 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
         val shuffled = optionsSet.toList().shuffled()
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
-            tv.text = "${shuffled[index]} J"
+            tv.text = getString(R.string.unit_joule_value, shuffled[index])
             layout.setBackgroundResource(R.drawable.custom_background)
         }
 
@@ -92,7 +92,7 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
 
@@ -104,11 +104,15 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
     }
 
     private fun updateQuestionText() {
-        val fullText = "Calculate the work done (A). F = $forceValue N, s = $distanceValue m"
+        val fullText = getString(R.string.question_calculate_work, forceValue, distanceValue)
         val spannable = SpannableStringBuilder(fullText)
         val lightBlue = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val keywords = listOf("(A)", "F =", "s =")
+        val keywords = listOf(
+            getString(R.string.keyword_work_a),
+            getString(R.string.keyword_f_equals),
+            getString(R.string.keyword_s_equals)
+        )
         keywords.forEach { word ->
             val start = fullText.indexOf(word)
             if (start != -1) {
@@ -146,12 +150,12 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -169,7 +173,7 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Physics7GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else if (!activity.checkAndTriggerMilestone()) {
                     resetUIForNext()
@@ -182,10 +186,10 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "A = F × s = $forceValue × $distanceValue = $correctAnswer J"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_work_calc, forceValue, distanceValue, correctAnswer)
             answerDisplay.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
@@ -194,7 +198,6 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
-            // Highlight ONLY the correct answer and reset others
             options.forEach { layout ->
                 val tv = layout.getChildAt(0) as TextView
                 val valInTv = tv.text.toString().filter { it.isDigit() }.toInt()
@@ -202,7 +205,6 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
                 if (valInTv == correctAnswer) {
                     layout.setBackgroundResource(R.drawable.option_showed)
                 } else {
-                    // This ensures incorrect/selected highlights are removed
                     layout.setBackgroundResource(R.drawable.custom_background)
                 }
             }
@@ -225,7 +227,7 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
         stateAnswer.text = ""
         answerDisplay.text = ""
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
@@ -259,8 +261,8 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer J"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.answer_work_display, correctAnswer)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -269,7 +271,8 @@ class UiWorkFragment : Fragment(R.layout.fragment_ui_work) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)

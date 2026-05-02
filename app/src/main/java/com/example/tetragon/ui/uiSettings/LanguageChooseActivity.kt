@@ -30,7 +30,7 @@ class LanguageChooseActivity : BaseActivity() {
         highlightSelectedLanguage(selectedLang)
         binding.saveEnabledBtnContainer.visibility = View.INVISIBLE
         binding.saveDisabledBtnContainer.visibility = View.VISIBLE
-        binding.saveDisabledBtn.text = "SAVE"
+        binding.saveDisabledBtn.text = getString(R.string.save)
 
         // Back button
         binding.backBtn.setOnClickListener {
@@ -47,10 +47,11 @@ class LanguageChooseActivity : BaseActivity() {
         binding.saveEnabledBtn.setOnClickListener {
             binding.saveEnabledBtnContainer.visibility = View.INVISIBLE
             binding.saveDisabledBtnContainer.visibility = View.VISIBLE
-            binding.saveDisabledBtn.text = "LOADING.."
+            binding.saveDisabledBtn.text = getString(R.string.loading_caps)
 
             LocaleHelper.setLocale(this, selectedLang)
 
+            // Clear stack and restart to apply new locale globally
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -67,11 +68,11 @@ class LanguageChooseActivity : BaseActivity() {
         if (selectedLang != savedLang) {
             binding.saveEnabledBtnContainer.visibility = View.VISIBLE
             binding.saveDisabledBtnContainer.visibility = View.INVISIBLE
-            binding.saveDisabledBtn.text = "SAVE"
+            binding.saveDisabledBtn.text = getString(R.string.save)
         } else {
             binding.saveEnabledBtnContainer.visibility = View.INVISIBLE
             binding.saveDisabledBtnContainer.visibility = View.VISIBLE
-            binding.saveDisabledBtn.text = "SAVE"
+            binding.saveDisabledBtn.text = getString(R.string.save)
         }
     }
 
@@ -101,5 +102,4 @@ class LanguageChooseActivity : BaseActivity() {
             }
         }
     }
-
 }

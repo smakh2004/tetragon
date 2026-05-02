@@ -89,7 +89,7 @@
                         android:paddingStart="40dp"
                         android:paddingEnd="40dp"
                         android:stateListAnimator="@drawable/button_animator"
-                        android:text="JUMP AHEAD"
+                        android:text="@string/jump_ahead"
                         android:textColor="@color/white"
                         android:textSize="17sp" />
                 </FrameLayout>
@@ -113,7 +113,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:fontFamily="@font/inter_semibold"
-                        android:text="Previous grade"
+                        android:text="@string/previous_grade"
                         android:textColor="@color/blue_2"
                         android:textSize="18sp" />
                 </LinearLayout>

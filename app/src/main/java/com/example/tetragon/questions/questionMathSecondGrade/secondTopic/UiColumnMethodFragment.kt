@@ -50,7 +50,7 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
-    private var isSolutionShown = false // TRACKS IF USER CLICKED "SEE SOLUTION"
+    private var isSolutionShown = false
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -148,14 +148,8 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     }
 
     private fun toggleCheckButtonState() {
-        // Both inputs must have a value to enable the CHECK button
         val isBothFilled = tvCarryInput.text.isNotEmpty() && tvSecondNumInput.text.isNotEmpty()
-
-        if (isBothFilled) {
-            enableCheckButton()
-        } else {
-            disableCheckButton()
-        }
+        if (isBothFilled) enableCheckButton() else disableCheckButton()
     }
 
     private fun generateProblem() {
@@ -177,11 +171,11 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
-        isSolutionShown = false // RESET FLAG
+        isSolutionShown = false
         seeBtn.visibility = View.GONE
 
         setFocus(tvCarryInput, boxCarry, cursorCarry)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -210,32 +204,25 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
             boxCarry.setImageResource(R.drawable.answer_correct_box)
             boxEmpty.setImageResource(R.drawable.answer_correct_box)
 
-            // --- PROGRESS & XP LOGIC ---
-            // 1. Increment progress (fills the bar)
             val isFinished = activity.incrementProgress()
-
-            // 2. Award XP ONLY on the first attempt
             if (isFirstAttempt) {
                 activity.totalXp += MathGrade2Type.COLUMN_METHOD_ADDITION.xp
             }
 
             activity.handleCorrectAnswer()
-
             isIncorrectAttempt = false
-            // 3. Set button text based on progress
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
-
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             boxCarry.setImageResource(R.drawable.answer_incorrect_box)
             boxEmpty.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
-        isFirstAttempt = false // Mark first attempt as over
+        isFirstAttempt = false
     }
 
     private fun setupCheckButton() {
@@ -250,11 +237,9 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    // If the button says FINISH, go to XP Gained screen
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
-                        // Otherwise, check for milestones or show next random question
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
                             resetUIForNext()
@@ -268,12 +253,13 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
-            isSolutionShown = true // MARK AS SKIPPED/SOLUTION SHOWN
+            isSolutionShown = true
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $fullNum1+$fullNum2=${fullNum1+fullNum2}"
+            stateAnswer.text = getString(R.string.state_solution)
+            val solutionText = "$fullNum1 + $fullNum2 = ${fullNum1 + fullNum2}"
+            answer.text = getString(R.string.label_answer, solutionText)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             boxCarry.setImageResource(R.drawable.answer_solution_box)
             boxEmpty.setImageResource(R.drawable.answer_solution_box)
@@ -282,7 +268,6 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
 
-            // Allow them to move forward, but treat as non-correct for progress
             isIncorrectAttempt = false
             isFirstAttempt = false
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
@@ -305,7 +290,7 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         setFocus(tvCarryInput, boxCarry, cursorCarry)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -313,8 +298,9 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $fullNum1+$fullNum2=${fullNum1+fullNum2}"
+        stateAnswer.text = getString(R.string.state_correct)
+        val solutionText = "$fullNum1 + $fullNum2 = ${fullNum1 + fullNum2}"
+        answer.text = getString(R.string.label_answer, solutionText)
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -322,9 +308,10 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
@@ -334,7 +321,7 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
         activity.hideSuccessAnimation()
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 
@@ -347,24 +334,16 @@ class UiColumnMethodFragment : Fragment(R.layout.fragment_ui_column_method) {
     private fun enableCheckButton() {
         checkBtn.isEnabled = true
         val activity = requireActivity() as Math2GradeQuestionActivity
-
-        // Show the enabled container and its background shadow
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
         checkBtnBack.visibility = View.VISIBLE
-
-        // Hide the disabled placeholder
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
     }
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
         val activity = requireActivity() as Math2GradeQuestionActivity
-
-        // Hide the enabled container and its background shadow
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         checkBtnBack.visibility = View.INVISIBLE
-
-        // Show the disabled placeholder
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
 

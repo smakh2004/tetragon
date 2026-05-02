@@ -102,7 +102,7 @@
                         android:id="@+id/minus_btn_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PIECE"
+                        android:text="@string/piece"
                         android:fontFamily="@font/inter_semibold"
                         android:textColor="@color/white"
                         android:textSize="20sp"
@@ -140,7 +140,7 @@
                         android:fontFamily="@font/inter_semibold"
                         android:textColor="@color/gray_1"
                         android:textSize="20sp"
-                        android:text="PIECE"
+                        android:text="@string/piece"
                         android:layout_marginStart="10dp"/>
                 </LinearLayout>
             </FrameLayout>
@@ -186,7 +186,7 @@
                         android:id="@+id/add_btn_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PIECE"
+                        android:text="@string/piece"
                         android:fontFamily="@font/inter_semibold"
                         android:textColor="@color/white"
                         android:textSize="20sp"
@@ -224,7 +224,7 @@
                         android:fontFamily="@font/inter_semibold"
                         android:textColor="@color/gray_1"
                         android:textSize="20sp"
-                        android:text="PIECE"
+                        android:text="@string/piece"
                         android:layout_marginStart="10dp"/>
                 </LinearLayout>
             </FrameLayout>

@@ -1,6 +1,5 @@
 package com.example.tetragon.questions.questionPhysicsEighthGrade.firstTopic
 
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.Spannable
@@ -11,10 +10,8 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tetragon.R
-import com.example.tetragon.questions.questionMathSecondGrade.MathGrade2Type
 import com.example.tetragon.questions.questionPhysicsEighthGrade.Physics8GradeQuestionActivity
 import com.example.tetragon.questions.questionPhysicsEighthGrade.PhysicsGrade8Type
-import com.example.tetragon.questions.questionPhysicsSevenGrade.PhysicsGrade7Type
 
 class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
 
@@ -67,7 +64,6 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
     }
 
     private fun generateProblem() {
-        // Speed = Distance / Time. We ensure it's an integer for simplicity.
         timeValue = listOf(2, 4, 5, 10).random()
         correctAnswer = (5..25).random()
         distanceValue = correctAnswer * timeValue
@@ -81,7 +77,7 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
         val shuffled = optionsSet.toList().shuffled()
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
-            tv.text = "${shuffled[index]} m/s"
+            tv.text = getString(R.string.unit_meters_per_second, shuffled[index])
             layout.setBackgroundResource(R.drawable.custom_background)
         }
 
@@ -96,7 +92,7 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
 
@@ -108,11 +104,14 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
     }
 
     private fun updateQuestionText() {
-        val fullText = "Find the speed v. s = $distanceValue m, t = $timeValue s"
+        val sLabel = getString(R.string.label_distance_short)
+        val tLabel = getString(R.string.label_time_short)
+        val fullText = getString(R.string.question_find_speed, distanceValue, timeValue)
+
         val spannable = SpannableStringBuilder(fullText)
         val lightBlue = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val keywords = listOf("speed v", "s =", "t =")
+        val keywords = listOf(getString(R.string.label_speed_v), "$sLabel =", "$tLabel =")
         keywords.forEach { word ->
             val start = fullText.indexOf(word)
             if (start != -1) {
@@ -144,7 +143,7 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Physics8GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else if (!activity.checkAndTriggerMilestone()) {
                     resetUIForNext()
@@ -168,17 +167,16 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
             activity.playSuccessAnimation()
             val isFinished = activity.incrementProgress()
 
-            // Assume XP is handled via Activity for consistency
             if (isFirstAttempt) activity.totalXp += PhysicsGrade8Type.FIND_SPEED.xp
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -188,10 +186,10 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "v = s / t = $distanceValue / $timeValue = $correctAnswer m/s"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_speed_calculation, distanceValue, timeValue, correctAnswer)
             answerDisplay.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
@@ -224,7 +222,7 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
         stateAnswer.text = ""
         answerDisplay.text = ""
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
@@ -258,8 +256,8 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer m/s"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer_speed, correctAnswer)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -268,9 +266,10 @@ class UiFindSpeedFragment : Fragment(R.layout.fragment_ui_find_speed) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

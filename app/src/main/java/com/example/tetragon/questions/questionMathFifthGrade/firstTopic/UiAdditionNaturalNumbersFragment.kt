@@ -231,7 +231,7 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         seeBtn.visibility = View.GONE
 
         setFocus(tvInputThousandsFirstText, boxThousFirst, cursorThousFirst)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -264,13 +264,13 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
             }
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             setAllBoxes(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -296,7 +296,7 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -314,10 +314,11 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         seeEnabledButton.setOnClickListener {
             isSolutionShown = true
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $fullNum1 + $fullNum2 = $targetSum"
+            stateAnswer.text = getString(R.string.state_solution)
+            val fullEquation = "$fullNum1 + $fullNum2 = $targetSum"
+            answer.text = getString(R.string.label_answer, fullEquation)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             setAllBoxes(R.drawable.answer_solution_box)
 
@@ -348,7 +349,7 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         setAllBoxes(R.drawable.answer_default_box)
         seeBtn.visibility = View.GONE
         setFocus(tvInputThousandsFirstText, boxThousFirst, cursorThousFirst)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -356,8 +357,9 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $fullNum1 + $fullNum2 = $targetSum"
+        stateAnswer.text = getString(R.string.state_correct)
+        val fullEquation = "$fullNum1 + $fullNum2 = $targetSum"
+        answer.text = getString(R.string.label_answer, fullEquation)
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
         enableCheckButton()
@@ -366,7 +368,8 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
     private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
@@ -380,7 +383,7 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
         seeBtn.visibility = View.GONE
         setupInitialButtonState()
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
     }
 

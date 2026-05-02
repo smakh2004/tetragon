@@ -1,6 +1,5 @@
 package com.example.tetragon.questions.questionPhysicsSevenGrade.secondTopicDensity
 
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.Spannable
@@ -78,7 +77,7 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
         val shuffled = optionsSet.toList().shuffled()
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
-            tv.text = "${shuffled[index]} kg"
+            tv.text = getString(R.string.unit_kg_value, shuffled[index])
             layout.setBackgroundResource(R.drawable.custom_background)
         }
 
@@ -93,9 +92,8 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
-        // Reset option backgrounds to default
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
 
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
@@ -106,11 +104,15 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
     }
 
     private fun updateQuestionText() {
-        val fullText = "Find the mass m. ρ = $densityValue kg/m³, v = $volumeValue m³"
+        val fullText = getString(R.string.question_find_mass, densityValue, volumeValue)
         val spannable = SpannableStringBuilder(fullText)
         val lightBlue = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val keywords = listOf("mass m", "ρ =", "v =")
+        val keywords = listOf(
+            getString(R.string.keyword_mass_m),
+            getString(R.string.keyword_rho_equals),
+            getString(R.string.keyword_v_equals)
+        )
         keywords.forEach { word ->
             val start = fullText.indexOf(word)
             if (start != -1) {
@@ -148,12 +150,12 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -171,7 +173,7 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Physics7GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else if (!activity.checkAndTriggerMilestone()) {
                     resetUIForNext()
@@ -184,10 +186,10 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "m = ρ × V = $densityValue × $volumeValue = $correctAnswer kg"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_mass_calc, densityValue, volumeValue, correctAnswer)
             answerDisplay.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
@@ -220,7 +222,7 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
         stateAnswer.text = ""
         answerDisplay.text = ""
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
@@ -254,8 +256,8 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer kg"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.answer_mass_display, correctAnswer)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -264,7 +266,8 @@ class UiFindMassFragment : Fragment(R.layout.fragment_ui_find_mass) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)

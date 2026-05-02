@@ -1,6 +1,5 @@
 package com.example.tetragon.questions.questionPhysicsEleventhGrade.firstTopic
 
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.Spannable
@@ -29,11 +28,8 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
     private lateinit var answerDisplay: TextView
 
     private var mValue: Int = 0
-    private val cValue: Double = 3.0 * 10.0.pow(8.0)
     private var correctAnswer: Long = 0
     private var selectedOptionIndex: Int? = null
-
-    // This list stores the actual numeric values to avoid string parsing bugs
     private var optionValues: List<Long> = emptyList()
 
     private var isAnswerChecked = false
@@ -76,14 +72,13 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
         val optionsSet = mutableSetOf(correctAnswer)
         while (optionsSet.size < 3) {
             val wrong = when((1..3).random()) {
-                1 -> (mValue.toLong() * 3) * 10.0.pow(8.0).toLong() // Forgot to square c
+                1 -> (mValue.toLong() * 3) * 10.0.pow(8.0).toLong()
                 2 -> correctAnswer + (10.0.pow(16.0)).toLong() * (1..2).random()
                 else -> (correctAnswer - (10.0.pow(16.0)).toLong()).coerceAtLeast(1)
             }
             if (wrong != correctAnswer) optionsSet.add(wrong)
         }
 
-        // Shuffle the values and store them
         optionValues = optionsSet.toList().shuffled()
 
         options.forEachIndexed { index, layout ->
@@ -97,12 +92,10 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
     }
 
     private fun formatScientific(value: Long): String {
-        // Check if value is in the magnitude of 10^16
         return if (value >= 10.0.pow(16.0).toLong()) {
             val base = value / 10.0.pow(16.0).toLong()
-            "$base × 10¹⁶ J"
+            getString(R.string.scientific_notation_16, base)
         } else {
-            // For smaller values (like the decoy where they forgot to square c)
             val formatter = java.text.DecimalFormat("0.#E0")
             formatter.format(value).replace("E", " × 10^") + " J"
         }
@@ -115,7 +108,7 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
 
@@ -127,11 +120,16 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
     }
 
     private fun updateQuestionText() {
-        val fullText = "Find the energy E. Given: m = $mValue kg, c = 3×10⁸ m/s"
+        val fullText = getString(R.string.question_einstein_energy, mValue)
         val spannable = SpannableStringBuilder(fullText)
         val lightBlue = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val keywords = listOf("energy E", "m =", "c =")
+        val keywords = listOf(
+            getString(R.string.label_energy_e),
+            "${getString(R.string.label_mass_short)} =",
+            "${getString(R.string.label_speed_light_short)} ="
+        )
+
         keywords.forEach { word ->
             val start = fullText.indexOf(word)
             if (start != -1) {
@@ -163,7 +161,7 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Physics11GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else if (!activity.checkAndTriggerMilestone()) {
                     resetUIForNext()
@@ -179,7 +177,6 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
         activity.isResultCurrentlyVisible = true
         stateContainer.visibility = View.VISIBLE
 
-        // Directly compare the stored value with the correct answer
         val chosenValue = optionValues[index]
 
         if (chosenValue == correctAnswer) {
@@ -191,12 +188,12 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -206,10 +203,12 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "E = mc² = $mValue × (3×10⁸)² = ${formatScientific(correctAnswer)}"
+            stateAnswer.text = getString(R.string.state_solution)
+
+            val formattedResult = formatScientific(correctAnswer)
+            answerDisplay.text = getString(R.string.solution_einstein_calculation, mValue, formattedResult)
             answerDisplay.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
@@ -241,7 +240,7 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
         stateAnswer.text = ""
         answerDisplay.text = ""
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
@@ -275,8 +274,8 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: ${formatScientific(correctAnswer)}"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer_energy, formatScientific(correctAnswer))
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -285,9 +284,10 @@ class UiFindEinsteinFragment : Fragment(R.layout.fragment_ui_find_einstein) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

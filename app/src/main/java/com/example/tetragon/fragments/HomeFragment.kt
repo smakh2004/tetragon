@@ -38,7 +38,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.type.Color
 import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
@@ -51,7 +50,6 @@ class HomeFragment : Fragment() {
     private lateinit var streakContainer: ConstraintLayout
     private lateinit var chatContainer: ConstraintLayout
 
-    // Star/Attempt UI
     private lateinit var starCountText: TextView
     private lateinit var starIcon: ImageView
 
@@ -59,15 +57,13 @@ class HomeFragment : Fragment() {
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private var userDataListener: ListenerRegistration? = null
 
-    // Timer Variables
     private var countDownTimer: CountDownTimer? = null
-    private val REGEN_TIME_MILLIS = 3600000L // 1 Hour
+    // 30 Minutes per star
+    private val REGEN_TIME_MILLIS = 1800000L
     private val MAX_STARS = 15
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
@@ -77,14 +73,11 @@ class HomeFragment : Fragment() {
 
         chatContainer = view.findViewById(R.id.chatContainer)
         streakContainer = view.findViewById(R.id.constraintLayout6)
-
         streakNumberTextView = view.findViewById(R.id.streakNumber)
         streakIcon = view.findViewById(R.id.streakIcon)
         classLabel = view.findViewById(R.id.class_label)
         topicNameDisplay = view.findViewById(R.id.topic_name)
         classBtn = view.findViewById(R.id.class_btn)
-
-        // Initialize Star Count UI
         starCountText = view.findViewById(R.id.starCountText)
         starIcon = view.findViewById(R.id.starIcon)
 
@@ -103,10 +96,8 @@ class HomeFragment : Fragment() {
         if (savedInstanceState == null) {
             val savedGrade = GradeManager.getGrade(requireContext())
             val savedSubject = GradeManager.getSubject(requireContext())
-
             val targetGrade = arguments?.getInt("target_grade", savedGrade) ?: savedGrade
             val targetSubject = arguments?.getString("target_subject", savedSubject) ?: savedSubject
-
             displayGrade(targetGrade, targetSubject)
         }
 
@@ -117,6 +108,14 @@ class HomeFragment : Fragment() {
         val mainActivity = activity as? MainActivity
         mainActivity?.setMiniGamesVisible(subject != "PHYSICS")
 
+        // 1. Get the translated Subject Name
+        val translatedSubject = when (subject) {
+            "MATH" -> getString(R.string.math_label)
+            "PHYSICS" -> getString(R.string.physics_label)
+            else -> subject // Fallback
+        }
+
+        // 2. Select Fragment (Keep your existing logic)
         val fragment = if (subject == "PHYSICS") {
             when (grade) {
                 7 -> Physics7GradeFragment()
@@ -147,7 +146,8 @@ class HomeFragment : Fragment() {
             .replace(R.id.home_content_frame, fragment)
             .commit()
 
-        classLabel.text = "$subject - GRADE $grade"
+        // 3. Set translated text: e.g., "Math - 5 Grade" or "Математика - 5 класс"
+        classLabel.text = getString(R.string.grade_label_format, translatedSubject, grade)
     }
 
     fun onTopicChanged(title: String) {
@@ -179,14 +179,19 @@ class HomeFragment : Fragment() {
                         starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
                     }
                     else -> {
-                        // Icon Logic
                         starIcon.setImageResource(if (stars <= 0) R.drawable.star_null else R.drawable.star)
 
-                        // If stars < 15, we need to show/run the timer
-                        if (stars < MAX_STARS && lastStarUsed != null) {
-                            startRegenTimer(lastStarUsed, stars.toInt())
+                        if (stars < MAX_STARS) {
+                            if (lastStarUsed != null) {
+                                startRegenTimer(lastStarUsed, stars.toInt())
+                            } else {
+                                // If user has < 15 stars but no timestamp, we force one to start the recovery
+                                db.collection("users").document(user.uid).update("lastStarUsedTime", Timestamp.now())
+                            }
                         } else {
+                            // Full stars (15)
                             starCountText.text = stars.toString()
+                            starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
                         }
                     }
                 }
@@ -195,44 +200,52 @@ class HomeFragment : Fragment() {
 
     private fun startRegenTimer(lastUsed: Timestamp, currentStars: Int) {
         val currentTime = System.currentTimeMillis()
-        val elapsedTime = currentTime - lastUsed.toDate().time
-        val timeLeft = REGEN_TIME_MILLIS - elapsedTime
+        val lastUsedMillis = lastUsed.toDate().time
+        val elapsedTime = currentTime - lastUsedMillis
 
-        if (timeLeft <= 0) {
-            recoverStar(currentStars)
+        // Calculate total star recovery based on elapsed time (offline recovery)
+        val starsToRecover = (elapsedTime / REGEN_TIME_MILLIS).toInt()
+        if (starsToRecover > 0) {
+            applyRecovery(currentStars, lastUsedMillis, starsToRecover)
             return
         }
 
+        val timeLeft = REGEN_TIME_MILLIS - elapsedTime
+
         countDownTimer = object : CountDownTimer(timeLeft, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                // Requirement: Only show timer text if stars are 0
+                if (!isAdded) return
+
                 if (currentStars <= 0) {
+                    // Show timer when user is out of stars
                     val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
                     val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
                     starCountText.text = String.format("%02dm %02ds", minutes, seconds)
                     starCountText.setTextColor(android.graphics.Color.parseColor("#FA236E"))
                 } else {
+                    // Show current count while timer runs in background
                     starCountText.text = currentStars.toString()
                     starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
                 }
             }
 
             override fun onFinish() {
-                recoverStar(currentStars)
+                applyRecovery(currentStars, lastUsedMillis, 1)
             }
         }.start()
     }
 
-    private fun recoverStar(currentStars: Int) {
+    private fun applyRecovery(currentStars: Int, lastUsedMillis: Long, amount: Int) {
         val user = auth.currentUser ?: return
-        val nextStars = (currentStars + 3).coerceAtMost(MAX_STARS)
-
+        val nextStars = (currentStars + amount).coerceAtMost(MAX_STARS)
         val updates = mutableMapOf<String, Any>("stars" to nextStars)
 
-        // If we haven't reached max, restart the clock from now
         if (nextStars < MAX_STARS) {
-            updates["lastStarUsedTime"] = Timestamp.now()
+            // Shift the start time forward by the time consumed to avoid "losing" milliseconds
+            val newTimeMillis = lastUsedMillis + (amount * REGEN_TIME_MILLIS)
+            updates["lastStarUsedTime"] = Timestamp(java.util.Date(newTimeMillis))
         } else {
+            // Reset reached
             updates["lastStarUsedTime"] = com.google.firebase.firestore.FieldValue.delete()
         }
 

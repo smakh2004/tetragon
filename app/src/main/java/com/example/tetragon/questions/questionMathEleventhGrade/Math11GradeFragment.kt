@@ -42,11 +42,9 @@ class Math11GradeFragment : Fragment() {
     private lateinit var continueEnabledBtnBack: View
     private lateinit var startLessonLabel: TextView
 
-    // --- NAVIGATION UI ---
     private lateinit var nextGradeLabel: TextView
     private lateinit var backToGrade10Btn: View
 
-    // Scroll UI
     private lateinit var scrollTargetContainer: View
     private lateinit var scrollArrowIcon: ImageView
 
@@ -54,8 +52,8 @@ class Math11GradeFragment : Fragment() {
 
     private val topicViews by lazy { listOf(topic1) }
 
-    // Grade 11 Topics
-    private val topicNames = listOf("Derivatives")
+    // Use string resources for topic names
+    private val topicNames by lazy { listOf(getString(R.string.topic_derivatives)) }
     private val topicKeys = listOf("DERIVATIVES")
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
@@ -66,7 +64,6 @@ class Math11GradeFragment : Fragment() {
     private var claimedRewards = mutableMapOf<String, Boolean>()
     private var isUnlocked = mutableMapOf<String, Boolean>()
 
-    // User State for Stars and Subscription
     private var userStars: Int = 15
     private var isInfinity: Boolean = false
 
@@ -142,7 +139,7 @@ class Math11GradeFragment : Fragment() {
 
         startContainer.visibility = View.GONE
         scrollTargetContainer.visibility = View.GONE
-        nextGradeLabel.text = "FINISH"
+        nextGradeLabel.text = getString(R.string.finish_caps)
     }
 
     private fun listenToTopicProgress() {
@@ -203,10 +200,10 @@ class Math11GradeFragment : Fragment() {
 
         if (rewardKey != null) {
             val idx = topicKeys.indexOf(rewardKey)
-            startLessonLabel.text = "Reward: ${topicNames[idx]}"
+            startLessonLabel.text = getString(R.string.reward_label, topicNames[idx])
         } else if (topicKey != null) {
             val idx = topicKeys.indexOf(topicKey)
-            startLessonLabel.text = "${idx + 1} Topic: ${topicNames[idx]}"
+            startLessonLabel.text = getString(R.string.topic_label, idx + 1, topicNames[idx])
         }
 
         val startContainerBg =
@@ -215,17 +212,17 @@ class Math11GradeFragment : Fragment() {
         if (isLocked) {
             startEnabledBtnContainer.visibility = View.GONE
             startDisabledBtnContainer.visibility = View.VISIBLE
-            startDisabledBtn.text = "NOT AVAILABLE"
+            startDisabledBtn.text = getString(R.string.not_available)
             startContainerBg?.setBackgroundResource(R.drawable.custom_background)
         } else if (rewardKey != null) {
-            continueEnabledBtn.text = "CLAIM"
+            continueEnabledBtn.text = getString(R.string.claim_reward_btn)
             startContainerBg?.setBackgroundResource(R.drawable.custom_background)
             resetButtonToDefaultTheme()
             startEnabledBtnContainer.visibility = View.VISIBLE
             startDisabledBtnContainer.visibility = View.GONE
         } else if (!isInfinity && userStars <= 0) {
-            continueEnabledBtn.text = "SUBSCRIBE"
-            startLessonLabel.text = "Out of Stars!"
+            continueEnabledBtn.text = getString(R.string.subscribe_caps)
+            startLessonLabel.text = getString(R.string.out_of_stars_label)
             startContainerBg?.setBackgroundResource(R.drawable.custom_premium_background_2)
             continueEnabledBtn.backgroundTintList = null
             continueEnabledBtnBack.backgroundTintList = null
@@ -234,7 +231,9 @@ class Math11GradeFragment : Fragment() {
             startEnabledBtnContainer.visibility = View.VISIBLE
             startDisabledBtnContainer.visibility = View.GONE
         } else {
-            continueEnabledBtn.text = buttonText
+            // Localize START/REVIEW based on buttonText parameter
+            continueEnabledBtn.text = if (buttonText == "REVIEW") getString(R.string.review_text) else getString(R.string.start_text)
+
             startContainerBg?.setBackgroundResource(R.drawable.custom_background)
             resetButtonToDefaultTheme()
             startEnabledBtnContainer.visibility = View.VISIBLE
@@ -244,12 +243,12 @@ class Math11GradeFragment : Fragment() {
     }
 
     private fun handleContinueClick() {
-        showLoadingState(true)
-
-        if (continueEnabledBtn.text == "SUBSCRIBE") {
+        if (continueEnabledBtn.text == getString(R.string.subscribe_caps)) {
             startActivity(Intent(requireContext(), IntroSubscriptionActivity::class.java))
             return
         }
+
+        showLoadingState(true)
 
         if (pendingRewardKey != null) {
             handleRewardClaimed(findTopicViewByKey(pendingRewardKey!!), pendingRewardKey!!)
@@ -303,10 +302,8 @@ class Math11GradeFragment : Fragment() {
     private fun showLoadingState(isLoading: Boolean) {
         startEnabledBtnContainer.visibility = if (isLoading) View.GONE else View.VISIBLE
         startDisabledBtnContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
-        if (isLoading) startDisabledBtn.text = "PROCESSING..."
+        if (isLoading) startDisabledBtn.text = getString(R.string.processing_caps)
     }
-
-    // --- HELPER METHODS ---
 
     private fun findTargetTopicIndex(
         progressMap: Map<*, *>,
@@ -386,6 +383,14 @@ class Math11GradeFragment : Fragment() {
                     val vmi = vm.createDefaultInstance()
                     rive.controller.stateMachines.firstOrNull()?.viewModelInstance = vmi
                     vmi.getNumberProperty("level")?.value = level
+
+                    // Localize text inside Rive
+                    val isFinished = (currentTopicProgress[topicKey] ?: 0f) >= 100f
+                    val startText = if (isFinished) getString(R.string.review_text) else getString(R.string.start_text)
+                    try {
+                        vmi.getStringProperty("startText")?.value = startText
+                        vmi.getStringProperty("rewardText")?.value = getString(R.string.reward_text_rive)
+                    } catch (e: Exception) {}
                 }
             }
 
@@ -394,10 +399,8 @@ class Math11GradeFragment : Fragment() {
                     when (stateName) {
                         "start_button_pressed" -> {
                             val unlocked = isUnlocked[topicKey] ?: false
-                            val btnText = if ((currentTopicProgress[topicKey]
-                                    ?: 0f) >= 100f
-                            ) "REVIEW" else "START"
-                            showBottomControls(btnText, topicKey, null, !unlocked)
+                            val btnType = if ((currentTopicProgress[topicKey] ?: 0f) >= 100f) "REVIEW" else "START"
+                            showBottomControls(btnType, topicKey, null, !unlocked)
                         }
 
                         "reward_button_pressed" -> {

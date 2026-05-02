@@ -3,7 +3,6 @@ package com.example.tetragon
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -21,12 +20,12 @@ import com.example.tetragon.connectivityCheck.ConnectivityViewModel
 import com.example.tetragon.connectivityCheck.AndroidConnectivityObserver
 import com.example.tetragon.connectivityCheck.userPresenceUtils.UserPresenceHelper
 import com.example.tetragon.questions.StreakManager
-import com.example.tetragon.reward.BagTapActivity
 import com.example.tetragon.ui.LoginActivity
 import com.example.tetragon.ui.WelcomeActivity
 import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.example.tetragon.utils.registrationUtils.DeviceUtils
 import com.example.tetragon.gameModel.GradeManager
+import com.example.tetragon.reward.MonthlyRewardActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -68,7 +67,11 @@ class MainActivity : BaseActivity() {
 
         AppInitializer.getInstance(applicationContext).initializeComponent(RiveInitializer::class.java)
 
-        replaceFragment(HomeFragment())
+        // Initialize first fragment
+        if (savedInstanceState == null) {
+            replaceFragment(HomeFragment())
+        }
+
         observeConnectivity()
 
         binding.bottomNavigationView.itemIconTintList = null
@@ -89,9 +92,9 @@ class MainActivity : BaseActivity() {
 
         val currentUser = auth.currentUser
 
-        // STRICT CHECK: No user OR Unverified email
+        // Security check for verified email
         if (currentUser == null || !currentUser.isEmailVerified) {
-            auth.signOut() // Clear the session
+            auth.signOut()
             val intent = Intent(this, WelcomeActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -99,7 +102,6 @@ class MainActivity : BaseActivity() {
             return
         }
 
-        // If we reach here, the user is valid and verified.
         checkMonthlyReset(currentUser.email)
         StreakManager.checkAndResetIfMissed()
         UserPresenceHelper.startTracking()
@@ -109,7 +111,7 @@ class MainActivity : BaseActivity() {
         setMiniGamesVisible(lastSubject != "PHYSICS")
     }
 
-    // --- MONTHLY RESET LOGIC START ---
+    // --- MONTHLY RESET LOGIC ---
     private fun checkMonthlyReset(currentUserEmail: String?) {
         if (currentUserEmail == null) return
 
@@ -118,7 +120,6 @@ class MainActivity : BaseActivity() {
 
         metaRef.get().addOnSuccessListener { metaDoc ->
             if (!metaDoc.exists()) {
-                // Initialize the system document if it's missing
                 metaRef.set(mapOf("lastMonth" to monthKey, "winnerEmails" to emptyList<String>()))
                 return@addOnSuccessListener
             }
@@ -126,7 +127,6 @@ class MainActivity : BaseActivity() {
             val lastMonth = metaDoc.getString("lastMonth") ?: ""
             val savedWinners = metaDoc.get("winnerEmails") as? List<String> ?: emptyList()
 
-            // CASE A: New month detected - Reset scores and identify all winners
             if (lastMonth != monthKey) {
                 db.collection("users")
                     .orderBy("monthlyXP", Query.Direction.DESCENDING)
@@ -155,13 +155,10 @@ class MainActivity : BaseActivity() {
                                     }
                                 }
                         } else {
-                            // No one had XP, just update the date
                             metaRef.update("lastMonth", monthKey)
                         }
                     }
-            }
-            // CASE B: Reset already done by someone else, check if I am a winner
-            else if (savedWinners.contains(currentUserEmail)) {
+            } else if (savedWinners.contains(currentUserEmail)) {
                 claimReward(metaRef, currentUserEmail, savedWinners)
             }
         }
@@ -171,16 +168,14 @@ class MainActivity : BaseActivity() {
         val updatedWinners = currentWinners.toMutableList()
         updatedWinners.remove(email)
 
-        // Update DB first to prevent multiple reward triggers
         metaRef.update("winnerEmails", updatedWinners).addOnSuccessListener {
-            val intent = Intent(this, BagTapActivity::class.java)
+            val intent = Intent(this, MonthlyRewardActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-            finish() // Close MainActivity so the winner is forced into the Reward screen
+            finish()
         }
     }
-    // --- MONTHLY RESET LOGIC END ---
 
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
@@ -257,10 +252,10 @@ class MainActivity : BaseActivity() {
 
     private fun showSessionExpiredDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Session Expired")
-            .setMessage("Your account was opened on another device.")
+            .setTitle(getString(R.string.session_expired))
+            .setMessage(getString(R.string.session_expired_message))
             .setCancelable(false)
-            .setPositiveButton("Refresh") { _, _ ->
+            .setPositiveButton(getString(R.string.refresh)) { _, _ ->
                 auth.signOut()
                 val intent = Intent(this, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

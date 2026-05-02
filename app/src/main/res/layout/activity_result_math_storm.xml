@@ -86,7 +86,7 @@
                 android:fontFamily="@font/inter_semibold"
                 android:letterSpacing="0"
                 android:stateListAnimator="@drawable/button_animator"
-                android:text="CONTINUE"
+                android:text="@string/continue_text"
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 app:backgroundTint="@null" />

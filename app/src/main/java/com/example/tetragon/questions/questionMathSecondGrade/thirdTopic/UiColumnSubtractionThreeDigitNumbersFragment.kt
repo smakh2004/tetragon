@@ -182,26 +182,22 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
         val activity = requireActivity() as Math2GradeQuestionActivity
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
 
-        // Subtraction Logic: Minuend > Subtrahend
         minuend = Random.nextInt(200, 999)
-        subtrahend = Random.nextInt(100, minuend - 50) // Ensure a positive result
+        subtrahend = Random.nextInt(100, minuend - 50)
         difference = minuend - subtrahend
 
         correctMinuendTens = (minuend / 10) % 10
         correctSubtrahendHundreds = subtrahend / 100
         correctSubtrahendOnes = subtrahend % 10
 
-        // Fixed numbers in UI
         tvMinuendHundreds.text = (minuend / 100).toString()
         tvMinuendOnes.text = (minuend % 10).toString()
         tvSubtrahendTens.text = ((subtrahend / 10) % 10).toString()
 
-        // Result numbers in UI
         tvResHundreds.text = (difference / 100).toString()
         tvResTens.text = ((difference / 10) % 10).toString()
         tvResOnes.text = (difference % 10).toString()
 
-        // Clear inputs
         tvInputMinuendTensText.text = ""
         tvInputSubtrahendHundredsText.text = ""
         tvInputSubtrahendOnesText.text = ""
@@ -213,7 +209,7 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
         seeBtn.visibility = View.GONE
 
         setFocus(tvInputMinuendTensText, boxMinuendTens, cursorMinuendTens)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -243,12 +239,11 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
 
             val isFinished = activity.incrementProgress()
             if (isFirstAttempt) {
-                // You might want to add a COLUMN_METHOD_SUBTRACTION_THREE_DIGITS to your enum
                 activity.totalXp += MathGrade2Type.COLUMN_METHOD_SUBTRACTION_THREE_DIGITS.xp
             }
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
@@ -257,7 +252,7 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
             boxSubtrahendOnes.setImageResource(R.drawable.answer_incorrect_box)
 
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -276,7 +271,7 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -294,10 +289,11 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
         seeEnabledButton.setOnClickListener {
             isSolutionShown = true
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $minuend - $subtrahend = $difference"
+            stateAnswer.text = getString(R.string.state_solution)
+            val solutionText = "$minuend - $subtrahend = $difference"
+            answer.text = getString(R.string.label_answer, solutionText)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             boxMinuendTens.setImageResource(R.drawable.answer_solution_box)
             boxSubtrahendHundreds.setImageResource(R.drawable.answer_solution_box)
@@ -331,7 +327,7 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
 
         seeBtn.visibility = View.GONE
         setFocus(tvInputMinuendTensText, boxMinuendTens, cursorMinuendTens)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -339,8 +335,9 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $minuend - $subtrahend = $difference"
+        stateAnswer.text = getString(R.string.state_correct)
+        val solutionText = "$minuend - $subtrahend = $difference"
+        answer.text = getString(R.string.label_answer, solutionText)
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
         enableCheckButton()
@@ -349,9 +346,10 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
     private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
         enableCheckButton()
     }
@@ -363,7 +361,7 @@ class UiColumnSubtractionThreeDigitNumbersFragment : Fragment(R.layout.fragment_
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
         seeBtn.visibility = View.GONE
         setupInitialButtonState()
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
     }
 

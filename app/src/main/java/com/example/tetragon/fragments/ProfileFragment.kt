@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import com.example.tetragon.R
 import com.example.tetragon.streakCalendar.StreakCalendarActivity
@@ -47,6 +48,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // UI Components for Shadow and Scroll
+        val profileScrollView = view.findViewById<NestedScrollView>(R.id.profileScrollView)
+        val profileTopShadow = view.findViewById<View>(R.id.profileTopShadow)
+
         val subscribeEnabledContainer = view.findViewById<View>(R.id.subscribe_enabled_btn_container)
         val subscribeDisabledContainer = view.findViewById<View>(R.id.subscribe_disabled_btn_container)
         val subscribeBtn = view.findViewById<Button>(R.id.subscribe_enabled_btn)
@@ -86,6 +91,15 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         mathStormText = view.findViewById(R.id.mathStormCount)
         cashStormText = view.findViewById(R.id.cashStormCount)
         levelText = view.findViewById(R.id.level)
+
+        // --- Shadow Logic ---
+        profileScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
+            if (scrollY > 0) {
+                profileTopShadow.visibility = View.VISIBLE
+            } else {
+                profileTopShadow.visibility = View.INVISIBLE
+            }
+        })
 
         loadUserData()
         loadStreak()
@@ -128,11 +142,14 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
                     val registeredAt = document.getTimestamp("registeredAt")
                     registeredAt?.let {
-                        val formatter = SimpleDateFormat("MMMM yyyy", Locale.ENGLISH)
-                        joinedText.text = "Joined ${formatter.format(it.toDate())}"
+                        // Note: It's better to localize the date format as well
+                        val formatter = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+                        val dateString = formatter.format(it.toDate())
+                        // Uses: "Joined %1$s"
+                        joinedText.text = getString(R.string.joined_format, dateString)
                     }
                     val level = document.getLong("level") ?: 1L
-                    levelText.text = "Level $level"
+                    levelText.text = getString(R.string.level_format, level.toInt())
                 }
             }
             .addOnFailureListener {
@@ -145,35 +162,25 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val userDoc = db.collection("users").document(user.uid)
 
         userDoc.get().addOnSuccessListener { snapshot ->
-
             val currentStreak = snapshot.getLong("streak") ?: 0L
             val maxStreak = snapshot.getLong("maxStreak") ?: 0L
-            val visitedDays =
-                snapshot.get("weeklyStreakDays") as? Map<String, Boolean>
-                    ?: emptyMap()
+            val visitedDays = snapshot.get("weeklyStreakDays") as? Map<String, Boolean> ?: emptyMap()
 
-            // ✅ JUST SHOW DATA (NO CALCULATION, NO UPDATE)
-
-            streakCountText.text = "$currentStreak day streak"
+            streakCountText.text = getString(R.string.day_streak_format, currentStreak.toInt())
 
             streakSubtitle.text = when {
-                currentStreak > 10 -> "YOU ARE BEAST!"
-                currentStreak > 0 -> "GOOD JOB!"
-                else -> "TIME FOR PRACTICE!"
+                currentStreak > 10 -> getString(R.string.streak_beast)
+                currentStreak > 0 -> getString(R.string.streak_good)
+                else -> getString(R.string.streak_practice)
             }
 
-            val streakImage =
-                if (currentStreak > 0)
-                    R.drawable.streak
-                else
-                    R.drawable.streak_null
+            val streakImage = if (currentStreak > 0) R.drawable.streak else R.drawable.streak_null
 
             view?.findViewById<ImageView>(R.id.streak_activation)
                 ?.setImageResource(streakImage)
 
             maxStreakText.text = maxStreak.toString()
 
-            // Show rolling week based on stored data
             val todayMidnight = getLocalMidnight()
             updateRollingWeek(visitedDays, todayMidnight)
         }
@@ -183,46 +190,28 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val userId = auth.currentUser?.uid ?: return
         val userRef = db.collection("users").document(userId)
 
-        // Fetch XP
         userRef.get().addOnSuccessListener { doc ->
             val xp = doc.getLong("xp") ?: 0L
             xpText.text = xp.toString()
         }
 
-        // Fetch MathStorm High Score
-        userRef
-            .collection("games")
-            .document("MathStorm")
-            .get()
-            .addOnSuccessListener { doc ->
-                val mathHighScore = doc.getLong("highScore") ?: 0L
-                mathStormText.text = mathHighScore.toString()
-            }
+        userRef.collection("games").document("MathStorm").get().addOnSuccessListener { doc ->
+            val mathHighScore = doc.getLong("highScore") ?: 0L
+            mathStormText.text = mathHighScore.toString()
+        }
 
-        // Fetch Online Battle Score (OnlineMathStorm)
-        userRef
-            .collection("games")
-            .document("OnlineMathStorm")
-            .get()
-            .addOnSuccessListener { doc ->
-                val onlineScore = doc.getLong("onlineScore") ?: 0L
-                battleWinsText.text = onlineScore.toString()
-            }
+        userRef.collection("games").document("OnlineMathStorm").get().addOnSuccessListener { doc ->
+            val onlineScore = doc.getLong("onlineScore") ?: 0L
+            battleWinsText.text = onlineScore.toString()
+        }
 
-        // Fetch CashStorm High Score
-        userRef
-            .collection("games")
-            .document("CashStorm")
-            .get()
-            .addOnSuccessListener { doc ->
-                val cashHighScore = doc.getLong("highScore") ?: 0L
-                cashStormText.text = cashHighScore.toString()
-            }
+        userRef.collection("games").document("CashStorm").get().addOnSuccessListener { doc ->
+            val cashHighScore = doc.getLong("highScore") ?: 0L
+            cashStormText.text = cashHighScore.toString()
+        }
     }
 
-    private fun getLocalMidnight(): Calendar {
-        return getLocalMidnight(Calendar.getInstance())
-    }
+    private fun getLocalMidnight(): Calendar = getLocalMidnight(Calendar.getInstance())
 
     private fun getLocalMidnight(calendar: Calendar): Calendar {
         calendar.set(Calendar.HOUR_OF_DAY, 0)
@@ -241,9 +230,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             val dayName = getShortDayName(cal)
             val isVisited = visitedDays[dateKey] == true
             val isFuture = cal.after(todayCal)
-            val index = i + 3 // today is center
+            val index = i + 3
 
-            // Update label
             dayLabels[index].text = dayName
             tickViews[index].setImageResource(
                 when {
@@ -261,20 +249,19 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private fun getShortDayName(calendar: Calendar): String {
         return when (calendar.get(Calendar.DAY_OF_WEEK)) {
-            Calendar.MONDAY -> "Mo"
-            Calendar.TUESDAY -> "Tu"
-            Calendar.WEDNESDAY -> "We"
-            Calendar.THURSDAY -> "Th"
-            Calendar.FRIDAY -> "Fr"
-            Calendar.SATURDAY -> "Sa"
-            Calendar.SUNDAY -> "Su"
+            Calendar.MONDAY -> getString(R.string.mo)
+            Calendar.TUESDAY -> getString(R.string.tu)
+            Calendar.WEDNESDAY -> getString(R.string.we)
+            Calendar.THURSDAY -> getString(R.string.th)
+            Calendar.FRIDAY -> getString(R.string.fr)
+            Calendar.SATURDAY -> getString(R.string.sa)
+            Calendar.SUNDAY -> getString(R.string.su)
             else -> ""
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // Ensure the button is enabled again when the user returns to the fragment
         view?.findViewById<View>(R.id.subscribe_enabled_btn_container)?.visibility = View.VISIBLE
         view?.findViewById<View>(R.id.subscribe_disabled_btn_container)?.visibility = View.INVISIBLE
     }

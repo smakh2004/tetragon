@@ -58,70 +58,47 @@ class UiApplesAzizProblemFragment :
             view.findViewById(R.id.option3)
         )
 
-        checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
-        checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
-        btnBack = requireActivity().findViewById(R.id.btnBackground)
-        seeBtn = requireActivity().findViewById(R.id.see_btn_container)
-        seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
-        stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
-        answer = requireActivity().findViewById(R.id.answer)
+        val activity = requireActivity()
+        checkBtn = activity.findViewById(R.id.check_enabled_btn)
+        checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
+        btnBack = activity.findViewById(R.id.btnBackground)
+        seeBtn = activity.findViewById(R.id.see_btn_container)
+        seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
+        stateAnswer = activity.findViewById(R.id.stateAnswer)
+        answer = activity.findViewById(R.id.answer)
     }
 
     private fun setupInitialButtonState() {
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-        checkBtn.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
-        checkBtnBack.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
+        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
+        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
         checkBtn.isEnabled = false
     }
 
     private fun generateProblem() {
-        val first = Random.Default.nextInt(1, 10)
-        val second = Random.Default.nextInt(1, 11 - first)
+        val first = Random.nextInt(1, 10)
+        val second = Random.nextInt(1, 11 - first)
         correctAnswer = first + second
 
-        val sentence =
-            "Aziz has $first apples, he got $second apples more. How many apples he has now?"
-
+        // Load translated template
+        val sentence = getString(R.string.problem_aziz_apples, first, second)
         val spannable = SpannableString(sentence)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        // Color first number
-        val firstIndex = sentence.indexOf(first.toString())
-        spannable.setSpan(
-            ForegroundColorSpan(blueColor),
-            firstIndex,
-            firstIndex + first.toString().length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        // Highlight first number
+        highlightSpan(spannable, first.toString(), blueColor)
+        // Highlight second number (searching after the first one)
+        val firstNumIndex = sentence.indexOf(first.toString())
+        highlightSpan(spannable, second.toString(), blueColor, firstNumIndex + 1)
 
-        // Color second number
-        val secondIndex = sentence.indexOf(second.toString(), firstIndex + 1)
-        spannable.setSpan(
-            ForegroundColorSpan(blueColor),
-            secondIndex,
-            secondIndex + second.toString().length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-
-        // Color all "apples"
-        var startIndex = sentence.indexOf("apples")
-        while (startIndex >= 0) {
-            spannable.setSpan(
-                ForegroundColorSpan(blueColor),
-                startIndex,
-                startIndex + "apples".length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-            startIndex = sentence.indexOf("apples", startIndex + 1)
-        }
+        // Highlight the keyword "apples" (or translated equivalent)
+        highlightAllOccurrences(spannable, getString(R.string.keyword_apples), blueColor)
 
         questionText.text = spannable
 
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 3) {
-            optionSet.add(Random.Default.nextInt(1, 11))
+            optionSet.add(Random.nextInt(1, 11))
         }
 
         val shuffled = optionSet.shuffled()
@@ -131,19 +108,32 @@ class UiApplesAzizProblemFragment :
             layout.setBackgroundResource(R.drawable.custom_background)
         }
 
-        // Reset internal logic variables
         selectedOptionIndex = null
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
 
-        // REINFORCE: Ensure Activity button is DISABLED/CHECK when navigating here
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
 
         setupInitialButtonState()
+    }
+
+    private fun highlightSpan(spannable: SpannableString, word: String, color: Int, startIndex: Int = 0) {
+        val index = spannable.toString().indexOf(word, startIndex)
+        if (index != -1) {
+            spannable.setSpan(ForegroundColorSpan(color), index, index + word.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    private fun highlightAllOccurrences(spannable: SpannableString, word: String, color: Int) {
+        var index = spannable.toString().indexOf(word, ignoreCase = true)
+        while (index >= 0) {
+            spannable.setSpan(ForegroundColorSpan(color), index, index + word.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            index = spannable.toString().indexOf(word, index + 1, ignoreCase = true)
+        }
     }
 
     private fun setupOptionClicks() {
@@ -159,19 +149,14 @@ class UiApplesAzizProblemFragment :
 
     private fun highlightSelectedOption(index: Int) {
         options.forEachIndexed { i, layout ->
-            layout.setBackgroundResource(
-                if (i == index) R.drawable.option_selected
-                else R.drawable.custom_background
-            )
+            layout.setBackgroundResource(if (i == index) R.drawable.option_selected else R.drawable.custom_background)
         }
     }
 
     private fun enableCheckButton() {
         checkBtn.isEnabled = true
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility =
-            View.VISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility =
-            View.INVISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
     }
 
     private fun setupCheckButton() {
@@ -181,25 +166,17 @@ class UiApplesAzizProblemFragment :
 
             if (!isAnswerChecked) {
                 selectedOptionIndex?.let { checkAnswer(it, stateContainer, circleState) }
+            } else if (isIncorrectAttempt) {
+                resetForTryAgain()
             } else {
-                if (isIncorrectAttempt) {
-                    resetForTryAgain()
+                val activity = requireActivity() as Math1GradeQuestionActivity
+                if (checkBtn.text == getString(R.string.btn_finish)) {
+                    activity.navigateToXpGained()
                 } else {
-                    val activity = requireActivity() as Math1GradeQuestionActivity
-
-                    if (checkBtn.text == "FINISH") {
-                        activity.navigateToXpGained()
-                    } else {
-                        // Check for milestone ONLY when CONTINUE is pressed
-                        val isMilestoneActive = activity.checkAndTriggerMilestone()
-
-                        if (!isMilestoneActive) {
-                            // If no milestone, proceed to next question
-                            resetUIForNext()
-                            activity.showRandomQuestion()
-                        }
-                        // If isMilestoneActive is true, Activity has already
-                        // replaced the fragment and started the 2.5s timer.
+                    val isMilestoneActive = activity.checkAndTriggerMilestone()
+                    if (!isMilestoneActive) {
+                        resetUIForNext()
+                        activity.showRandomQuestion()
                     }
                 }
             }
@@ -210,152 +187,89 @@ class UiApplesAzizProblemFragment :
         isAnswerChecked = true
         val chosen = (options[index].getChildAt(0) as TextView).text.toString().toInt()
         val activity = requireActivity() as Math1GradeQuestionActivity
+        activity.isResultCurrentlyVisible = true
+
+        stateContainer.visibility = View.VISIBLE
 
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
             isIncorrectAttempt = false
             val isFinished = activity.incrementProgress()
-
-            if (isFirstAttempt) {
-                activity.totalXp += MathGrade1Type.AZIZ_APPLE_PROBLEM.xp
-            }
-
-            // Increment the count in Activity
+            if (isFirstAttempt) activity.totalXp += MathGrade1Type.AZIZ_APPLE_PROBLEM.xp
             activity.handleCorrectAnswer()
-
-            // ALWAYS show success UI here so they can see it before clicking CONTINUE
             activity.playSuccessAnimation()
-            stateContainer.visibility = View.VISIBLE
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
-            // Standard incorrect logic
-            stateContainer.visibility = View.VISIBLE
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
         isFirstAttempt = false
     }
 
-    private fun showCorrectState(
-        stateContainer: FrameLayout,
-        circleState: ImageView,
-        index: Int
-    ) {
-        stateContainer.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.green_3)
-        )
+    private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
+        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-
         options[index].setBackgroundResource(R.drawable.option_correct)
-
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
-
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer)
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
-    private fun showIncorrectState(
-        stateContainer: FrameLayout,
-        circleState: ImageView,
-        index: Int
-    ) {
-        stateContainer.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.red_4)
-        )
+    private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
+        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
-
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
-    private fun setupSeeSolution(
-        stateContainer: FrameLayout,
-        circleState: ImageView
-    ) {
-
+    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
-
             seeBtn.visibility = View.GONE
-
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer)
             answer.visibility = View.VISIBLE
-
-            // Reset button colors to gray
-            checkBtn.backgroundTintList =
-                ContextCompat.getColorStateList(requireContext(), R.color.black_3)
-            checkBtnBack.backgroundTintList =
-                ContextCompat.getColorStateList(requireContext(), R.color.black_2)
-            btnBack.setBackgroundColor(
-                ContextCompat.getColor(requireContext(), R.color.gray_2)
-            )
-
             circleState.setImageResource(R.drawable.solution_lamp_icon)
-            stateContainer.setBackgroundColor(
-                ContextCompat.getColor(requireContext(), R.color.gray_2)
-            )
+            stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
-            options.forEachIndexed { i, layout ->
+            options.forEach { layout ->
                 val tv = layout.getChildAt(0) as TextView
-                layout.setBackgroundResource(
-                    if (tv.text.toString().toInt() == correctAnswer)
-                        R.drawable.option_showed
-                    else
-                        R.drawable.custom_background
-                )
+                val valInt = tv.text.toString().toInt()
+                layout.setBackgroundResource(if (valInt == correctAnswer) R.drawable.option_showed else R.drawable.custom_background)
             }
 
+            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
+            checkBtn.text = getString(R.string.btn_continue)
             isAnswerChecked = true
             isIncorrectAttempt = false
-            checkBtn.text = "CONTINUE"
         }
     }
 
-    private fun applyButtonColors(
-        buttonColor: Int,
-        backColor: Int,
-        backgroundColor: Int
-    ) {
-        checkBtn.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), buttonColor)
-        checkBtnBack.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), backColor)
-        btnBack.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), backgroundColor)
-        )
+    private fun applyButtonColors(btn: Int, back: Int, bg: Int) {
+        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), btn)
+        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), back)
+        btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), bg))
     }
 
     private fun resetForTryAgain() {
+        (requireActivity() as Math1GradeQuestionActivity).isResultCurrentlyVisible = false
         isAnswerChecked = false
         isIncorrectAttempt = false
         selectedOptionIndex = null
-
-        options.forEach {
-            it.setBackgroundResource(R.drawable.custom_background)
-        }
-
-        checkBtn.text = "CHECK"
+        options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
-
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility =
-            View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility =
-            View.VISIBLE
-
+        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
         setupInitialButtonState()
-
-        requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility =
-            View.INVISIBLE
-
+        requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
         answer.visibility = View.VISIBLE
@@ -364,24 +278,16 @@ class UiApplesAzizProblemFragment :
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Clear Mr. Square
-
-        // 1. Hide the result banner
+        activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-
-        // 2. Reset Button to DISABLED "CHECK" state
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
-
-        // 3. Switch containers to show the gray/disabled button version
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-
-        // 4. Reset colors and fragment-specific options
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
@@ -396,6 +302,5 @@ class UiApplesAzizProblemFragment :
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release()
-        mediaPlayer = null
     }
 }

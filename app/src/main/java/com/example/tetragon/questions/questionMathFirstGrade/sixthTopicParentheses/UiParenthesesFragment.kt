@@ -11,7 +11,7 @@ import com.example.tetragon.questions.questionMathFirstGrade.Math1GradeQuestionA
 import com.example.tetragon.questions.questionMathFirstGrade.MathGrade1Type
 import kotlin.random.Random
 
-class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // Ensure this matches your XML filename
+class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) {
 
     private lateinit var problemRow: LinearLayout
     private lateinit var firstNumberText: TextView
@@ -47,14 +47,14 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
             view.findViewById(R.id.option3)
         )
 
-        // Activity UI elements
-        checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
-        checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
-        btnBack = requireActivity().findViewById(R.id.btnBackground)
-        seeBtn = requireActivity().findViewById(R.id.see_btn_container)
-        seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
-        stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
-        answer = requireActivity().findViewById(R.id.answer)
+        val activity = requireActivity()
+        checkBtn = activity.findViewById(R.id.check_enabled_btn)
+        checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
+        btnBack = activity.findViewById(R.id.btnBackground)
+        seeBtn = activity.findViewById(R.id.see_btn_container)
+        seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
+        stateAnswer = activity.findViewById(R.id.stateAnswer)
+        answer = activity.findViewById(R.id.answer)
 
         setupInitialButtonState()
         generateProblem()
@@ -76,18 +76,15 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
         checkBtn.isEnabled = false
     }
 
-    // ---------------------- Problem Generation (Modified for Parentheses) ----------------------
-
     private fun generateProblem() {
         currentProblem = generateParenthesesProblem()
         correctAnswer = evaluateParenthesesProblem(currentProblem)
 
-        firstNumberText.text = "$currentProblem ="
+        // Using a template for the math problem display
+        firstNumberText.text = getString(R.string.math_problem_equal_template, currentProblem)
         problemImage.setImageResource(R.drawable.answer_blue_box)
 
         val optionSet = mutableSetOf(correctAnswer)
-
-        // Distractors between 1 and 10
         while (optionSet.size < 3) {
             val distractor = Random.nextInt(1, 11)
             optionSet.add(distractor)
@@ -110,7 +107,7 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -118,37 +115,26 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
         setupInitialButtonState()
     }
 
-    // ---------------------- Problem Generation (Strictly 1-10) ----------------------
-
     private fun generateParenthesesProblem(): String {
         val isAddition = Random.nextBoolean()
         val useParenthesesAtEnd = Random.nextBoolean()
         val maxTotal = 10
 
         return if (isAddition) {
-            // Addition: a + (b + c) or (a + b) + c
-            // Start with small numbers so sum doesn't exceed 10
-            val a = Random.nextInt(1, 6) // 1..5
-            val b = Random.nextInt(1, 4) // 1..3
-            // Ensure c makes the total at most 10, but at least 1
+            val a = Random.nextInt(1, 6)
+            val b = Random.nextInt(1, 4)
             val remaining = maxTotal - (a + b)
             val c = if (remaining > 1) Random.nextInt(1, remaining + 1) else 1
 
             if (useParenthesesAtEnd) "$a+($b+$c)" else "($a+$b)+$c"
         } else {
-            // Subtraction: a - (b + c) or (a - b) - c
-            // We use (b + c) inside to keep 1st-grade logic simple and positive
-            val first = Random.nextInt(5, 11) // Start with 5-10
-
+            val first = Random.nextInt(5, 11)
             if (useParenthesesAtEnd) {
-                // Form: a - (b + c) -> Result must be >= 1
-                // So (b + c) must be <= a - 1
                 val maxInnerSum = first - 1
                 val b = Random.nextInt(1, maxInnerSum)
                 val c = Random.nextInt(1, (maxInnerSum - b) + 1)
                 "$first-($b+$c)"
             } else {
-                // Form: (a - b) - c -> a-b must be >= 2, result must be >= 1
                 val b = Random.nextInt(1, first - 1)
                 val currentStep = first - b
                 val c = Random.nextInt(1, currentStep)
@@ -158,18 +144,14 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
     }
 
     private fun evaluateParenthesesProblem(problem: String): Int {
-        // 1. Find and solve parentheses
         val startIndex = problem.indexOf('(')
         val endIndex = problem.indexOf(')')
 
         return if (startIndex != -1 && endIndex != -1) {
             val innerExp = problem.substring(startIndex + 1, endIndex)
             val innerResult = solveSimple(innerExp)
-
-            // 2. Build the new expression with the result
             val leftPart = problem.substring(0, startIndex)
             val rightPart = problem.substring(endIndex + 1)
-
             solveSimple("$leftPart$innerResult$rightPart")
         } else {
             solveSimple(problem)
@@ -183,11 +165,9 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
                 parts[0].toInt() + parts[1].toInt()
             }
             expression.contains("-") -> {
-                val parts = expression.split("-")
-                // Handle cases where the split might leave empty strings if '-' is at start
                 val cleanParts = expression.split("-").filter { it.isNotEmpty() }
                 if (cleanParts.size == 2) {
-                    parts[0].toInt() - parts[1].toInt()
+                    cleanParts[0].toInt() - cleanParts[1].toInt()
                 } else {
                     cleanParts[0].toInt()
                 }
@@ -195,8 +175,6 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
             else -> expression.toInt()
         }
     }
-
-    // ---------------------- Option Clicks ----------------------
 
     private fun setupOptionClicks() {
         options.forEachIndexed { index, layout ->
@@ -228,8 +206,6 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
     }
 
-    // ---------------------- Check Answer ----------------------
-
     private fun setupCheckButton() {
         checkBtn.setOnClickListener {
             val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
@@ -242,13 +218,10 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
                     resetForTryAgain()
                 } else {
                     val activity = requireActivity() as Math1GradeQuestionActivity
-
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
-                        // GATE: Trigger milestone only after clicking CONTINUE
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
-
                         if (!isMilestoneActive) {
                             resetUIForNext()
                             activity.showRandomQuestion()
@@ -261,41 +234,37 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
 
     private fun checkAnswer(index: Int, stateContainer: FrameLayout, circleState: ImageView) {
         isAnswerChecked = true
-        val chosen = (options[index].getChildAt(0) as TextView).text.toString().toInt()
+        val chosenText = (options[index].getChildAt(0) as TextView).text.toString()
+        val chosen = chosenText.toInt()
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = true
         stateContainer.visibility = View.VISIBLE
 
         val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
-        problemAnswerText.text = chosen.toString()
+        problemAnswerText.text = chosenText
 
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
-
-            // 1. Play success animation (Mr. Square celebration)
             activity.playSuccessAnimation()
             problemImage.setImageResource(R.drawable.answer_correct_box)
 
             val isFinished = activity.incrementProgress()
-
             if (isFirstAttempt) {
                 activity.totalXp += MathGrade1Type.PARENTHESES.xp
             }
-
-            // 2. Log progress for milestones/streaks in Activity
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
-            setupSeeSolution(stateContainer, circleState, index)
+            setupSeeSolution(stateContainer, circleState)
         }
         isFirstAttempt = false
     }
@@ -304,8 +273,8 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circle.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -313,21 +282,23 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circle.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
-    private fun setupSeeSolution(container: FrameLayout, circle: ImageView, wrongIndex: Int) {
+    private fun setupSeeSolution(container: FrameLayout, circle: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             problemImage.setImageResource(R.drawable.answer_solution_box)
             requireView().findViewById<TextView>(R.id.problemAnswerText).text = correctAnswer.toString()
+            requireView().findViewById<TextView>(R.id.problemAnswerText).visibility = View.VISIBLE
             circle.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
             isIncorrectAttempt = false
@@ -361,7 +332,7 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         answer.visibility = View.VISIBLE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -371,12 +342,12 @@ class UiParenthesesFragment : Fragment(R.layout.fragment_ui_parentheses) { // En
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Ensure Mr. Square is reset
+        activity.hideSuccessAnimation()
 
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }

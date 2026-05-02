@@ -5,10 +5,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.tetragon.R
 import com.example.tetragon.databinding.ActivityNameChangeBinding
 import com.example.tetragon.utils.languageChangeUtils.BaseActivity
@@ -25,6 +21,9 @@ class NameChangeActivity : BaseActivity() {
         binding = ActivityNameChangeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Initial state of the button text
+        binding.saveDisabledBtn.text = getString(R.string.save)
+
         binding.backBtn.setOnClickListener {
             finish()
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
@@ -35,15 +34,15 @@ class NameChangeActivity : BaseActivity() {
             val firstName = binding.firstNameEditText.text.toString().trim()
             val lastName = binding.lastNameEditText.text.toString().trim()
 
-            // ✅ Disable button while operation is in progress
-            binding.saveEnabledBtnContainer.visibility = View.INVISIBLE
-            binding.saveDisabledBtnContainer.visibility = View.VISIBLE
-            binding.saveDisabledBtn.text = "SAVING.."
-
             if (firstName.isEmpty() || lastName.isEmpty()) {
-                Toast.makeText(this, "Fields cannot be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_empty_fields), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            // UI Feedback: Show SAVING.. state
+            binding.saveEnabledBtnContainer.visibility = View.INVISIBLE
+            binding.saveDisabledBtnContainer.visibility = View.VISIBLE
+            binding.saveDisabledBtn.text = getString(R.string.saving_caps)
 
             val userId = auth.currentUser?.uid ?: return@setOnClickListener
 
@@ -56,15 +55,16 @@ class NameChangeActivity : BaseActivity() {
                 .document(userId)
                 .update(updates)
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Name updated successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.name_updated), Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 .addOnFailureListener {
-                    Toast.makeText(this, "Failed to update name", Toast.LENGTH_SHORT).show()
-                    // ✅ Disable button while operation is in progress
+                    Toast.makeText(this, getString(R.string.name_update_failed), Toast.LENGTH_SHORT).show()
+
+                    // Reset UI on failure
                     binding.saveEnabledBtnContainer.visibility = View.VISIBLE
                     binding.saveDisabledBtnContainer.visibility = View.INVISIBLE
-                    binding.saveDisabledBtn.text = "SAVE"
+                    binding.saveDisabledBtn.text = getString(R.string.save)
                 }
         }
 
@@ -95,6 +95,8 @@ class NameChangeActivity : BaseActivity() {
 
         binding.saveDisabledBtnContainer.visibility =
             if (enabled) View.INVISIBLE else View.VISIBLE
-    }
 
+        // Ensure the button text is set correctly when fields change
+        binding.saveDisabledBtn.text = getString(R.string.save)
+    }
 }

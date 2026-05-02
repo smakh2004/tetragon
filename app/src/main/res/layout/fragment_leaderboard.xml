@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_semibold"
-            android:text="LEADERBOARD"
+            android:text="@string/leaderboard"
             android:textColor="@color/blue_2"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:fontFamily="@font/inter_semibold"
-            android:text="Get a reward at the end of the month"
+            android:text="@string/get_a_reward_at_the_end_of_the_month"
             android:textColor="@color/gray_1"
             android:textSize="14sp" />
 

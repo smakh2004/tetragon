@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:fontFamily="@font/inter_bold"
-                android:text="TETRAGON"
+                android:text="@string/tetragon"
                 android:textColor="@color/blue_2"
                 android:textSize="36sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_medium"
                 android:layout_marginTop="-10dp"
-                android:text="learn with joy"
+                android:text="@string/learn_with_joy"
                 android:textColor="@color/gray_1"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -95,6 +95,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tetragon_text" />
 
 
+            <!-- START BUTTON -->
             <LinearLayout
                 android:id="@+id/offlineContainer"
                 android:layout_width="0dp"
@@ -104,8 +105,10 @@
                 android:padding="16dp"
                 app:layout_constraintBottom_toTopOf="@+id/start_btn_container"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0">
 
                 <app.rive.runtime.kotlin.RiveAnimationView
                     android:id="@+id/internet_mr_square"
@@ -121,7 +124,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/inter_semibold"
-                    android:text="App is currently unavailable."
+                    android:text="@string/app_is_currently_unavailable"
                     android:textColor="@color/black_3"
                     android:textSize="18sp" />
 
@@ -132,14 +135,13 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/inter_medium"
                     android:gravity="center"
-                    android:text="Check your connection or try again later!"
+                    android:text="@string/check_your_connection_or_try_again_later"
                     android:textAlignment="center"
                     android:textColor="@color/gray_1"
                     android:textSize="14sp" />
 
             </LinearLayout>
 
-            <!-- START BUTTON -->
             <FrameLayout
                 android:id="@+id/start_btn_container"
                 android:layout_width="0dp"

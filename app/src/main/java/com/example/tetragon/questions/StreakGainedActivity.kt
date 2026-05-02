@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import app.rive.runtime.kotlin.core.Rive
 import com.example.tetragon.R
 import com.example.tetragon.databinding.ActivityStreakGainedBinding
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,7 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class StreakGainedActivity : AppCompatActivity() {
+class StreakGainedActivity : BaseActivity() {
 
     private lateinit var binding: ActivityStreakGainedBinding
 
@@ -158,13 +159,13 @@ class StreakGainedActivity : AppCompatActivity() {
 
     private fun getShortDayName(calendar: Calendar): String {
         return when (calendar.get(Calendar.DAY_OF_WEEK)) {
-            Calendar.MONDAY -> "Mo"
-            Calendar.TUESDAY -> "Tu"
-            Calendar.WEDNESDAY -> "We"
-            Calendar.THURSDAY -> "Th"
-            Calendar.FRIDAY -> "Fr"
-            Calendar.SATURDAY -> "Sa"
-            Calendar.SUNDAY -> "Su"
+            Calendar.MONDAY -> getString(R.string.mo)
+            Calendar.TUESDAY -> getString(R.string.tu)
+            Calendar.WEDNESDAY -> getString(R.string.we)
+            Calendar.THURSDAY -> getString(R.string.th)
+            Calendar.FRIDAY -> getString(R.string.fr)
+            Calendar.SATURDAY -> getString(R.string.sa)
+            Calendar.SUNDAY -> getString(R.string.su)
             else -> ""
         }
     }

@@ -79,7 +79,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="-5dp"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="7 GRADE"
+                                android:text="@string/seventh_grade"
                                 android:textColor="@color/text_color"
                                 android:textSize="18sp" />
 
@@ -87,7 +87,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="5 topics"
+                                android:text="@string/_3_topics"
                                 android:textColor="@color/gray_2"
                                 android:textSize="14sp" />
                         </LinearLayout>
@@ -146,7 +146,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="-5dp"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="8 GRADE"
+                                android:text="@string/eighth_grade"
                                 android:textColor="@color/text_color"
                                 android:textSize="18sp" />
 
@@ -154,7 +154,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="5 topics"
+                                android:text="@string/_1_topic"
                                 android:textColor="@color/gray_2"
                                 android:textSize="14sp" />
                         </LinearLayout>
@@ -213,7 +213,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="-5dp"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="9 GRADE"
+                                android:text="@string/ninth_grade"
                                 android:textColor="@color/text_color"
                                 android:textSize="18sp" />
 
@@ -221,7 +221,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="5 topics"
+                                android:text="@string/_1_topic"
                                 android:textColor="@color/gray_2"
                                 android:textSize="14sp" />
                         </LinearLayout>
@@ -280,7 +280,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="-5dp"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="10 GRADE"
+                                android:text="@string/tenth_grade"
                                 android:textColor="@color/text_color"
                                 android:textSize="18sp" />
 
@@ -288,7 +288,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="5 topics"
+                                android:text="@string/_1_topic"
                                 android:textColor="@color/gray_2"
                                 android:textSize="14sp" />
                         </LinearLayout>
@@ -347,7 +347,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="-5dp"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="11 GRADE"
+                                android:text="@string/eleventh_grade"
                                 android:textColor="@color/text_color"
                                 android:textSize="18sp" />
 
@@ -355,7 +355,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="5 topics"
+                                android:text="@string/_1_topic"
                                 android:textColor="@color/gray_2"
                                 android:textSize="14sp" />
                         </LinearLayout>

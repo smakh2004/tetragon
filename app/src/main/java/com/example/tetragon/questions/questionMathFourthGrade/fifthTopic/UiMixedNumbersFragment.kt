@@ -16,7 +16,7 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
     private lateinit var tvWhole1: TextView
     private lateinit var tvNum1: TextView
     private lateinit var tvDenom1: TextView
-    private lateinit var tvOperator: TextView // Added for +/-
+    private lateinit var tvOperator: TextView
     private lateinit var tvWhole2: TextView
     private lateinit var tvNum2: TextView
     private lateinit var tvDenom2: TextView
@@ -61,7 +61,7 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
         tvWhole1 = view.findViewById(R.id.whole1)
         tvNum1 = view.findViewById(R.id.num1)
         tvDenom1 = view.findViewById(R.id.denom1)
-        tvOperator = view.findViewById(R.id.tvOperator) // Ensure this ID exists in your XML
+        tvOperator = view.findViewById(R.id.tvOperator)
         tvWhole2 = view.findViewById(R.id.whole2)
         tvNum2 = view.findViewById(R.id.num2)
         tvDenom2 = view.findViewById(R.id.denom2)
@@ -86,7 +86,7 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
 
     private fun generateProblem() {
         val commonDenom = listOf(2, 3, 4, 6).random()
-        val isSubtraction = (0..1).random() == 1 // 50/50 chance for subtraction
+        val isSubtraction = (0..1).random() == 1
 
         tvOperator.text = if (isSubtraction) "-" else "+"
 
@@ -95,17 +95,13 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
         var w2 = (1..3).random()
         var n2 = (1 until commonDenom).random()
 
-        // Validation for Subtraction: Ensure result is positive
         if (isSubtraction) {
             val totalParts1 = (w1 * commonDenom) + n1
             val totalParts2 = (w2 * commonDenom) + n2
 
             if (totalParts2 >= totalParts1) {
-                // Swap them
                 val tempW = w1; w1 = w2; w2 = tempW
                 val tempN = n1; n1 = n2; n2 = tempN
-
-                // If they are identical, boost the first one so it's not a 0 result
                 if (totalParts1 == totalParts2) w1 += 1
             }
         }
@@ -119,7 +115,6 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
         if (isSubtraction) {
             var finalNum = n1 - n2
             var finalWhole = w1 - w2
-            // Borrowing logic
             if (finalNum < 0) {
                 finalNum += commonDenom
                 finalWhole -= 1
@@ -207,12 +202,12 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
             if (isFirstAttempt) activity.totalXp += MathGrade4Type.MIXED_NUMBERS_ARITHMETICS.xp
             activity.handleCorrectAnswer()
             val isFinished = activity.incrementProgress()
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showResultState(true, index, stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showResultState(false, index, stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -224,14 +219,18 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
             container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
             icon.setImageResource(R.drawable.correct_tick_icon)
             options[index].setBackgroundResource(R.drawable.option_correct)
-            stateAnswer.text = "Correct!"; answer.text = "Answer: $correctAnswerString"; answer.visibility = View.VISIBLE
+            stateAnswer.text = getString(R.string.state_correct)
+            answer.text = getString(R.string.label_answer, correctAnswerString)
+            answer.visibility = View.VISIBLE
             applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
         } else {
             container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
             icon.setImageResource(R.drawable.wrong_circle)
             options[index].setBackgroundResource(R.drawable.option_incorrect)
-            stateAnswer.text = "Incorrect!"; answer.visibility = View.GONE
+            stateAnswer.text = getString(R.string.state_incorrect)
+            answer.visibility = View.GONE
             seeBtn.visibility = View.VISIBLE
+            seeEnabledButton.text = getString(R.string.btn_see_solution)
             applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
         }
     }
@@ -239,8 +238,10 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"; answer.text = "Answer: $correctAnswerString"; answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswerString)
+            answer.visibility = View.VISIBLE
+            checkBtn.text = getString(R.string.btn_continue)
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isIncorrectAttempt = false
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
@@ -261,7 +262,7 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
                 if (isIncorrectAttempt) resetForTryAgain()
                 else {
                     val activity = requireActivity() as Math4GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         activity.isResultCurrentlyVisible = false
                         activity.hideSuccessAnimation()
@@ -278,7 +279,7 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
         seeBtn.visibility = View.GONE
         isAnswerChecked = false; isIncorrectAttempt = false; isFirstAttempt = true
         selectedOptionIndex = null;
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 
@@ -290,7 +291,7 @@ class UiMixedNumbersFragment : Fragment(R.layout.fragment_ui_mixed_numbers) {
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
         problemImage.setImageResource(R.drawable.answer_blue_box)
         stateContainer.visibility = View.INVISIBLE; seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 

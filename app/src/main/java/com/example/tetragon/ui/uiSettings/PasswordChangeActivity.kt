@@ -22,6 +22,9 @@ class PasswordChangeActivity : BaseActivity() {
         binding = ActivityPasswordChangeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Initial UI setup
+        binding.saveDisabledBtn.text = getString(R.string.save)
+
         setupTextWatchers()
         setupSaveButton()
 
@@ -37,7 +40,6 @@ class PasswordChangeActivity : BaseActivity() {
             R.drawable.ic_eye_closed
         )
 
-        // Set up password eye toggle functionality
         PasswordToggleHelper.attach(
             binding.newPasswordEditText,
             R.drawable.ic_eye_open,
@@ -45,7 +47,6 @@ class PasswordChangeActivity : BaseActivity() {
         )
     }
 
-    /** Enable / disable save button depending on inputs */
     private fun setupTextWatchers() {
         val watcher = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = checkFields()
@@ -64,9 +65,11 @@ class PasswordChangeActivity : BaseActivity() {
 
         binding.saveEnabledBtnContainer.visibility = if (enable) View.VISIBLE else View.INVISIBLE
         binding.saveDisabledBtnContainer.visibility = if (enable) View.INVISIBLE else View.VISIBLE
+
+        // Ensure disabled button always shows translated "SAVE"
+        binding.saveDisabledBtn.text = getString(R.string.save)
     }
 
-    /** Save button logic with re-authentication */
     private fun setupSaveButton() {
         binding.saveEnabledBtn.setOnClickListener {
 
@@ -74,49 +77,48 @@ class PasswordChangeActivity : BaseActivity() {
             val newPassword = binding.newPasswordEditText.text.toString().trim()
 
             if (currentPassword.isEmpty() || newPassword.isEmpty()) {
-                Toast.makeText(this, "Fields cannot be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_empty_fields), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (newPassword.length < 6) {
-                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_password_length), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val user = auth.currentUser ?: return@setOnClickListener
             val email = user.email ?: return@setOnClickListener
 
-            // ✅ Disable button while operation is in progress
+            // UI Feedback: Disable button and show SAVING.. state
             binding.saveEnabledBtnContainer.visibility = View.INVISIBLE
             binding.saveDisabledBtnContainer.visibility = View.VISIBLE
-            binding.saveDisabledBtn.text = "SAVING.."
+            binding.saveDisabledBtn.text = getString(R.string.saving_caps)
 
             val credential = EmailAuthProvider.getCredential(email, currentPassword)
             user.reauthenticate(credential)
                 .addOnSuccessListener {
                     user.updatePassword(newPassword)
                         .addOnSuccessListener {
-                            Toast.makeText(this, "Password updated successfully", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(R.string.password_updated), Toast.LENGTH_SHORT).show()
                             binding.passwordEditText.text?.clear()
                             binding.newPasswordEditText.text?.clear()
-                            finish() // Activity closes
+                            finish()
                         }
                         .addOnFailureListener {
-                            Toast.makeText(this, "Failed to update password: ${it.message}", Toast.LENGTH_SHORT).show()
-                            // ✅ Re-enable button if failed
-                            binding.saveEnabledBtnContainer.visibility = View.VISIBLE
-                            binding.saveDisabledBtnContainer.visibility = View.INVISIBLE
-                            binding.saveDisabledBtn.text = "SAVE"
+                            Toast.makeText(this, getString(R.string.password_update_failed, it.message), Toast.LENGTH_SHORT).show()
+                            resetSaveButton()
                         }
                 }
                 .addOnFailureListener {
-                    Toast.makeText(this, "Current password is incorrect", Toast.LENGTH_SHORT).show()
-                    // ✅ Re-enable button if failed
-                    binding.saveEnabledBtnContainer.visibility = View.VISIBLE
-                    binding.saveDisabledBtnContainer.visibility = View.INVISIBLE
-                    binding.saveDisabledBtn.text = "SAVE"
+                    Toast.makeText(this, getString(R.string.error_incorrect_password), Toast.LENGTH_SHORT).show()
+                    resetSaveButton()
                 }
         }
     }
 
+    private fun resetSaveButton() {
+        binding.saveEnabledBtnContainer.visibility = View.VISIBLE
+        binding.saveDisabledBtnContainer.visibility = View.INVISIBLE
+        binding.saveDisabledBtn.text = getString(R.string.save)
+    }
 }

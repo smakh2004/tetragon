@@ -52,9 +52,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
     private val INPUT_HEIGHT = "height"
     private val INPUT_ANSWERED = "answered"
 
-    // Nob inputs for visual positioning
     private val NOB_INPUTS = listOf("1_nob", "2_nob", "3_nob", "4_nob")
-
     private val allowedValues = listOf(2, 4, 6, 8)
     private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -89,35 +87,35 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
             targetWidth = allowedValues.random()
             targetHeight = allowedValues.random()
             targetPerimeter = 2 * (targetWidth + targetHeight)
-        } while (targetPerimeter == 8) // Keep picking if the result is 8
+        } while (targetPerimeter == 8)
 
         updateQuestionText()
         resetFragmentState(2f, 2f)
     }
 
     private fun updateQuestionText() {
-        val type = if (targetWidth == targetHeight) "square" else "rectangle"
-        val pValueText = "$targetPerimeter units"
-        val sentence = "Create a $type with a perimeter of:"
+        val isSquare = targetWidth == targetHeight
+        val type = if (isSquare) getString(R.string.label_square) else getString(R.string.label_rectangle)
+        val perimeterLabel = getString(R.string.label_perimeter)
 
-        // Colors from your resources
+        val pValueText = getString(R.string.label_perimeter_units, targetPerimeter)
+        val sentence = getString(R.string.question_create_shape_perimeter, type)
+
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
         val textColor = ContextCompat.getColor(requireContext(), R.color.text_color)
 
-        // 1. Format the main instruction (questionText)
         val spannableSentence = SpannableString(sentence)
         val typeStart = sentence.indexOf(type)
-        val perimeterWordStart = sentence.indexOf("perimeter")
+        val perimeterWordStart = sentence.indexOf(perimeterLabel)
 
         if (typeStart != -1) {
             spannableSentence.setSpan(ForegroundColorSpan(blueColor), typeStart, typeStart + type.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         if (perimeterWordStart != -1) {
-            spannableSentence.setSpan(ForegroundColorSpan(blueColor), perimeterWordStart, perimeterWordStart + "perimeter".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableSentence.setSpan(ForegroundColorSpan(blueColor), perimeterWordStart, perimeterWordStart + perimeterLabel.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         questionText.text = spannableSentence
 
-        // 2. Format the units (perimeterValueDisplay) to use text_color
         val spannableUnits = SpannableString(pValueText)
         spannableUnits.setSpan(ForegroundColorSpan(textColor), 0, pValueText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         perimeterValueDisplay.text = spannableUnits
@@ -128,7 +126,6 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
         val userH = getRiveValue(INPUT_HEIGHT).toInt()
         val userPerimeter = 2 * (userW + userH)
 
-        // Check if the target was specifically a square
         val isTargetSquare = (targetWidth == targetHeight)
         val isUserSquare = (userW == userH)
 
@@ -138,9 +135,6 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
         stateContainer.visibility = View.VISIBLE
         riveRectangle.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, true)
 
-        // Validation logic:
-        // 1. Perimeters must match.
-        // 2. If the prompt asked for a SQUARE, the user's dimensions must be equal.
         val isCorrect = (userPerimeter == targetPerimeter) && (!isTargetSquare || isUserSquare)
 
         if (isCorrect) {
@@ -150,19 +144,17 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
             if (isFirstAttempt) activity.totalXp += MathGrade3Type.PERIMETER.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(userW, userH)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
 
-            // Provide a hint if they got the perimeter right but forgot it needs to be a square
             if (userPerimeter == targetPerimeter && isTargetSquare && !isUserSquare) {
-                stateAnswer.text = "Almost! Make it a square."
+                stateAnswer.text = getString(R.string.state_almost_square)
             }
-
             setupSeeSolution()
         }
         isFirstAttempt = false
@@ -171,38 +163,32 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
 
-            // Adding the Formula to the Solution text
-            val formula = "Formula: P = 2 × (w + h)"
-            val calculation = "2 × ($targetWidth + $targetHeight) = $targetPerimeter"
+            val formula = getString(R.string.label_perimeter_formula)
+            val calculation = getString(R.string.label_perimeter_calculation, targetWidth, targetHeight, targetPerimeter)
             answerDisplay.text = "$formula\n$calculation"
             answerDisplay.visibility = View.VISIBLE
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
-            // Logical inputs
             riveRectangle.setNumberState(STATE_MACHINE, INPUT_WIDTH, targetWidth.toFloat())
             riveRectangle.setNumberState(STATE_MACHINE, INPUT_HEIGHT, targetHeight.toFloat())
 
-            // Sync visual Nobs
             val nobValue = calculateNobValue(targetWidth, targetHeight)
             NOB_INPUTS.forEach { name ->
                 riveRectangle.setNumberState(STATE_MACHINE, name, nobValue.toFloat())
             }
 
             riveRectangle.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, true)
-
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
         }
     }
 
-    // Helper to determine the nob value based on W and H
     private fun calculateNobValue(w: Int, h: Int): Int {
-        // This is based on the logic pattern you provided
         return when {
             h == 2 && w == 2 -> 0
             h == 2 && w == 4 -> 1
@@ -252,14 +238,12 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
         isAnswerChecked = false
         isIncorrectAttempt = false
         isUserInteracting = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
 
         riveRectangle.setNumberState(STATE_MACHINE, INPUT_WIDTH, startW)
         riveRectangle.setNumberState(STATE_MACHINE, INPUT_HEIGHT, startH)
-
-        // Reset Nobs to 0
         NOB_INPUTS.forEach { riveRectangle.setNumberState(STATE_MACHINE, it, 0f) }
 
         riveRectangle.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, false)
@@ -282,7 +266,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         disableCheckButton()
@@ -290,7 +274,7 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
     }
 
     private fun handleNavigation(activity: Math3GradeQuestionActivity) {
-        if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+        if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
         else if (!activity.checkAndTriggerMilestone()) {
             resetUIForNext()
             activity.showRandomQuestion()
@@ -307,8 +291,8 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
     private fun showCorrectState(w: Int, h: Int) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Perimeter: 2 × ($w + $h) = $targetPerimeter"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_perimeter_calculation, w, h, targetPerimeter)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -316,9 +300,10 @@ class UiFindPerimeterFragment : Fragment(R.layout.fragment_ui_find_perimeter) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

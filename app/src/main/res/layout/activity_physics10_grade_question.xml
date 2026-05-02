@@ -235,7 +235,7 @@
                     android:background="@drawable/custom_button"
                     android:fontFamily="@font/inter_semibold"
                     android:stateListAnimator="@drawable/button_animator"
-                    android:text="CHECK"
+                    android:text="@string/check"
                     android:textColor="@color/white"
                     android:textSize="17sp"
                     app:backgroundTint="@color/blue_2" />
@@ -260,7 +260,7 @@
                     android:layout_height="48dp"
                     android:fontFamily="@font/inter_semibold"
                     android:gravity="center"
-                    android:text="CHECK"
+                    android:text="@string/check"
                     android:textColor="@color/gray_1"
                     android:textSize="17sp"
                     android:translationY="5dp" />

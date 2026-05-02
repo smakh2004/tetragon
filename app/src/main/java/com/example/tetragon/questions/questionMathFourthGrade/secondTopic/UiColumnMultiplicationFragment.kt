@@ -107,7 +107,6 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
         val cursor = activeCursor ?: return
         val input = activeInput ?: return
         val density = resources.displayMetrics.density
-        // Since it's strictly 1 digit, if text exists, hide cursor or shift it to the end
         cursor.translationX = if (input.text.isNotEmpty()) 12f * density else 0f
     }
 
@@ -119,12 +118,9 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
         var p2Full: Int
         var finalFull: Int
 
-        // Logic:
-        // 1. Every input/static must be 1 digit EXCEPT tvP1Static (which can be 2).
-        // 2. This means we must avoid carries in the ones-column multiplication.
         while (true) {
-            num1 = Random.nextInt(10, 51) // Up to 50s
-            num2 = Random.nextInt(11, 25) // Smaller multiplier to keep partials manageable
+            num1 = Random.nextInt(10, 51)
+            num2 = Random.nextInt(11, 25)
 
             val n1Ones = num1 % 10
             val n2Tens = num2 / 10
@@ -134,45 +130,29 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
             p2Full = num1 * n2Tens
             finalFull = num1 * num2
 
-            // Validation:
-            // Ones multiplication must not carry: (n1Ones * n2Ones < 10)
             val noCarryP1 = (n1Ones * n2Ones < 10)
             val noCarryP2 = (n1Ones * n2Tens < 10)
-
-            // Partial 2 must stay below 100 because correctP2Input and tvP2Static are 1 digit each
             val p2SizeValid = p2Full < 100
-
-            // Final sum columns validation:
-            // FinalStaticRight is 1 digit: (finalFull % 10 < 10) - Always true if noCarryP1
-            // FinalStaticLeft is 1 digit: (finalFull / 100 < 10)
             val finalSizeValid = (finalFull / 100) < 10
 
             if (noCarryP1 && noCarryP2 && p2SizeValid && finalSizeValid) break
         }
 
-        // Set Top Numbers
         binding.tvNum1Tens.text = (num1 / 10).toString()
         binding.tvNum1Ones.text = (num1 % 10).toString()
         binding.tvNum2Tens.text = (num2 / 10).toString()
         binding.tvNum2Ones.text = (num2 % 10).toString()
 
-        // Partial Product 1:
-        // tvP1Static is ALLOWED to be 2 digits (tens and hundreds)
         binding.tvP1Static.text = (p1Full / 10).toString()
         correctP1Input = p1Full % 10
 
-        // Partial Product 2:
-        // Must be 1 digit each
         correctP2Input = p2Full / 10
         binding.tvP2Static.text = (p2Full % 10).toString()
 
-        // Final Result:
-        // All must be 1 digit
         binding.tvFinalStaticLeft.text = (finalFull / 100).toString()
         correctFinalInput = (finalFull / 10) % 10
         binding.tvFinalStaticRight.text = (finalFull % 10).toString()
 
-        // UI Reset
         binding.tvInputPartial1.text = ""
         binding.tvInputPartial2.text = ""
         binding.tvInputFinal.text = ""
@@ -183,7 +163,7 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
         seeBtn.visibility = View.GONE
 
         setFocus(binding.tvInputPartial1, binding.ivBoxP1, binding.cursorP1)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -193,8 +173,6 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
         buttonIds.forEach { id ->
             view.findViewById<Button>(id).setOnClickListener {
                 if (isAnswerChecked) return@setOnClickListener
-
-                // STRICTLY ONE DIGIT for all input boxes
                 if (activeInput?.text.isNullOrEmpty()) {
                     activeInput?.text = (it as Button).text.toString()
                     updateCursorPosition()
@@ -229,12 +207,10 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
 
         if (u1 == correctP1Input && u2 == correctP2Input && u3 == correctFinalInput) {
             playSound(R.raw.correct)
-            activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
             setAllBoxes(R.drawable.answer_correct_box)
 
-            // UPDATE THIS LINE: Show the full equation
-            answer.text = "${binding.tvNum1Tens.text}${binding.tvNum1Ones.text} × ${binding.tvNum2Tens.text}${binding.tvNum2Ones.text} = ${num1 * num2}"
+            answer.text = getString(R.string.label_answer_multiplication, num1, num2, num1 * num2)
             answer.visibility = View.VISIBLE
 
             val isFinished = activity.incrementProgress()
@@ -242,13 +218,13 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
 
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             setAllBoxes(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -264,7 +240,7 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -281,16 +257,11 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
 
-            // Get the numbers directly from the top TextViews for the display
-            val firstNum = "${binding.tvNum1Tens.text}${binding.tvNum1Ones.text}"
-            val secondNum = "${binding.tvNum2Tens.text}${binding.tvNum2Ones.text}"
-            val result = num1 * num2
-
-            answer.text = "$firstNum × $secondNum = $result"
+            answer.text = getString(R.string.label_answer_multiplication, num1, num2, num1 * num2)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             setAllBoxes(R.drawable.answer_solution_box)
             binding.tvInputPartial1.text = correctP1Input.toString()
@@ -318,7 +289,7 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
         setAllBoxes(R.drawable.answer_default_box)
         seeBtn.visibility = View.GONE
         setFocus(binding.tvInputPartial1, binding.ivBoxP1, binding.cursorP1)
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -330,14 +301,14 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
         seeBtn.visibility = View.GONE
         setupInitialButtonState()
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
     }
 
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
+        stateAnswer.text = getString(R.string.state_correct)
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
         enableCheckButton()
@@ -346,9 +317,10 @@ class UiColumnMultiplicationFragment : Fragment(R.layout.fragment_ui_column_mult
     private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
         enableCheckButton()
     }

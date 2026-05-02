@@ -30,11 +30,12 @@ import com.example.tetragon.questions.questionMathThirdGrade.secondTopic.UiCompl
 import com.example.tetragon.questions.questionMathThirdGrade.secondTopic.UiComplexDivisionInteractiveFragment
 import com.example.tetragon.questions.questionMathThirdGrade.thirdTopic.UiFractionPizzaSixPiecesFragment
 import com.example.tetragon.questions.questionMathThirdGrade.thirdTopic.UiFractionProblemFragment
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class Math3GradeQuestionActivity : AppCompatActivity() {
+class Math3GradeQuestionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMath3GradeQuestionBinding
     private lateinit var selectedTopic: MathGrade3Topic
@@ -217,16 +218,19 @@ class Math3GradeQuestionActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        view.findViewById<TextView>(R.id.titleText).text = "Are you sure?"
-        view.findViewById<TextView>(R.id.messageText).text = "If you exit, you will lose all progress for this lesson."
+        // Localized Title and Message
+        view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
+        view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
 
+        // Localized "CONTINUE" button
         view.findViewById<Button>(R.id.noButton).apply {
-            text = "CONTINUE"
+            text = getString(R.string.continue_text)
             setOnClickListener { dialog.dismiss() }
         }
 
+        // Localized "EXIT" button
         view.findViewById<Button>(R.id.finishButton).apply {
-            text = "EXIT"
+            text = getString(R.string.exit_btn)
             setOnClickListener {
                 finish()
                 dialog.dismiss()

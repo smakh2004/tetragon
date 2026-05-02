@@ -38,11 +38,12 @@ import com.example.tetragon.questions.questionMathSecondGrade.sixthTopic.UiSetTi
 import com.example.tetragon.questions.questionMathSecondGrade.sixthTopic.UiTimeArithmeticsFragment
 import com.example.tetragon.questions.questionMathSecondGrade.thirdTopic.UiColumnAdditionThreeDigitNumbersFragment
 import com.example.tetragon.questions.questionMathSecondGrade.thirdTopic.UiColumnSubtractionThreeDigitNumbersFragment
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class Math2GradeQuestionActivity : AppCompatActivity() {
+class Math2GradeQuestionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityQuestionQctivityBinding
     private lateinit var selectedTopic: MathGrade2Topic
@@ -270,29 +271,24 @@ class Math2GradeQuestionActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        // 1. Find the TextViews and Buttons by ID
-        val titleText = view.findViewById<TextView>(R.id.titleText)
-        val messageText = view.findViewById<TextView>(R.id.messageText)
-        val continueButton = view.findViewById<Button>(R.id.noButton)
-        val finishButton = view.findViewById<Button>(R.id.finishButton)
+        // Localized Title and Message
+        view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
+        view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
 
-        // 2. Set the custom text
-        titleText.text = "Are you sure?"
-        messageText.text = "If you exit, you will lose all the points you gained in this lesson."
-
-        continueButton.text = "CONTINUE LESSON"
-        finishButton.text = "EXIT"
-
-        // 3. Set the Click Listeners
-        continueButton.setOnClickListener {
-            dialog.dismiss()
+        // Localized "CONTINUE" button
+        view.findViewById<Button>(R.id.noButton).apply {
+            text = getString(R.string.continue_text)
+            setOnClickListener { dialog.dismiss() }
         }
 
-        finishButton.setOnClickListener {
-            finish()
-            dialog.dismiss()
+        // Localized "EXIT" button
+        view.findViewById<Button>(R.id.finishButton).apply {
+            text = getString(R.string.exit_btn)
+            setOnClickListener {
+                finish()
+                dialog.dismiss()
+            }
         }
-
         dialog.show()
     }
 

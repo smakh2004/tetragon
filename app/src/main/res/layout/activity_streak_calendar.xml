@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_semibold"
-            android:text="Streak"
+            android:text="@string/streak"
             android:textColor="#78849E"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -116,7 +116,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter_bold"
                     android:includeFontPadding="false"
-                    android:text="YEAR"
+                    android:text="@string/year"
                     android:textColor="#78849E"
                     android:textSize="14sp" />
             </LinearLayout>

@@ -120,7 +120,6 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
     }
 
     private fun updateLayoutWithText(rootView: View, value: String, isOption: Boolean) {
-        // Find the specific views within the layout
         val topText = when (rootView.id) {
             R.id.option1 -> rootView.findViewById<TextView>(R.id.option1Top)
             R.id.option2 -> rootView.findViewById<TextView>(R.id.option2Top)
@@ -168,18 +167,6 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
         }
     }
 
-    private fun findViewsRecursive(view: View, textList: MutableList<TextView>, otherList: MutableList<View>) {
-        if (view is TextView) {
-            textList.add(view)
-        } else if (view is ViewGroup) {
-            for (i in 0 until view.childCount) {
-                findViewsRecursive(view.getChildAt(i), textList, otherList)
-            }
-        } else {
-            otherList.add(view)
-        }
-    }
-
     private fun colorTrigFunctions(text: String): SpannableString {
         val spannable = SpannableString(text)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_1)
@@ -202,7 +189,7 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
                     resetForTryAgain()
                 } else {
                     val activity = requireActivity() as Math10GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else if (!activity.checkAndTriggerMilestone()) {
                         resetUIForNext()
                         activity.showRandomQuestion()
@@ -229,13 +216,13 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
             if (isFirstAttempt) activity.totalXp += MathGrade10Type.TRIGONOMETRY_PROBLEM.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -245,10 +232,10 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerText.text = "Answer: ${correctAnswerStr.replace("_", "/")}"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerText.text = getString(R.string.label_answer, correctAnswerStr.replace("_", "/"))
             answerText.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             problemImage.setImageResource(R.drawable.answer_solution_box)
             updateLayoutWithText(problemAnswerContainer, correctAnswerStr, isOption = false)
             problemAnswerContainer.visibility = View.VISIBLE
@@ -277,8 +264,8 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
         sc.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         cs.setImageResource(R.drawable.correct_tick_icon)
         options[idx].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answerText.text = "Answer: ${correctAnswerStr.replace("_", "/")}"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerText.text = getString(R.string.label_answer, correctAnswerStr.replace("_", "/"))
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -286,9 +273,10 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
         sc.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         cs.setImageResource(R.drawable.wrong_circle)
         options[idx].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerText.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
@@ -312,7 +300,7 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
@@ -328,7 +316,7 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
         problemAnswerContainer.visibility = View.GONE
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -341,7 +329,7 @@ class UiTrigonometryProblemFragment : Fragment(R.layout.fragment_ui_trigonometry
         activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 

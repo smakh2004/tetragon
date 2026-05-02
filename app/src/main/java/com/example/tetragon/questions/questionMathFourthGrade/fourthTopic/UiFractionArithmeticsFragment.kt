@@ -31,7 +31,7 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
     private lateinit var tvDenom1: TextView
     private lateinit var tvNum2: TextView
     private lateinit var tvDenom2: TextView
-    private lateinit var tvOperator: TextView // Assuming you have a TextView for the +/- sign
+    private lateinit var tvOperator: TextView
 
     private lateinit var addBtn: LinearLayout
     private lateinit var minusBtn: LinearLayout
@@ -89,7 +89,7 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
         tvDenom1 = view.findViewById(R.id.tvDenom1)
         tvNum2 = view.findViewById(R.id.tvNum2)
         tvDenom2 = view.findViewById(R.id.tvDenom2)
-        tvOperator = view.findViewById(R.id.tvOperator) // Update your XML to include this ID
+        tvOperator = view.findViewById(R.id.tvOperator)
 
         addBtn = view.findViewById(R.id.add_btn)
         minusBtn = view.findViewById(R.id.minus_btn)
@@ -119,7 +119,7 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         activity.isResultCurrentlyVisible = false
                         activity.hideSuccessAnimation()
@@ -203,13 +203,12 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
             tvOperator.text = "+"
             n1 = (1 until targetDenominatorResult).random()
             n2 = 1
-            // Ensure result doesn't exceed 1 (e.g., if n1=5 and denom=6, result is 6/6)
             if (n1 + n2 > targetDenominatorResult) n1 = targetDenominatorResult - 1
             targetNumeratorResult = n1 + n2
         } else {
             tvOperator.text = "-"
             n1 = (2..targetDenominatorResult).random()
-            n2 = (1 until n1).random() // Ensures n1 - n2 is at least 1/targetDenominatorResult
+            n2 = (1 until n1).random()
             targetNumeratorResult = n1 - n2
         }
 
@@ -230,7 +229,7 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         updateLayoutButtonsUI()
@@ -238,9 +237,9 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
     }
 
     private fun updateQuestionText() {
-        val sentence = "Create a fraction to find the answer."
+        val sentence = getString(R.string.title_fraction_arithmetics)
+        val wordToHighlight = getString(R.string.highlight_fraction)
         val spannable = SpannableString(sentence)
-        val wordToHighlight = "fraction"
         val start = sentence.indexOf(wordToHighlight)
         if (start != -1) {
             spannable.setSpan(
@@ -276,12 +275,12 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
 
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -293,9 +292,9 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
             isAnswerChecked = true
             isIncorrectAttempt = false
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
 
-            answerDisplay.text = "Answer: ${formatAnswer(targetNumeratorResult, targetDenominatorResult)}"
+            answerDisplay.text = getString(R.string.label_answer_fraction, formatAnswer(targetNumeratorResult, targetDenominatorResult))
             answerDisplay.visibility = View.VISIBLE
 
             currentDenominator = targetDenominatorResult
@@ -309,7 +308,7 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             updateLayoutButtonsUI()
         }
     }
@@ -352,7 +351,7 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
         animationOverlay.visibility = View.GONE
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         resetAllVisualSlices()
         disableCheckButton()
@@ -362,8 +361,8 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: ${formatAnswer(targetNumeratorResult, targetDenominatorResult)}"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer_fraction, formatAnswer(targetNumeratorResult, targetDenominatorResult))
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -371,9 +370,10 @@ class UiFractionArithmeticsFragment : Fragment(R.layout.fragment_ui_fraction_ari
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

@@ -20,11 +20,12 @@ import com.example.tetragon.questions.FiveCorrectAnswerFragment
 import com.example.tetragon.questions.SubjectConstants
 import com.example.tetragon.questions.XpGainedActivity
 import com.example.tetragon.questions.questionPhysicsEighthGrade.firstTopic.UiFindSpeedFragment
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class Physics8GradeQuestionActivity : AppCompatActivity() {
+class Physics8GradeQuestionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPhysics8GradeQuestionBinding
     private lateinit var selectedTopic: PhysicsGrade8Topic
@@ -209,10 +210,23 @@ class Physics8GradeQuestionActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        view.findViewById<Button>(R.id.noButton).setOnClickListener { dialog.dismiss() }
-        view.findViewById<Button>(R.id.finishButton).setOnClickListener {
-            finish()
-            dialog.dismiss()
+        // Localized Title and Message
+        view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
+        view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
+
+        // Localized "CONTINUE" button
+        view.findViewById<Button>(R.id.noButton).apply {
+            text = getString(R.string.continue_text)
+            setOnClickListener { dialog.dismiss() }
+        }
+
+        // Localized "EXIT" button
+        view.findViewById<Button>(R.id.finishButton).apply {
+            text = getString(R.string.exit_btn)
+            setOnClickListener {
+                finish()
+                dialog.dismiss()
+            }
         }
         dialog.show()
     }

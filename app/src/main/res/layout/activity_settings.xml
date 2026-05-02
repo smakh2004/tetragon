@@ -303,6 +303,23 @@
                     android:src="@drawable/continue_btn" />
             </LinearLayout>
 
+
+            <!-- PRIVACY AND POLICY TEXT -->
+            <TextView
+                android:id="@+id/privacyPolicyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/privacy_policy"
+                android:textColor="@color/blue_1"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

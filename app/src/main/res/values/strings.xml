@@ -60,4 +60,511 @@
     <string name="confirm_password">Confirm password</string>
     <string name="delete">DELETE</string>
     <string name="age">Age</string>
+    <string name="chat">CHAT</string>
+    <string name="bot_greeting">Hello! I\'m Mr. Square. I am your personal math tutor.</string>
+    <string name="bot_thinking">Mr. Square is thinking...</string>
+    <string name="bot_error_generic">Mr. Square got his angles crossed! Let\'s try again in a bit.</string>
+    <string name="bot_error_429">Mr. Square is taking a short math break to sharpen his pencils. Please wait a moment!</string>
+    <string name="bot_no_answer">I\'m sorry, I couldn\'t process that.</string>
+    <string name="write_your_question">Write your question...</string>
+    <string name="send">SEND</string>
+    <string name="verify_your_email_address">Verify your email address.</string>
+    <string name="we_ve_sent_a_verification_link_to">We\'ve sent a verification link to</string>
+    <string name="nplease_check_your_inbox_and_click_the_link_n_nthe_continue_button_will_unlock_automatically_once_you_verify">\nPlease check your inbox and click the link. \n\nThe \'Continue\' button will unlock automatically once you verify.</string>
+    <string name="verify_email_instructions">We\'ve sent a verification link to %1$s.</string>
+    <string name="error_prefix">Error: %1$s</string>
+    <string name="creating_account">CREATING ACCOUNT...</string>
+    <string name="verify_email_first">Please verify your email first!</string>
+    <string name="enter_email">Enter email</string>
+    <string name="enter_password">Enter password</string>
+    <string name="loading_caps">LOADING..</string>
+    <string name="login_successful">Successful login.</string>
+    <string name="auth_failed">Authentication failed.</string>
+    <string name="first_grade">1 GRADE</string>
+    <string name="second_grade">2 GRADE</string>
+    <string name="third_grade">3 GRADE</string>
+    <string name="fourth_grade">4 GRADE</string>
+    <string name="fifth_grade">5 GRADE</string>
+    <string name="sixth_grade">6 GRADE</string>
+    <string name="seventh_grade">7 GRADE</string>
+    <string name="eighth_grade">8 GRADE</string>
+    <string name="ninth_grade">9 GRADE</string>
+    <string name="tenth_grade">10 GRADE</string>
+    <string name="eleventh_grade">11 GRADE</string>
+    <string name="_12_topics">12 topics</string>
+    <string name="_8_topics">8 topics</string>
+    <string name="_4_topics">4 topics</string>
+    <string name="_5_topics">5 topics</string>
+    <string name="_1_topic">1 topic</string>
+    <string name="_3_topics">3 topics</string>
+    <string name="grade_label_format">%1$s - GRADE %2$d</string>
+    <string name="timer_format">%1$02dm %2$02ds</string>
+    <string name="leaderboard">LEADERBOARD</string>
+    <string name="get_a_reward_at_the_end_of_the_month">Get a reward at the end of the month</string>
+    <string name="days_left_singular">1 DAY LEFT</string>
+    <string name="days_left_plural">%1$d DAYS LEFT</string>
+    <string name="rank_status_format">You are in %1$d-place</string>
+    <string name="start_gaining_xp">Start to gain XP!</string>
+    <string name="math_games">Math Games</string>
+    <string name="cash_storm">CASH STORM</string>
+    <string name="start_10xp">START +10XP</string>
+    <string name="online_count">%1$d online</string>
+    <string name="no_attempts_caps">NO ATTEMPTS</string>
+    <string name="record_format">Record: %1$d</string>
+    <string name="wins_format">Wins: %1$d</string>
+    <string name="refresh_page">Refresh page</string>
+    <string name="start_xp_format">START +%1$dXP</string>
+    <string name="play_online_xp">PLAY ONLINE +30XP</string>
+    <string name="private_game_caps">PRIVATE GAME</string>
+    <string name="_5_attempts_left"> / 5 attempts left</string>
+    <string name="max_streak">Max Streak</string>
+    <string name="total_xp">Total XP</string>
+    <string name="unlock_the_tetragon_infinity">Unlock the Tetragon Infinity</string>
+    <string name="premium_gives_you_full_access_to_every_features_and_more">Premium gives you full access to every features - and more</string>
+    <string name="subscribe_now">SUBSCRIBE NOW</string>
+    <string name="mo">Mo</string>
+    <string name="tu">Tu</string>
+    <string name="we">We</string>
+    <string name="th">Th</string>
+    <string name="fr">Fr</string>
+    <string name="sa">Sa</string>
+    <string name="su">Su</string>
+    <string name="joined_format">Joined %1$s</string>
+    <string name="level_format">Level %1$d</string>
+    <string name="day_streak_format">%1$d day streak</string>
+    <string name="streak_beast">YOU ARE BEAST!</string>
+    <string name="streak_good">GOOD JOB!</string>
+    <string name="streak_practice">TIME FOR PRACTICE!</string>
+    <string name="xp_format">%1$d XP</string>
+    <string name="shop">Shop</string>
+    <string name="attempts">Attempts</string>
+    <string name="infinity">Infinity</string>
+    <string name="with_full_of_stars_you_can_solve_more_math_problems">With full of stars you can solve more math problems</string>
+    <string name="star">Star</string>
+    <string name="refill_your_stars_to_continue_your_learning_journey">Refill your stars to continue your learning journey</string>
+    <string name="coins">Coins</string>
+    <string name="_0_29">0.49 $</string>
+    <string name="_0_99">0.99 $</string>
+    <string name="_2_29">1.99 $</string>
+    <string name="refill_stars_label">Refill Stars</string>
+    <string name="monthly_infinity_label">Monthly Infinity</string>
+    <string name="full_caps">FULL</string>
+    <string name="active_caps">ACTIVE</string>
+
+    <string name="stars_full_toast">Stars are already full!</string>
+    <string name="stars_refilled_toast">Stars refilled!</string>
+    <string name="infinity_activated_toast">Infinity Activated!</string>
+    <string name="not_enough_coins">Not enough coins!</string>
+    <string name="transaction_failed">Transaction failed. Try again.</string>
+    <string name="buy_for">BUY FOR</string>
+    <string name="of_the_month">OF THE MONTH</string>
+    <string name="claim_reward">CLAIM REWARD</string>
+    <string name="streak">Streak</string>
+    <string name="year">YEAR</string>
+    <string name="benefits">Benefits</string>
+    <string name="daily_lessons">Daily lessons</string>
+    <string name="unlimited_learning">Unlimited learning</string>
+    <string name="no_ads">No ads</string>
+    <string name="unlimited_mini_games">Unlimited mini games</string>
+    <string name="free">Free</string>
+    <string name="subscribe_for_1_33">SUBSCRIBE FOR $1.99</string>
+    <string name="unlock_the_ntetragon_infinity">Unlock the\nTetragon Infinity</string>
+    <string name="premium_gives_you_full_access_nto_every_features_and_more">Premium gives you full access\nto every features - and more</string>
+    <string name="annual">Annual</string>
+    <string name="_12_month_15">12 month = $24</string>
+    <string name="_1_33_mo">$ 1.99/mo*</string>
+    <string name="monthly">Monthly</string>
+    <string name="_3_mo">$ 2.99/mo*</string>
+    <string name="subscribe">SUBSCRIBE</string>
+    <string name="math">MATH</string>
+    <string name="physics">PHYSICS</string>
+    <string name="subjects">Subjects</string>
+    <string name="tetragon2">Tetragon</string>
+    <string name="app_is_currently_unavailable">App is currently unavailable.</string>
+    <string name="check_your_connection_or_try_again_later">Check your connection or try again later!</string>
+    <string name="learn_with_joy">learn with joy</string>
+    <string name="new_profit_record">New Profit Record!</string>
+    <string name="sync_error">Sync Error</string>
+    <string name="tier_starting_business">Starting Your Business!</string>
+    <string name="tier_smart_spender">Smart Spender!</string>
+    <string name="tier_wealth_builder">Wealth Builder!</string>
+    <string name="tier_profit_master">Profit Master!</string>
+    <string name="tier_cash_tycoon">Cash Tycoon!</string>
+    <string name="tier_financial_genius">Financial Genius!</string>
+    <string name="tier_market_legend">Market Legend!</string>
+    <string name="select_the_better_option">Select the better option.</string>
+    <string name="new_record_caps">New Record!</string>
+    <string name="error_saving_progress">Error saving progress</string>
+    <string name="tier_starting_out">Starting Out!</string>
+    <string name="tier_keep_going">Keep Going!</string>
+    <string name="tier_nice_work">Nice Work!</string>
+    <string name="tier_getting_better">Getting Better!</string>
+    <string name="tier_strong_effort">Strong Effort!</string>
+    <string name="tier_good_job">Good Job!</string>
+    <string name="tier_math_master">Math Master!</string>
+    <string name="tier_you_rock">You Rock!</string>
+    <string name="draw">DRAW</string>
+    <string name="player_default">Player</string>
+    <string name="opponent_default">Opponent</string>
+    <string name="searching">Searching..</string>
+    <string name="you_caps">You</string>
+    <string name="opponent_caps">Opponent</string>
+    <string name="unknown_player">Unknown</string>
+    <string name="room_id_prefix">Room ID:</string>
+    <string name="waiting_opponent">Ожидание противника...</string>
+    <string name="connecting_caps">CONNECTING...</string>
+    <string name="error_enter_id">Please enter Room ID</string>
+    <string name="error_invalid_id">Invalid game ID</string>
+    <string name="error_connection">Error connecting. Try again.</string>
+    <string name="delete_account_caps">DELETE ACCOUNT (%d)</string>
+    <string name="delete_caps">DELETE</string>
+    <string name="error_no_user">No user logged in</string>
+    <string name="account_deleted">Account deleted</string>
+    <string name="reauth_failed">Reauthentication failed: %s</string>
+    <string name="saving_caps">SAVING..</string>
+    <string name="error_empty_fields">Fields cannot be empty</string>
+    <string name="name_updated">Name updated successfully</string>
+    <string name="name_update_failed">Failed to update name</string>
+    <string name="error_password_length">Password must be at least 6 characters</string>
+    <string name="password_updated">Password updated successfully</string>
+    <string name="password_update_failed">Failed to update password: %s</string>
+    <string name="error_incorrect_password">Current password is incorrect</string>
+    <string name="session_expired">Session Expired</string>
+    <string name="session_expired_message">Your account was opened on another device.</string>
+    <string name="refresh">Refresh</string>
+    <string name="math_label">MATH</string>
+    <string name="physics_label">PHYSICS</string>
+    <string name="topic_square_roots">Square Roots</string>
+    <string name="topic_quadratic_functions">Quadratic Functions</string>
+    <string name="reward_label">Reward: %s</string>
+    <string name="topic_label">%1$d Topic: %2$s</string>
+    <string name="topic_preview_format">Topic %1$d: %2$s</string>
+    <string name="not_available">NOT AVAILABLE</string>
+    <string name="out_of_stars_label">Out of Stars!</string>
+    <string name="processing">PROCESSING...</string>
+    <string name="jump_ahead">JUMP AHEAD</string>
+    <string name="previous_grade">Previous grade</string>
+    <string name="quit_title">Are you sure?</string>
+    <string name="quit_message">If you exit, you will lose all progress for this lesson.</string>
+    <string name="continue_btn">CONTINUE</string>
+    <string name="exit_btn">EXIT</string>
+    <string name="processing_btn">PROCESSING...</string>
+    <string name="state_correct">Correct!</string>
+    <string name="state_incorrect">Incorrect!</string>
+    <string name="state_solution">Solution</string>
+    <string name="label_answer">Answer: %1$s</string>
+    <string name="btn_check">CHECK</string>
+    <string name="btn_continue">CONTINUE</string>
+    <string name="btn_finish">FINISH</string>
+    <string name="btn_try_again">TRY AGAIN</string>
+    <string name="find_the_square_root">Find the square root.</string>
+    <string name="review_text">REVIEW</string>
+    <string name="btn_see_solution">SEE SOLUTION</string>
+    <string name="reward_text_rive">REWARD</string>
+    <string name="_5_correct">5 CORRECT!</string>
+    <string name="xp_topic_mastered">Topic Mastered! Max XP reached.</string>
+    <string name="xp_collected_desc">Experience points collected!</string>
+    <string name="days_of_mindful_problem_solving">Days of mindful problem solving</string>
+    <string name="topic_derivatives">Derivatives</string>
+    <string name="finish_caps">FINISH</string>
+    <string name="claim_reward_btn">CLAIM</string>
+    <string name="subscribe_caps">SUBSCRIBE</string>
+    <string name="processing_caps">PROCESSING...</string>
+    <string name="find_the_derivative">Find the derivative.</string>
+    <string name="topic_natural_numbers">Natural numbers</string>
+    <string name="topic_fractions">Дроби</string>
+    <string name="find_missed_numbers">Find missed numbers.</string>
+    <string name="choose_your_language">Choose your language</string>
+    <string name="privacy_policy">PRIVACY AND POLICY</string>
+    <!-- Grade 1 Math Topics -->
+    <string name="counting_numbers">Counting numbers</string>
+    <string name="addition">Addition</string>
+    <string name="subtraction">Subtraction</string>
+    <string name="odd_or_even">Odd or Even</string>
+    <string name="comparison">Comparison</string>
+    <string name="parentheses">Parentheses</string>
+    <string name="addition_up_to_20">Addition up to 20</string>
+    <string name="subtraction_up_to_20">Subtraction up to 20</string>
+    <string name="round_numbers">Round numbers</string>
+    <string name="two_digit_numbers">Two-digit numbers</string>
+    <string name="problem_solving">Problem solving</string>
+    <string name="length_centimeter">Length. Centimeter.</string>
+
+    <!-- Grade 2 Math Topics -->
+    <string name="arithmetic_basics">Arithmetics Basics</string>
+    <string name="column_method">Column Method</string>
+    <string name="three_digit_numbers">Three Digit Numbers</string>
+    <string name="comparison_grade2">Comparison</string>
+    <string name="length_measurement">Length Measurement</string>
+    <string name="multiplication_table">Multiplication table</string>
+    <string name="division">Division</string>
+    <string name="time">Time</string>
+
+    <!-- Grade 4 Topics -->
+    <string name="complex_arithmetics">Complex Arithmetics</string>
+    <string name="column_multiplication">Column Multiplication</string>
+    <string name="column_division">Column Division</string>
+    <string name="fraction_arithmetics">Fraction Arithmetics</string>
+    <string name="mixed_numbers">Mixed Numbers</string>
+
+    <!-- Grade 5 Topics -->
+    <string name="natural_numbers">Natural Numbers</string>
+    <!-- Grade 9 Topics -->
+    <string name="quadratic_equations">Quadratic Equations</string>
+
+    <!-- Grade 10 Topics -->
+    <string name="trigonometry">Trigonometry</string>
+
+    <string name="arithmetics_basics">Arithmetics Basics</string>
+    <!-- Grade 3 Preview -->
+    <string name="complex_multiplication">Complex Multiplication</string>
+    <string name="complex_division">Complex Division</string>
+    <string name="fractions">Fractions</string>
+    <string name="perimeter_area">Perimeter &amp; Area</string>
+
+    <string name="si_units">SI Units</string>
+    <string name="density">Density</string>
+    <string name="simple_machines">Simple Machines</string>
+    <string name="force_and_motion">Force and Motion</string>
+    <string name="newtons_laws">Newton\'s Laws</string>
+    <string name="magnetism">Magnetism</string>
+    <string name="modern_physics">Modern Physics</string>
+    <string name="how_many_apples">How many apples?</string>
+    <string name="find_the_missed_number">Find the missed number.</string>
+    <string name="question_next_after">What is the next number after %1$s?</string>
+    <string name="question_before">What is the number before %1$s?</string>
+    <string name="question_how_many_angles">How many angles does a %1$s have?</string>
+    <string name="shape_circle">circle</string>
+    <string name="shape_triangle">triangle</string>
+    <string name="shape_rectangle">rectangle</string>
+    <string name="shape_square">square</string>
+    <string name="find_the_answer">Find the answer.</string>
+    <string name="toast_clear_number">Please draw a clear number!</string>
+    <string name="write_the_answer">Write the answer.</string>
+    <string name="undo">UNDO</string>
+    <string name="instruction_addition_tree">Add two numbers to find the answer.</string>
+    <string name="instruction_find_missed">Find the missed number.</string>
+    <string name="keyword_missed">missed</string>
+    <string name="instruction_represent_sum">Represent %1$s as sum of %2$s.</string>
+    <string name="keyword_three_numbers">three numbers</string>
+    <string name="instruction_represent_sum_two">Represent %1$s as sum of %2$s.</string>
+    <string name="keyword_two_numbers">two numbers</string>
+    <string name="instruction_find_missed_number">Find the %1$s number.</string>
+    <string name="instruction_represent_as_subtraction">Represent %1$s as %2$s of two numbers.</string>
+    <string name="keyword_subtraction">subtraction</string>
+    <string name="label_answer_subtraction">Answer: %1$s - %2$s</string>
+    <string name="instruction_find_type_numbers">Find the %1$s numbers.</string>
+    <string name="type_even">even</string>
+    <string name="type_odd">odd</string>
+    <string name="question_is_odd_or_even">Is %1$s %2$s or %3$s number?</string>
+    <string name="question_numbers_upto">Which numbers are %1$s up to %2$s?</string>
+    <string name="question_comparison_strawberry_grape">What is more %1$s or %2$s?</string>
+    <string name="item_strawberries">strawberries</string>
+    <string name="item_grapes">grapes</string>
+    <string name="option_strawberry">Strawberry</string>
+    <string name="option_grape">Grape</string>
+    <string name="option_same">Same</string>
+    <string name="instruction_put_sign">Put the correct %1$s.</string>
+    <string name="instruction_sign_word">sign</string>
+    <string name="math_format_addition">%1$d + %2$d</string>
+    <string name="math_format_subtraction">%1$d - %2$d</string>
+    <string name="question_true_or_false">Is that %1$s or %2$s?</string>
+    <string name="option_true">True</string>
+    <string name="option_false">False</string>
+    <string name="math_problem_equal_template">%1$s =</string>
+    <string name="instruction_missed_word">missed</string>
+    <string name="instruction_find_missed2">Find the %1$s number.</string>
+    <string name="triple_sum_template">%1$d + %2$d + %3$d</string>
+    <string name="keyword_sum">sum</string>
+    <string name="double_sum_template">%1$d + %2$d</string>
+    <string name="subtraction_first_part">%1$d -</string>
+    <string name="subtraction_result_part">= %1$d</string>
+    <string name="instruction_represent_sub_two">Represent %1$s as %2$s of %3$s.</string>
+    <string name="double_sub_template">%1$d - %2$d</string>
+    <string name="subtraction_problem_template">%1$d - %2$d =</string>
+    <string name="arithmetic_problem_template">%1$d %2$s %3$d =</string>
+    <string name="sequence_template">%1$s, </string>
+    <string name="question_round_closest">Round up %1$d to the closest round number.</string>
+    <string name="keyword_round_up">Round up</string>
+    <string name="keyword_closest">closest</string>
+    <string name="question_how_many_tens">How many tens are in the number %1$d?</string>
+    <string name="keyword_tens">tens</string>
+    <string name="label_answer_tens">Answer: %1$d tens</string>
+    <string name="arithmetic_problem_template_simple">%1$s =</string>
+    <string name="instruction_comparison">Put the correct sign.</string>
+    <string name="instruction_comparison_keyword">sign</string>
+    <string name="arithmetic_plus_template">%1$d + %2$d</string>
+    <string name="arithmetic_minus_template">%1$d - %2$d</string>
+    <string name="problem_equals_template">%1$s =</string>
+    <string name="instruction_represent_sum2">Represent %1$d as sum of two numbers.</string>
+    <string name="label_answer_sum">Answer: %1$d + %2$d</string>
+    <string name="instruction_true_false">Is that true or false?</string>
+    <string name="visual_value_template">=%1$d</string>
+    <string name="problem_aziz_apples">Aziz has %1$d apples, he got %2$d apples more. How many apples he has now?</string>
+    <string name="keyword_apples">apples</string>
+    <string name="problem_fish_arithmetic">Aziz ate %1$d fish out of %2$d, how many fish are left?</string>
+    <string name="keyword_fish">fish</string>
+    <string name="question_show_cm_ruler">Show %1$s on the ruler.</string>
+    <string name="cm_unit_template">%1$d cm</string>
+    <string name="label_correct_length">The correct length is %1$s</string>
+    <string name="question_show_dm_in_cm">Show %1$s in %2$s.</string>
+    <string name="dm_unit_template">%1$d dm</string>
+    <string name="keyword_cm">cm</string>
+    <string name="label_dm_to_cm_result">%1$d dm = %2$d cm</string>
+    <string name="solution_dm_to_cm">1 dm = 10 cm, so %1$d dm = %2$d cm</string>
+    <string name="label_answer_complex_addition">Answer: %1$d + %2$d = %3$d</string>
+    <string name="label_answer_complex_subtraction">Answer: %1$d - %2$d = %3$d</string>
+    <string name="label_answer_multiplication">Answer: %1$d × %2$d = %3$d</string>
+    <string name="title_multiply_numbers">Multiply the numbers.</string>
+    <string name="label_answer_division">Answer: %1$s ÷ %2$s = %3$s</string>
+    <string name="title_divide_numbers">Divide the numbers.</string>
+    <string name="title_fraction_arithmetics">Создай дробь, чтобы найти ответ.</string>
+    <string name="highlight_fraction">дробь</string>
+    <string name="label_answer_fraction">Ответ: %1$s</string>
+    <string name="piece">PIECE</string>
+    <string name="solve_the_equation">Solve the equation.</string>
+    <string name="match_the_pairs">Match the pairs.</string>
+    <string name="instruction_comparison_sign">Put the correct sign.</string>
+    <string name="highlight_word_sign">sign</string>
+    <string name="instruction_meter_to_cm">Convert meter to centimeter.</string>
+    <string name="unit_meter_full">meter</string>
+    <string name="unit_centimeter_full">centimeter</string>
+    <string name="solution_meter_to_cm">1 m = 100 cm, so %1$d m = %2$d cm</string>
+    <string name="unit_m">m</string>
+    <string name="unit_cm">cm</string>
+    <string name="instruction_set_time">Set this time %1$s.</string>
+    <string name="solution_set_time">The correct time is %1$s</string>
+    <string name="unit_h">h</string>
+    <string name="unit_min">min</string>
+    <string name="solve_the_multiplication">Solve the multiplication</string>
+    <string name="solve_the_division">Solve the division</string>
+    <string name="question_fraction_pizza">Show %1$s of the pizza.</string>
+    <string name="label_fraction_solution_pizza">The answer is %1$d out of 6 slices.</string>
+    <string name="state_praise_great_job">Great job!</string>
+    <string name="question_fraction_shape">Show %1$s of the shape.</string>
+    <string name="label_answer_fraction2">Answer: %1$d/%2$d</string>
+    <string name="label_fraction_solution_general">The correct answer is %1$d/%2$d</string>
+
+    <string name="label_square">square</string>
+    <string name="label_rectangle">rectangle</string>
+    <string name="label_area">area</string>
+    <string name="question_create_shape_area">Create a %1$s with an area of:</string>
+    <string name="label_area_units">%1$d squares</string>
+    <string name="label_area_formula">Formula: Area = w × h</string>
+    <string name="label_area_calculation">Area: %1$d × %2$d = %3$d</string>
+
+    <string name="state_almost_square">Almost! Make it a square.</string>
+    <string name="label_perimeter">perimeter</string>
+    <string name="question_create_shape_perimeter">Create a %1$s with a perimeter of:</string>
+    <string name="label_perimeter_units">%1$d units</string>
+    <string name="label_perimeter_formula">Formula: P = 2 × (w + h)</string>
+    <string name="label_perimeter_calculation">2 × (%1$d + %2$d) = %3$d</string>
+
+    <string name="label_speed_v">speed v</string>
+    <string name="label_distance_short">s</string>
+    <string name="label_time_short">t</string>
+    <string name="unit_meters_per_second">%1$d m/s</string>
+
+    <!-- Dynamic Text Templates -->
+    <string name="question_find_speed">Find the speed v. s = %1$d m, t = %2$d s</string>
+    <string name="label_answer_speed">Answer: %1$d m/s</string>
+    <string name="solution_speed_calculation">v = s / t = %1$d / %2$d = %3$d m/s</string>
+
+    <string name="label_energy_e">energy E</string>
+    <string name="label_mass_short">m</string>
+    <string name="label_speed_light_short">c</string>
+    <string name="scientific_notation_16">%1$d × 10¹⁶ J</string>
+    <string name="question_einstein_energy">Find the energy E. Given: m = %1$d kg, c = 3×10⁸ m/s</string>
+    <string name="label_answer_energy">Answer: %1$s</string>
+    <string name="solution_einstein_calculation">E = mc² = %1$d × (3×10⁸)² = %2$s</string>
+
+    <!-- Force Specific Labels -->
+    <string name="label_force_f">force F</string>
+    <string name="label_acceleration_short">a</string>
+    <string name="unit_newtons">%1$d N</string>
+
+    <!-- Templates -->
+    <string name="question_find_force">Find the force F. m = %1$d kg, a = %2$d m/s²</string>
+    <string name="label_answer_force">Answer: %1$d N</string>
+    <string name="solution_force_calculation">F = m × a = %1$d × %2$d = %3$d N</string>
+
+    <string name="label_answer_with_value">Answer: %1$d N</string>
+    <string name="question_find_ampere_force">Find the Ampere force F. B = %1$d T, I = %2$d A, L = %3$d m</string>
+    <string name="solution_bil_formula">F = B × I × L = %1$d × %2$d × %3$d = %4$d N</string>
+
+    <string name="question_convert_length">Convert %1$d %2$s to %3$s.</string>
+    <string name="unit_meters_full">meters</string>
+    <string name="unit_kilometers_full">kilometers</string>
+    <string name="unit_centimeters_full">centimeters</string>
+
+    <!-- Solutions & Labels -->
+    <string name="label_conversion_result">%1$d %2$s = %3$d %4$s</string>
+    <string name="solution_m_to_cm">1 m = 100 cm, so the correct answer is %1$d cm</string>
+    <string name="solution_km_to_m">1 km = 1000 m, so the correct answer is %1$d m</string>
+
+    <string name="unit_liter_short">L</string>
+    <string name="target_liters_phrase">%1$d liters</string>
+    <string name="question_fill_kettle">Fill the kettle with %1$s of water.</string>
+    <string name="solution_kettle_liters">The correct level is %1$d liters</string>
+    <string name="answer_with_liters">Answer: %1$d L</string>
+
+    <string name="unit_kg_uppercase">KG</string>
+    <string name="unit_kg_lowercase">kg</string>
+    <string name="unit_grams_full">grams</string>
+    <string name="unit_kilograms_full">kilograms</string>
+
+    <!-- Question & Solution -->
+    <string name="question_mass_conversion">What is %1$s %2$s in %3$s?</string>
+    <string name="solution_mass_correct">The mass is exactly %1$d kg</string>
+    <string name="solution_mass_explanation">1000 grams = 1 kg, so the answer is %1$d kg</string>
+
+    <string name="temp_celsius_format">%1$d°C</string>
+    <string name="unit_thermometer">thermometer</string>
+    <string name="question_show_temperature">Show %1$s in the %2$s.</string>
+    <string name="solution_temp_correct">The temperature is exactly %1$d°C</string>
+    <string name="solution_temp_explanation">Look for the marker labeled %1$d°C.</string>
+
+    <string name="density_unit_value">%1$d kg/m³</string>
+    <string name="question_density_find">Find the density ρ. m = %1$d kg, v = %2$d m³</string>
+    <string name="keyword_density">density ρ</string>
+    <string name="keyword_mass_label">m =</string>
+    <string name="keyword_volume_label">v =</string>
+    <string name="answer_density_display">Answer: %1$d kg/m³</string>
+    <string name="solution_density_calc">ρ = m / V = %1$d / %2$d = %3$d kg/m³</string>
+
+    <string name="unit_kg_value">%1$d kg</string>
+    <string name="question_find_mass">Find the mass m. ρ = %1$d kg/m³, v = %2$d m³</string>
+    <string name="keyword_mass_m">mass m</string>
+    <string name="keyword_rho_equals">ρ =</string>
+    <string name="keyword_v_equals">v =</string>
+    <string name="answer_mass_display">Answer: %1$d kg</string>
+    <string name="solution_mass_calc">m = ρ × V = %1$d × %2$d = %3$d kg</string>
+
+    <string name="question_find_ma">Find the mechanical advantage (MA). Load = %1$d N, Effort = %2$d N</string>
+    <string name="keyword_ma">(MA)</string>
+    <string name="keyword_load_equals">Load =</string>
+    <string name="keyword_effort_equals">Effort =</string>
+    <string name="answer_ma_display">Answer: %1$d</string>
+    <string name="solution_ma_calc">MA = Load / Effort = %1$d / %2$d = %3$d</string>
+
+    <string name="unit_joule_value">%1$d J</string>
+    <string name="question_calculate_work">Calculate the work done (A). F = %1$d N, s = %2$d m</string>
+    <string name="keyword_work_a">(A)</string>
+    <string name="keyword_f_equals">F =</string>
+    <string name="keyword_s_equals">s =</string>
+    <string name="answer_work_display">Answer: %1$d J</string>
+    <string name="solution_work_calc">A = F × s = %1$d × %2$d = %3$d J</string>
+
+    <string name="notif_title">Tetragon</string>
+    <string name="notif_message">It is time for your daily lesson!</string>
+    <string name="notif_channel_name">Daily Reminders</string>
+    <string name="notif_permission_denied">Please allow notifications in system settings to receive reminders.</string>
+    <string name="current_plan">Current plan</string>
+    <string name="go_premium">Go premium</string>
+    <string name="premium_plan_free">Free</string>
+    <string name="premium_plan_premium">Premium</string>
+    <string name="premium_go_premium">Go Premium</string>
+    <string name="premium_nav_title">Subscription Settings</string>
+    <string name="full_stars">FULL STARS</string>
+    <string name="activated">ACTIVATED</string>
 </resources>

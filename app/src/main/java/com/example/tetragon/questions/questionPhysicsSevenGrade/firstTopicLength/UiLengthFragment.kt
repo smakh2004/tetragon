@@ -45,7 +45,7 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
-    private var isInitialized = false // Guard to prevent re-generation
+    private var isInitialized = false
     private var mediaPlayer: MediaPlayer? = null
 
     private val STATE_MACHINE = "State Machine 1"
@@ -101,10 +101,10 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
     private fun generateProblem() {
         conversionType = (0..1).random()
 
-        if (conversionType == 0) { // m -> cm
+        if (conversionType == 0) {
             inputValue = (2..12).random()
             correctAnswer = inputValue * 100
-        } else { // km -> m
+        } else {
             inputValue = (2..9).random()
             correctAnswer = inputValue * 1000
         }
@@ -144,8 +144,10 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
     }
 
     private fun updateQuestionText() {
-        val sentence = if (conversionType == 0) "Convert $inputValue meters to centimeters."
-        else "Convert $inputValue kilometers to meters."
+        val unitFromStr = if (conversionType == 0) getString(R.string.unit_meters_full) else getString(R.string.unit_kilometers_full)
+        val unitToStr = if (conversionType == 0) getString(R.string.unit_centimeters_full) else getString(R.string.unit_meters_full)
+
+        val sentence = getString(R.string.question_convert_length, inputValue, unitFromStr, unitToStr)
 
         val spannable = SpannableString(sentence)
         val blue = ContextCompat.getColor(requireContext(), R.color.blue_2)
@@ -156,16 +158,14 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
             spannable.setSpan(ForegroundColorSpan(blue), numberStart, numberStart + numberPart.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        val unitFrom = if (conversionType == 0) "meters" else "kilometers"
-        val fromStart = sentence.indexOf(unitFrom)
+        val fromStart = sentence.indexOf(unitFromStr)
         if (fromStart != -1) {
-            spannable.setSpan(ForegroundColorSpan(blue), fromStart, fromStart + unitFrom.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(ForegroundColorSpan(blue), fromStart, fromStart + unitFromStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        val unitTo = if (conversionType == 0) "centimeters" else "meters"
-        val toStart = sentence.lastIndexOf(unitTo)
+        val toStart = sentence.lastIndexOf(unitToStr)
         if (toStart != -1) {
-            spannable.setSpan(ForegroundColorSpan(blue), toStart, toStart + unitTo.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(ForegroundColorSpan(blue), toStart, toStart + unitToStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
         questionText.text = spannable
@@ -196,12 +196,12 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
             if (isFirstAttempt) activity.totalXp += PhysicsGrade7Type.LENGTH.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -211,8 +211,12 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = if (conversionType == 0) "$inputValue m = $correctAnswer cm" else "$inputValue km = $correctAnswer m"
+        stateAnswer.text = getString(R.string.state_correct)
+
+        val unitFrom = if (conversionType == 0) "m" else "km"
+        val unitTo = if (conversionType == 0) "cm" else "m"
+        answerDisplay.text = getString(R.string.label_conversion_result, inputValue, unitFrom, correctAnswer, unitTo)
+
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -220,7 +224,8 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
@@ -229,12 +234,14 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
+
             answerDisplay.text = if (conversionType == 0) {
-                "1 m = 100 cm, so the correct answer is $correctAnswer cm"
+                getString(R.string.solution_m_to_cm, correctAnswer)
             } else {
-                "1 km = 1000 m, so the correct answer is $correctAnswer m"
+                getString(R.string.solution_km_to_m, correctAnswer)
             }
+
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -244,7 +251,7 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
             correctIndex?.let { riveAnimation.setNumberState(STATE_MACHINE, INPUT_CHOICE, it.toFloat()) }
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
         }
@@ -282,12 +289,7 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
     private fun resetUIForNext() {
         val activity = requireActivity() as Physics7GradeQuestionActivity
         activity.hideSuccessAnimation()
-
-        // STOP the listener
         mainHandler.removeCallbacks(checkRunnable)
-
-        // DO NOT reset Rive or internal UI here to keep the visual state consistent
-        // until the Activity swaps this fragment out.
         activity.isResultCurrentlyVisible = false
     }
 
@@ -313,7 +315,7 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
@@ -329,7 +331,7 @@ class UiLengthFragment : Fragment(R.layout.fragment_ui_length) {
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }

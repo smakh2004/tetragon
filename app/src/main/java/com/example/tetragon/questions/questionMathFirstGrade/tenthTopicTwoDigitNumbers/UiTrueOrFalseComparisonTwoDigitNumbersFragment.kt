@@ -21,7 +21,7 @@ import kotlin.random.Random
 
 class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragment_ui_true_or_false_comparison_two_digit_numbers) {
 
-    private lateinit var firstNumber: TextView // Expression like "3 < 4"
+    private lateinit var firstNumber: TextView
     private lateinit var options: List<LinearLayout>
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
@@ -48,34 +48,15 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
     }
 
     private fun initViews(view: View) {
-        // --- Setup Header Text Styling (Blue "true" and "false") ---
         val instructionText = view.findViewById<TextView>(R.id.textView2)
-        val fullHeaderText = "Is that true or false?"
+        val fullHeaderText = getString(R.string.instruction_true_false)
         val headerSpannable = SpannableString(fullHeaderText)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        // Find "true"
-        val trueStart = fullHeaderText.indexOf("true")
-        if (trueStart != -1) {
-            headerSpannable.setSpan(
-                ForegroundColorSpan(blueColor),
-                trueStart, trueStart + 4,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-
-        // Find "false"
-        val falseStart = fullHeaderText.indexOf("false")
-        if (falseStart != -1) {
-            headerSpannable.setSpan(
-                ForegroundColorSpan(blueColor),
-                falseStart, falseStart + 5,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
+        highlightSpan(headerSpannable, getString(R.string.option_true), blueColor)
+        highlightSpan(headerSpannable, getString(R.string.option_false), blueColor)
         instructionText.text = headerSpannable
 
-        // --- Standard View Init ---
         firstNumber = view.findViewById(R.id.firstNumber)
         options = listOf(
             view.findViewById(R.id.option1),
@@ -92,6 +73,13 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
         answer = activity.findViewById(R.id.answer)
     }
 
+    private fun highlightSpan(spannable: SpannableString, word: String, color: Int) {
+        val index = spannable.toString().indexOf(word, ignoreCase = true)
+        if (index != -1) {
+            spannable.setSpan(ForegroundColorSpan(color), index, index + word.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
+
     private fun generateProblem() {
         val leftValue = Random.nextInt(1, 101)
         val rightValue = Random.nextInt(1, 101)
@@ -104,7 +92,6 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
             else -> leftValue == rightValue
         }
 
-        // --- Math Expression: Blue Sign Styling ---
         val fullExpression = "$leftValue $randomSign $rightValue"
         val mathSpannable = SpannableString(fullExpression)
         val startOfSign = leftValue.toString().length + 1
@@ -112,15 +99,13 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
 
         mathSpannable.setSpan(
             ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.blue_1)),
-            startOfSign,
-            endOfSign,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            startOfSign, endOfSign, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
         firstNumber.text = mathSpannable
-        correctAnswer = if (isActuallyTrue) "True" else "False"
+        correctAnswer = if (isActuallyTrue) getString(R.string.option_true) else getString(R.string.option_false)
 
-        val tOrF = listOf("True", "False")
+        val tOrF = listOf(getString(R.string.option_true), getString(R.string.option_false))
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
             tv.text = tOrF[index]
@@ -146,12 +131,10 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Math1GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else {
-                    // GATE: Trigger milestone only after clicking CONTINUE
                     val isMilestoneActive = activity.checkAndTriggerMilestone()
-
                     if (!isMilestoneActive) {
                         resetUIForNext()
                         activity.showRandomQuestion()
@@ -172,8 +155,6 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
-
-            // 1. Play success animation (Mr. Square)
             activity.playSuccessAnimation()
 
             val isFinished = activity.incrementProgress()
@@ -181,16 +162,14 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
                 activity.totalXp += MathGrade1Type.COMPARISON_TRUE_OR_FALSE_TWO_DIGIT_NUMBERS.xp
             }
 
-            // 2. Register correct answer for milestones/streaks
             activity.handleCorrectAnswer()
-
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -201,8 +180,8 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer)
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -211,24 +190,23 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
         answer.visibility = View.GONE
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isAnswerChecked = true
             isIncorrectAttempt = false
 
-            checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_3)
-            checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_2)
-            btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
@@ -243,13 +221,12 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
     }
 
     private fun resetForTryAgain() {
-        val activity = requireActivity() as Math1GradeQuestionActivity
-        activity.isResultCurrentlyVisible = false
+        (requireActivity() as Math1GradeQuestionActivity).isResultCurrentlyVisible = false
         isAnswerChecked = false
         isIncorrectAttempt = false
         selectedOptionIndex = null
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         setupInitialButtonState()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
@@ -263,14 +240,14 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Clear animation state
+        activity.hideSuccessAnimation()
 
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         setupInitialButtonState()
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
@@ -278,7 +255,6 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
 
-    // --- Helpers ---
     private fun applyButtonColors(buttonColor: Int, backColor: Int, backgroundColor: Int) {
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), buttonColor)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), backColor)
@@ -317,6 +293,5 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release()
-        mediaPlayer = null
     }
 }

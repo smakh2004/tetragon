@@ -7,8 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import app.rive.runtime.kotlin.core.Rive
 import com.example.tetragon.R
 import com.example.tetragon.databinding.ActivitySubscriptionModelBinding
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 
-class SubscriptionModelActivity : AppCompatActivity() {
+class SubscriptionModelActivity : BaseActivity() {
     private lateinit var binding: ActivitySubscriptionModelBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -73,23 +73,16 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
     }
 
     private fun generateProblem() {
-        // 1. Pick a target sum between 2 and 10 (First grade limit)
         correctAnswer = Random.nextInt(2, 21)
-
-        // 2. Split the sum into two parts for the fruits
-        // This ensures apple + grape ALWAYS equals a sum <= 10
         appleValue = Random.nextInt(1, correctAnswer)
         grapeValue = correctAnswer - appleValue
 
-        // Update UI Legend
         appleValueText.text = "= $appleValue"
         grapeValueText.text = "= $grapeValue"
 
-        // Reset Answer Box
         problemAnswerText.visibility = View.GONE
         problemImage.setImageResource(R.drawable.answer_blue_box)
 
-        // 3. Generate Options (Restricted to 1-10)
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 3) {
             val fake = Random.nextInt(1, 21)
@@ -103,14 +96,13 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
             layout.setBackgroundResource(R.drawable.custom_background)
         }
 
-        // 4. Reset States
         selectedOptionIndex = null
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         requireActivity().findViewById<View>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<View>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -132,8 +124,6 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
-
-            // 1. Play success animation
             activity.playSuccessAnimation()
             problemImage.setImageResource(R.drawable.answer_correct_box)
 
@@ -142,17 +132,15 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
                 activity.totalXp += MathGrade1Type.ADDITION_VISUAL_PROBLEM_20.xp
             }
 
-            // 2. Log progress for milestones/streaks in activity
             activity.handleCorrectAnswer()
-
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -166,8 +154,6 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
                 selectedOptionIndex = index
                 highlightSelectedOption(index)
                 enableCheckButton()
-
-                // Show current choice in the box
                 problemAnswerText.text = (layout.getChildAt(0) as TextView).text
                 problemAnswerText.visibility = View.VISIBLE
             }
@@ -194,12 +180,10 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Math1GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else {
-                    // GATE: Trigger milestone ONLY after clicking CONTINUE
                     val isMilestoneActive = activity.checkAndTriggerMilestone()
-
                     if (!isMilestoneActive) {
                         resetUIForNext()
                         activity.showRandomQuestion()
@@ -212,10 +196,10 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             problemImage.setImageResource(R.drawable.answer_solution_box)
             problemAnswerText.text = correctAnswer.toString()
@@ -234,54 +218,44 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
         }
     }
 
-    // Standard UI Reset Methods
     private fun resetForTryAgain() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-
-        // 1. Fragment internal state reset
         isAnswerChecked = false
         isIncorrectAttempt = false
         selectedOptionIndex = null
 
-        // 2. Reset Fragment UI elements
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
         problemAnswerText.visibility = View.GONE
         problemImage.setImageResource(R.drawable.answer_blue_box)
 
-        // 3. Reset Activity UI elements (The Bottom Bar)
         val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
         stateContainer.visibility = View.INVISIBLE
 
-        // --- THE FIX: Explicitly hide seeBtn and reset answer visibility ---
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
         answer.visibility = View.VISIBLE
-        // ------------------------------------------------------------------
 
-        // 4. Reset Button States
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
 
-        // Reset the button background containers
         requireActivity().findViewById<View>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<View>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
 
-        // Restore blue/white theme colors
         setupInitialButtonState()
     }
 
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Ensure Mr. Square is hidden
+        activity.hideSuccessAnimation()
 
         requireActivity().findViewById<View>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         setupInitialButtonState()
     }
@@ -302,8 +276,8 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -311,9 +285,10 @@ class UiVisualAdditionProblem20Fragment : Fragment(R.layout.fragment_ui_visual_a
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

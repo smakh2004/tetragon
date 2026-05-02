@@ -22,11 +22,12 @@ import com.example.tetragon.questions.FiveCorrectAnswerFragment
 import com.example.tetragon.questions.SubjectConstants
 import com.example.tetragon.questions.XpGainedActivity
 import com.example.tetragon.questions.questionMathFifthGrade.firstTopic.UiAdditionNaturalNumbersFragment
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class Math5GradeQuestionActivity : AppCompatActivity() {
+class Math5GradeQuestionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMath5GradeQuestionBinding
     private lateinit var selectedTopic: MathGrade5Topic
@@ -182,16 +183,17 @@ class Math5GradeQuestionActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        view.findViewById<TextView>(R.id.titleText).text = "Are you sure?"
-        view.findViewById<TextView>(R.id.messageText).text = "If you exit, you will lose all progress for this lesson."
+        // Localized using strings.xml keys
+        view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
+        view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
 
         view.findViewById<Button>(R.id.noButton).apply {
-            text = "CONTINUE"
+            text = getString(R.string.continue_btn) // "CONTINUE"
             setOnClickListener { dialog.dismiss() }
         }
 
         view.findViewById<Button>(R.id.finishButton).apply {
-            text = "EXIT"
+            text = getString(R.string.exit_btn) // "EXIT"
             setOnClickListener {
                 finish()
                 dialog.dismiss()
@@ -222,6 +224,8 @@ class Math5GradeQuestionActivity : AppCompatActivity() {
                 binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
             }
         } else {
+            // Note: If you have a specific "You are offline" text in the layout,
+            // ensure it's also linked to R.string.you_are_offline in the XML.
             binding.internetConnection.visibility = View.VISIBLE
             binding.offlineContainer.visibility = View.VISIBLE
             binding.topBarContainer.visibility = View.GONE

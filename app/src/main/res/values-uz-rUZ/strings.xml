@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Tetragon</string>
     <string name="login_text">KIRISH</string>
-    <string name="start_text">BOSHLASH</string>
+    <string name="start_text">START</string>
     <string name="enter_your_details">Ma\'lumotlaringizni kiriting</string>
     <string name="continue_text">DAVOM ETISH</string>
     <string name="email_text">Email</string>
@@ -16,8 +16,8 @@
     <string name="create_a_password">Parol yarating</string>
     <string name="password">Parol</string>
     <string name="mini_games">Mini o\'yinlar</string>
-    <string name="math_storm">MATEMATIK BO\'RON</string>
-    <string name="battle_storm">JANG BO\'RONI</string>
+    <string name="math_storm">MATEMATIK SHTORM</string>
+    <string name="battle_storm">BELASHUV SHTORM</string>
     <string name="play_online">ONLAYN O\'YNASH</string>
     <string name="private_game">BEPUL SHAXSIY O\'YIN</string>
     <string name="what_s_your_full_name">To\'liq ismingiz nima?</string>
@@ -63,4 +63,504 @@
     <string name="confirm_password">Parolni tasdiqlang</string>
     <string name="delete">O\'CHIRISH</string>
     <string name="age">Yosh</string>
+    <string name="chat">CHAT</string>
+    <string name="bot_greeting">Salom! Men Janob Kvadratman. Men sizning shaxsiy matematika o\'qituvchingizman.</string>
+    <string name="bot_thinking">Janob Kvadrat o\'ylamoqda...</string>
+    <string name="bot_error_generic">Janob Kvadratning burchaklari chalkashib ketdi! Birozdan keyin qayta urinib ko\'ring.</string>
+    <string name="bot_error_429">Janob Kvadrat qalamlarini o\'tkirlash uchun tanaffusga chiqdi. Iltimos, biroz kuting!</string>
+    <string name="bot_no_answer">Kechirasiz, buni qayta ishlay olmadim.</string>
+    <string name="write_your_question">Savolingizni yozing...</string>
+    <string name="send">YUBORISH</string>
+    <string name="verify_your_email_address">Email manzilingizni tasdiqlang.</string>
+    <string name="we_ve_sent_a_verification_link_to">Biz tasdiqlash havolasini quyidagi manzilga yubordik:</string>
+    <string name="nplease_check_your_inbox_and_click_the_link_n_nthe_continue_button_will_unlock_automatically_once_you_verify">\nIltimos, pochta qutingizni tekshiring va havolani bosing. \n\nTasdiqlaganingizdan so\'ng "Davom etish" tugmasi avtomatik ravishda ochiladi.</string>
+    <string name="verify_email_instructions">Biz tasdiqlash havolasini %1$s manziliga yubordik.</string>
+    <string name="error_prefix">Xatolik: %1$s</string>
+    <string name="creating_account">HISOB YARATILMOQDA...</string>
+    <string name="verify_email_first">Iltimos, avval emailni tasdiqlang!</string>
+    <string name="enter_email">Emailni kiriting</string>
+    <string name="enter_password">Parolni kiriting</string>
+    <string name="loading_caps">YUKLANMOQDA..</string>
+    <string name="login_successful">Tizimga muvaffaqiyatli kirildi.</string>
+    <string name="auth_failed">Haqiqiylikni tekshirish muvaffaqiyatsiz tugadi.</string>
+    <string name="first_grade">1-SINF</string>
+    <string name="second_grade">2-SINF</string>
+    <string name="third_grade">3-SINF</string>
+    <string name="fourth_grade">4-SINF</string>
+    <string name="fifth_grade">5-SINF</string>
+    <string name="sixth_grade">6-SINF</string>
+    <string name="seventh_grade">7-SINF</string>
+    <string name="eighth_grade">8-SINF</string>
+    <string name="ninth_grade">9-SINF</string>
+    <string name="tenth_grade">10-SINF</string>
+    <string name="eleventh_grade">11-SINF</string>
+    <string name="_12_topics">12 ta mavzu</string>
+    <string name="_8_topics">8 ta mavzu</string>
+    <string name="_4_topics">4 ta mavzu</string>
+    <string name="_5_topics">5 ta mavzu</string>
+    <string name="_1_topic">1 ta mavzu</string>
+    <string name="_3_topics">3 ta mavzu</string>
+    <string name="grade_label_format">%1$s - %2$d-SINF</string>
+    <string name="timer_format">%1$02dm %2$02ds</string>
+    <string name="leaderboard">LIDERLAR JADVALI</string>
+    <string name="get_a_reward_at_the_end_of_the_month">Oy oxirida mukofotga ega bo\'ling</string>
+    <string name="days_left_singular">1 KUN QOLDI</string>
+    <string name="days_left_plural">%1$d KUN QOLDI</string>
+    <string name="rank_status_format">Siz %1$d-o\'rindasiz</string>
+    <string name="start_gaining_xp">Ochko to\'plashni boshlang!</string>
+    <string name="math_games">MATEMATIK O‘YINLAR</string>
+    <string name="cash_storm">KESH SHTORM</string>
+    <string name="start_10xp">BOSHLASH +10 OCHKO</string>
+    <string name="online_count">%1$d onlayn</string>
+    <string name="no_attempts_caps">URINISHLAR YO\'Q</string>
+    <string name="record_format">Rekord: %1$d</string>
+    <string name="wins_format">G\'alabalar: %1$d</string>
+    <string name="refresh_page">Sahifani yangilang</string>
+    <string name="start_xp_format">BOSHLASH +%1$dOCHKO</string>
+    <string name="play_online_xp">ONLAYN O\'YIN +30 OCHKO</string>
+    <string name="private_game_caps">XUSUSIY O\'YIN</string>
+    <string name="_5_attempts_left"> / 5 urinish qoldi</string>
+    <string name="max_streak">Eng yuqori natija</string>
+    <string name="total_xp">Jami ochko</string>
+    <string name="unlock_the_tetragon_infinity">Tetragon Infinity-ni oching</string>
+    <string name="premium_gives_you_full_access_to_every_features_and_more">Premium barcha funksiyalardan to\'liq foydalanish imkonini beradi</string>
+    <string name="subscribe_now">OBUNA BO\'LISH</string>
+    <string name="mo">Du</string>
+    <string name="tu">Se</string>
+    <string name="we">Ch</string>
+    <string name="th">Pa</string>
+    <string name="fr">Ju</string>
+    <string name="sa">Sh</string>
+    <string name="su">Ya</string>
+    <string name="joined_format">%1$s da qo\'shilgan</string>
+    <string name="level_format">Daraja %1$d</string>
+    <string name="day_streak_format">%1$d kunlik natija</string>
+    <string name="streak_beast">SIZ MAXLUQSIZ!</string>
+    <string name="streak_good">BARAKALLA!</string>
+    <string name="streak_practice">MASHQLAR VAQTI KELDI!</string>
+    <string name="xp_format">%1$d OCHKO</string>
+    <string name="shop">Do\'kon</string>
+    <string name="attempts">Urinishlar</string>
+    <string name="infinity">Cheksiz yulduzlar</string>
+    <string name="with_full_of_stars_you_can_solve_more_math_problems">Yulduzlaringiz ko\'p bo\'lsa, ko\'proq misol yechishingiz mumkin</string>
+    <string name="star">Yulduz</string>
+    <string name="refill_your_stars_to_continue_your_learning_journey">O\'qishni davom ettirish uchun yulduzlarni to\'ldiring</string>
+    <string name="coins">Tangalar</string>
+    <string name="_0_29">6 500 so\'m</string>
+    <string name="_0_99">13 000 so\'m</string>
+    <string name="_2_29">26 000 so\'m</string>
+    <string name="refill_stars_label">Yulduzlarni to\'ldirish</string>
+    <string name="monthly_infinity_label">Bir oylik premium</string>
+    <string name="full_caps">TO\'LGAN</string>
+    <string name="active_caps">FAOL</string>
+
+    <string name="stars_full_toast">Yulduzlar allaqachon to\'lgan!</string>
+    <string name="stars_refilled_toast">Yulduzlar to\'ldirildi!</string>
+    <string name="infinity_activated_toast">Cheksizlik faollashtirildi!</string>
+    <string name="not_enough_coins">Tangalar yetarli emas!</string>
+    <string name="transaction_failed">Tranzaksiya amalga oshmadi. Qayta urinib ko\'ring.</string>
+    <string name="buy_for">SOTIB OLISH</string>
+    <string name="of_the_month">OYNING</string>
+    <string name="claim_reward">MUKOFOTNI OLISH</string>
+    <string name="streak">Seriya</string>
+    <string name="year">YIL</string>
+    <string name="benefits">Afzalliklar</string>
+    <string name="daily_lessons">Kundalik darslar</string>
+    <string name="unlimited_learning">Cheksiz bilim olish</string>
+    <string name="no_ads">Reklamasiz</string>
+    <string name="unlimited_mini_games">Cheksiz mini-o\'yinlar</string>
+    <string name="free">Bepul</string>
+    <string name="subscribe_for_1_33">26 000 SO\'MGA OBUNA BO\'LISH</string>
+    <string name="unlock_the_ntetragon_infinity">Tetragon Infinity\nimkoniyatini oching</string>
+    <string name="premium_gives_you_full_access_nto_every_features_and_more">Premium barcha funksiyalarga to\'liq\nkirish imkonini beradi va ko\'proq</string>
+    <string name="annual">Yillik</string>
+    <string name="_12_month_15">12 oy = 312 000 so\'m</string>
+    <string name="_1_33_mo">26 000 so\'m/oy*</string>
+    <string name="monthly">Oylik</string>
+    <string name="_3_mo">39 000 so\'m/oy*</string>
+    <string name="subscribe">OBUNA BO\'LISH</string>
+    <string name="math">MATEMATIKA</string>
+    <string name="physics">FIZIKA</string>
+    <string name="subjects">Fanlar</string>
+    <string name="tetragon2">Tetragon</string>
+    <string name="app_is_currently_unavailable">Ilova ayni damda mavjud emas.</string>
+    <string name="check_your_connection_or_try_again_later">Internet aloqasini tekshiring yoki birozdan so\'ng urinib ko\'ring!</string>
+    <string name="learn_with_joy">zavq bilan o\'rganing</string>
+    <string name="new_profit_record">Yangi foyda rekordi!</string>
+    <string name="sync_error">Sinxronlash xatosi</string>
+    <string name="tier_starting_business">Biznesingiz boshlanishi!</string>
+    <string name="tier_smart_spender">Aqlli sarmoyador!</string>
+    <string name="tier_wealth_builder">Boylik bunyodkori!</string>
+    <string name="tier_profit_master">Foyda ustasi!</string>
+    <string name="tier_cash_tycoon">Pul magnati!</string>
+    <string name="tier_financial_genius">Moliyaviy daho!</string>
+    <string name="tier_market_legend">Bozor afsonasi!</string>
+    <string name="select_the_better_option">Yaxshiroq variantni tanlang.</string>
+    <string name="new_record_caps">Yangi rekord!</string>
+    <string name="error_saving_progress">Natijani saqlashda xatolik</string>
+    <string name="tier_starting_out">Boshlanishi yomon emas!</string>
+    <string name="tier_keep_going">To\'xtab qolma!</string>
+    <string name="tier_nice_work">Yaxshi natija!</string>
+    <string name="tier_getting_better">Yaxshilanyapti!</string>
+    <string name="tier_strong_effort">Ajoyib harakat!</string>
+    <string name="tier_good_job">Barakalla!</string>
+    <string name="tier_math_master">Matematika ustasi!</string>
+    <string name="tier_you_rock">Siz zo\'rsiz!</string>
+    <string name="draw">DURANG</string>
+    <string name="player_default">O\'yinchi</string>
+    <string name="opponent_default">Raqib</string>
+    <string name="searching">Qidirilmoqda..</string>
+    <string name="you_caps">Siz</string>
+    <string name="opponent_caps">Raqib</string>
+    <string name="unknown_player">Noma\'lum</string>
+    <string name="room_id_prefix">Xona ID:</string>
+    <string name="waiting_opponent">Raqib kutilmoqda...</string>
+    <string name="connecting_caps">ULANMOQDA...</string>
+    <string name="error_enter_id">Iltimos, xona ID-sini kiriting</string>
+    <string name="error_invalid_id">Xato o\'yin ID-si</string>
+    <string name="error_connection">Ulanishda xatolik. Qayta urinib ko\'ring.</string>
+    <string name="delete_account_caps">AKKAUNTNI O\'CHIRISH (%d)</string>
+    <string name="delete_caps">O\'CHIRISH</string>
+    <string name="error_no_user">Tizimga kirilmagan</string>
+    <string name="account_deleted">Akkaunt o\'chirildi</string>
+    <string name="reauth_failed">Autentifikatsiya xatosi: %s</string>
+    <string name="saving_caps">SAQLANMOQDA..</string>
+    <string name="error_empty_fields">Maydonlar bo\'sh bo\'lishi mumkin emas</string>
+    <string name="name_updated">Ism muvaffaqiyatli yangilandi</string>
+    <string name="name_update_failed">Ismni yangilab bo\'lmadi</string>
+    <string name="error_password_length">Parol kamida 6 ta belgidan iborat bo\'lishi kerak</string>
+    <string name="password_updated">Parol muvaffaqiyatli yangilandi</string>
+    <string name="password_update_failed">Parolni yangilab bo\'lmadi: %s</string>
+    <string name="error_incorrect_password">Hozirgi parol noto\'g\'ri</string>
+    <string name="session_expired">Sessiya muddati tugadi</string>
+    <string name="session_expired_message">Hisobingiz boshqa qurilmada ochildi.</string>
+    <string name="refresh">Yangilash</string>
+    <string name="math_label">MATEMATIKA</string>
+    <string name="physics_label">FIZIKA</string>
+    <string name="topic_square_roots">Kvadrat ildizlar</string>
+    <string name="topic_quadratic_functions">Kvadrat funksiyalar</string>
+    <string name="reward_label">Mukofot: %s</string>
+    <string name="topic_label">%1$d-mavzu: %2$s</string>
+    <string name="topic_preview_format">%1$d-mavzu: %2$s</string>
+    <string name="not_available">MAVJUD EMAS</string>
+    <string name="out_of_stars_label">Yulduzlar tugadi!</string>
+    <string name="processing">ISHLANMOQDA...</string>
+    <string name="jump_ahead">OLDINGA O‘TISH</string>
+    <string name="previous_grade">Oldingi sinf</string>
+    <string name="quit_title">Ishonchingiz komilmi?</string>
+    <string name="quit_message">Agar chiqib ketsangiz, ushbu darsdagi barcha natijalaringiz o‘chib ketadi.</string>
+    <string name="continue_btn">DAVOM ETISH</string>
+    <string name="exit_btn">CHIQISH</string>
+    <string name="processing_btn">ISHLANMOQDA...</string>
+    <string name="state_correct">To‘g‘ri!</string>
+    <string name="state_incorrect">Noto‘g‘ri!</string>
+    <string name="state_solution">Yechim</string>
+    <string name="label_answer">Javob: %1$s</string>
+    <string name="btn_check">TEKSHIRISH</string>
+    <string name="btn_continue">DAVOM ETISH</string>
+    <string name="btn_finish">TUGATISH</string>
+    <string name="btn_try_again">QAYTADAN URINISH</string>
+    <string name="find_the_square_root">Kvadrat ildizni toping.</string>
+    <string name="review_text">TAKRORLASH</string>
+    <string name="btn_see_solution">JAVOBNI KO\'RISH</string>
+    <string name="reward_text_rive">SOVG\'A</string>
+    <string name="_5_correct">5-TA TO\'G\'RI!</string>
+    <string name="xp_topic_mastered">Mavzu o‘zlashtirildi! Maksimal XP olindi.</string>
+    <string name="xp_collected_desc">Tajriba ballari to‘plandi!</string>
+    <string name="days_of_mindful_problem_solving">Diqqat bilan masalalar yechilgan kunlar</string>
+    <string name="topic_derivatives">Hosilalar</string>
+    <string name="finish_caps">TUGATISH</string>
+    <string name="claim_reward_btn">OLISH</string>
+    <string name="subscribe_caps">OBUNA BO‘LISH</string>
+    <string name="processing_caps">YUKLANMOQDA...</string>
+    <string name="find_the_derivative">Hosilani toping.</string>
+    <string name="topic_natural_numbers">Natural sonlar</string>
+    <string name="topic_fractions">Kasrlar</string>
+    <string name="find_missed_numbers">Tushirib qoldirilgan sonlarni toping.</string>
+    <string name="choose_your_language">Tilingizni tanlang</string>
+    <string name="privacy_policy">MAXFIYLIK SIYOSATI</string>
+    <!-- Grade 1 Math Topics -->
+    <string name="counting_numbers">Sonlarni sanash</string>
+    <string name="addition">Qo‘shish</string>
+    <string name="subtraction">Ayiqish</string>
+    <string name="odd_or_even">Juft yoki toq</string>
+    <string name="comparison">Taqqoslash</string>
+    <string name="parentheses">Qavslar</string>
+    <string name="addition_up_to_20">20 gacha qo‘shish</string>
+    <string name="subtraction_up_to_20">20 gacha ayirish</string>
+    <string name="round_numbers">Yaxlit sonlar</string>
+    <string name="two_digit_numbers">Ikki xonali sonlar</string>
+    <string name="problem_solving">Masala yechish</string>
+    <string name="length_centimeter">Uzunlik. Santimetr.</string>
+
+    <!-- Grade 2 Math Topics -->
+    <string name="arithmetic_basics">Arifmetika asoslari</string>
+    <string name="column_method">Ustun usuli</string>
+    <string name="three_digit_numbers">Uch xonali sonlar</string>
+    <string name="comparison_grade2">Taqqoslash</string>
+    <string name="length_measurement">Uzunlikni o‘lchash</string>
+    <string name="multiplication_table">Ko‘paytirish jadvali</string>
+    <string name="division">Bo‘lish</string>
+    <string name="time">Vaqt</string>
+
+    <!-- Grade 4 Topics -->
+    <string name="complex_arithmetics">Murakkab hisob-kitoblar</string>
+    <string name="column_multiplication">Ustun shaklida ko‘paytirish</string>
+    <string name="column_division">Ustun shaklida bo‘lish</string>
+    <string name="fraction_arithmetics">Kasrlar arifmetikasi</string>
+    <string name="mixed_numbers">Aralash sonlar</string>
+
+    <!-- Grade 5 Topics -->
+    <string name="natural_numbers">Natural sonlar</string>
+    <!-- Grade 9 Topics -->
+    <string name="quadratic_equations">Kvadrat tenglamalar</string>
+
+    <!-- Grade 10 Topics -->
+    <string name="trigonometry">Trigonometriya</string>
+
+    <string name="arithmetics_basics">Arifmetika asoslari</string>
+
+    <string name="complex_multiplication">Murakkab ko‘paytirish</string>
+    <string name="complex_division">Murakkab bo‘lish</string>
+    <string name="fractions">Kasrlar</string>
+    <string name="perimeter_area">Perimetr va yuza</string>
+
+    <string name="si_units">SI birliklari</string>
+    <string name="density">Zichlik</string>
+    <string name="simple_machines">Oddiy mexanizmlar</string>
+    <string name="force_and_motion">Kuch va harakat</string>
+    <string name="newtons_laws">Nyuton qonunlari</string>
+    <string name="magnetism">Magnetizm</string>
+    <string name="modern_physics">Zamonaviy fizika</string>
+    <string name="how_many_apples">Nechta olma ko\'rsatilgan?</string>
+    <string name="find_the_missed_number">Tushirib qoldirilgan sonni toping.</string>
+    <string name="question_next_after">%1$s sonidan keyingi sonni toping.</string>
+    <string name="question_before">%1$s sonidan oldingi sonni toping.</string>
+    <string name="question_how_many_angles">%1$s shaklining nechta burchagi bor?</string>
+    <string name="shape_circle">Doira</string>
+    <string name="shape_triangle">Uchburchak</string>
+    <string name="shape_rectangle">Toʻrtburchak</string>
+    <string name="shape_square">Kvadrat</string>
+    <string name="find_the_answer">Yechimni toping.</string>
+    <string name="toast_clear_number">Iltimos, aniq raqam chizing!</string>
+    <string name="write_the_answer">Javobni yozing.</string>
+    <string name="undo">QAYTRISH</string>
+    <string name="instruction_addition_tree">Javobni topish uchun ikkita sonni qo‘shing.</string>
+    <string name="instruction_find_missed">Tushirib qoldirilgan sonni toping.</string>
+    <string name="keyword_missed">qoldirilgan</string>
+    <string name="instruction_represent_sum">%1$s sonini %2$s yig‘indisi ko‘rinishida ifodalang.</string>
+    <string name="keyword_three_numbers">uchta son</string>
+    <string name="instruction_represent_sum_two">%1$s sonini %2$s yig‘indisi ko‘rinishida ifodalang.</string>
+    <string name="keyword_two_numbers">ikkita son</string>
+    <string name="instruction_find_missed_number">%1$s sonni toping.</string>
+    <string name="instruction_represent_as_subtraction">%1$s sonini ikki sonning %2$s ko‘rinishida ifodalang.</string>
+    <string name="keyword_subtraction">ayirmasi</string>
+    <string name="label_answer_subtraction">Javob: %1$s - %2$s</string>
+    <string name="instruction_find_type_numbers">%1$s sonlarni toping.</string>
+    <string name="type_even">juft</string>
+    <string name="type_odd">toq</string>
+    <string name="question_is_odd_or_even">%1$s soni %2$s yoki %3$s sonmi?</string>
+    <string name="question_numbers_upto">%2$s gacha bo‘lgan qaysi sonlar %1$s?</string>
+    <string name="question_comparison_strawberry_grape">Qaysi biri ko‘p: %1$s yoki %2$s?</string>
+    <string name="item_strawberries">qulupnay</string>
+    <string name="item_grapes">uzum</string>
+    <string name="option_strawberry">Qulupnay</string>
+    <string name="option_grape">Uzum</string>
+    <string name="option_same">Bir xil</string>
+    <string name="instruction_put_sign">To‘g‘ri %1$sni qo‘ying.</string>
+    <string name="instruction_sign_word">belgi</string>
+    <string name="math_format_addition">%1$d + %2$d</string>
+    <string name="math_format_subtraction">%1$d - %2$d</string>
+    <string name="question_true_or_false">Bu %1$smi yoki %2$s?</string>
+    <string name="option_true">Rost</string>
+    <string name="option_false">Yolg‘on</string>
+    <string name="math_problem_equal_template">%1$s =</string>
+    <string name="instruction_missed_word">Tushirib qoldirilgan</string>
+    <string name="instruction_find_missed2">%1$s sonni toping.</string>
+    <string name="triple_sum_template">%1$d + %2$d + %3$d</string>
+    <string name="keyword_sum">yig‘indisi</string>
+    <string name="double_sum_template">%1$d + %2$d</string>
+    <string name="subtraction_first_part">%1$d -</string>
+    <string name="subtraction_result_part">= %1$d</string>
+    <string name="instruction_represent_sub_two">%1$s sonini %3$sning %2$si ko‘rinishida ifodalang.</string>
+    <string name="double_sub_template">%1$d - %2$d</string>
+    <string name="subtraction_problem_template">%1$d - %2$d =</string>
+    <string name="arithmetic_problem_template">%1$d %2$s %3$d =</string>
+    <string name="sequence_template">%1$s, </string>
+    <string name="question_round_closest">%1$d sonini eng yaqin yaxlit songacha yaxlitlang.</string>
+    <string name="keyword_round_up">yaxlitlang</string>
+    <string name="keyword_closest">eng yaqin</string>
+    <string name="question_how_many_tens">%1$d sonida nechta o‘nlik bor?</string>
+    <string name="keyword_tens">o‘nlik</string>
+    <string name="label_answer_tens">Javob: %1$d ta o‘nlik</string>
+    <string name="arithmetic_problem_template_simple">%1$s =</string>
+    <string name="instruction_comparison">To‘g‘ri belgini qo‘ying.</string>
+    <string name="instruction_comparison_keyword">belgini</string>
+    <string name="arithmetic_plus_template">%1$d + %2$d</string>
+    <string name="arithmetic_minus_template">%1$d - %2$d</string>
+    <string name="problem_equals_template">%1$s =</string>
+    <string name="instruction_represent_sum2">%1$d sonini ikkita sonning yig‘indisi ko‘rinishida ifodalang.</string>
+    <string name="label_answer_sum">Javob: %1$d + %2$d</string>
+    <string name="instruction_true_false">Bu rostmi yoki yolgʻon?</string>
+    <string name="visual_value_template">=%1$d</string>
+    <string name="problem_aziz_apples">Azizda %1$d ta olma bor edi, unga yana %2$d ta olma berishdi. Azizda jami nechta olma bo‘ldi?</string>
+    <string name="keyword_apples">olma</string>
+    <string name="problem_fish_arithmetic">Aziz %2$d ta baliqdan %1$d tasini yedi. Nechta baliq qoldi?</string>
+    <string name="keyword_fish">baliq</string>
+    <string name="question_show_cm_ruler">Chizg‘ichda %1$s ko‘rsating.</string>
+    <string name="cm_unit_template">%1$d sm</string>
+    <string name="label_correct_length">To‘g‘ri uzunlik — %1$s</string>
+    <string name="question_show_dm_in_cm">%1$s ni %2$s da ko‘rsating.</string>
+    <string name="dm_unit_template">%1$d dm</string>
+    <string name="keyword_cm">sm</string>
+    <string name="label_dm_to_cm_result">%1$d dm = %2$d sm</string>
+    <string name="solution_dm_to_cm">1 dm = 10 sm, shuning uchun %1$d dm = %2$d sm</string>
+    <string name="label_answer_complex_addition">Javob: %1$d + %2$d = %3$d</string>
+    <string name="label_answer_complex_subtraction">Javob: %1$d - %2$d = %3$d</string>
+    <string name="label_answer_multiplication">Javob: %1$d × %2$d = %3$d</string>
+    <string name="title_multiply_numbers">Sonlarni ko‘paytiring.</string>
+    <string name="label_answer_division">Javob: %1$s ÷ %2$s = %3$s</string>
+    <string name="title_divide_numbers">Sonlarni bo‘ling.</string>
+    <string name="title_fraction_arithmetics">Javobni topish uchun kasr yarating.</string>
+    <string name="highlight_fraction">kasr</string>
+    <string name="label_answer_fraction">Javob: %1$s</string>
+    <string name="piece">QISM</string>
+    <string name="solve_the_equation">Tenglamani yeching.</string>
+    <string name="match_the_pairs">Juftliklarni moslang.</string>
+    <string name="instruction_comparison_sign">To‘g‘ri belgini qo‘ying.</string>
+    <string name="highlight_word_sign">belgi</string>
+    <string name="instruction_meter_to_cm">Metrni santimetrga aylantiring.</string>
+    <string name="unit_meter_full">metr</string>
+    <string name="unit_centimeter_full">santimetr</string>
+    <string name="solution_meter_to_cm">1 m = 100 sm, demak %1$d m = %2$d sm</string>
+    <string name="unit_m">m</string>
+    <string name="unit_cm">cm</string>
+    <string name="instruction_set_time">Ushbu vaqtni o‘rnating: %1$s.</string>
+    <string name="solution_set_time">To‘g‘ri vaqt: %1$s</string>
+    <string name="unit_h">soat</string>
+    <string name="unit_min">minut</string>
+    <string name="solve_the_multiplication">Ko‘paytirishni yeching.</string>
+    <string name="solve_the_division">Bo‘lishni yeching.</string>
+    <string name="question_fraction_pizza">Pitsaning %1$s qismini ko‘rsating.</string>
+    <string name="label_fraction_solution_pizza">Javob: 6 bo‘lakdan %1$d tasi.</string>
+    <string name="state_praise_great_job">Ajoyib ish!</string>
+    <string name="question_fraction_shape">Shaklning %1$s qismini ko‘rsating.</string>
+    <string name="label_answer_fraction2">Javob: %1$d/%2$d</string>
+    <string name="label_fraction_solution_general">To‘g‘ri javob: %1$d/%2$d</string>
+
+    <string name="label_square">kvadrat</string>
+    <string name="label_rectangle">to‘g‘ri to‘rtburchak</string>
+    <string name="label_area">yuzasi</string>
+    <string name="question_create_shape_area">%1$s ni quyidagi yuzaga ega qilib yarating:</string>
+    <string name="label_area_units">%1$d kvadrat</string>
+    <string name="label_area_formula">Formula: Yuzasi = w × h</string>
+    <string name="label_area_calculation">Yuzasi: %1$d × %2$d = %3$d</string>
+    <string name="state_almost_square">Deyarli! Uni kvadrat qiling.</string>
+
+    <string name="label_perimeter">perimetr</string>
+    <string name="question_create_shape_perimeter">%1$s ni quyidagi perimetrga ega qilib yarating:</string>
+    <string name="label_perimeter_units">%1$d birlik</string>
+    <string name="label_perimeter_formula">Formula: P = 2 × (w + h)</string>
+    <string name="label_perimeter_calculation">2 × (%1$d + %2$d) = %3$d</string>
+
+    <string name="label_speed_v">tezlik v</string>
+    <string name="label_distance_short">s</string>
+    <string name="label_time_short">t</string>
+    <string name="unit_meters_per_second">%1$d m/s</string>
+    <string name="question_find_speed">Tezlik v ni toping. s = %1$d m, t = %2$d s</string>
+    <string name="label_answer_speed">Javob: %1$d m/s</string>
+    <string name="solution_speed_calculation">v = s / t = %1$d / %2$d = %3$d m/s</string>
+
+    <string name="label_energy_e">energiya E</string>
+    <string name="label_mass_short">m</string>
+    <string name="label_speed_light_short">c</string>
+    <string name="scientific_notation_16">%1$d × 10¹⁶ J</string>
+    <string name="question_einstein_energy">E energiyani toping. Berilgan: m = %1$d kg, c = 3×10⁸ m/s</string>
+    <string name="label_answer_energy">Javob: %1$s</string>
+    <string name="solution_einstein_calculation">E = mc² = %1$d × (3×10⁸)² = %2$s</string>
+
+    <string name="label_force_f">kuch F</string>
+    <string name="label_acceleration_short">a</string>
+    <string name="unit_newtons">%1$d N</string>
+
+    <string name="question_find_force">F kuchni toping. m = %1$d kg, a = %2$d m/s²</string>
+    <string name="label_answer_force">Javob: %1$d N</string>
+    <string name="solution_force_calculation">F = m × a = %1$d × %2$d = %3$d N</string>
+
+    <string name="label_answer_with_value">Javob: %1$d N</string>
+    <string name="question_find_ampere_force">Amper kuchi F ni toping. B = %1$d T, I = %2$d A, L = %3$d m</string>
+    <string name="solution_bil_formula">F = B × I × L = %1$d × %2$d × %3$d = %4$d N</string>
+
+    <string name="question_convert_length">%1$d %2$s ni %3$s ga aylantiring.</string>
+    <string name="unit_meters_full">metr</string>
+    <string name="unit_kilometers_full">kilometr</string>
+    <string name="unit_centimeters_full">santimetr</string>
+    <string name="label_conversion_result">%1$d %2$s = %3$d %4$s</string>
+    <string name="solution_m_to_cm">1 m = 100 sm, to‘g‘ri javob: %1$d sm</string>
+    <string name="solution_km_to_m">1 km = 1000 m, to‘g‘ri javob: %1$d m</string>
+
+    <string name="unit_liter_short">L</string>
+    <string name="target_liters_phrase">%1$d litr</string>
+    <string name="question_fill_kettle">Choynakni %1$s suv bilan to‘ldiring.</string>
+    <string name="solution_kettle_liters">To‘g‘ri daraja: %1$d litr</string>
+    <string name="answer_with_liters">Javob: %1$d L</string>
+
+    <string name="unit_kg_uppercase">KG</string>
+    <string name="unit_kg_lowercase">kg</string>
+    <string name="unit_grams_full">gramm</string>
+    <string name="unit_kilograms_full">kilogramm</string>
+    <string name="question_mass_conversion">%1$s %2$s ni %3$s ga aylantiring.</string>
+    <string name="solution_mass_correct">Massasi aniq %1$d kg</string>
+    <string name="solution_mass_explanation">1000 gramm = 1 kg, demak javob: %1$d kg</string>
+
+    <string name="temp_celsius_format">%1$d°C</string>
+    <string name="unit_thermometer">termometr</string>
+    <string name="question_show_temperature">%1$s ni %2$s da ko‘rsating.</string>
+    <string name="solution_temp_correct">Harorat aniq %1$d°C</string>
+    <string name="solution_temp_explanation">%1$d°C belgisini toping.</string>
+
+    <string name="density_unit_value">%1$d kg/m³</string>
+    <string name="question_density_find">Zichlik ρ ni toping. m = %1$d kg, v = %2$d m³</string>
+    <string name="keyword_density">zichlik ρ</string>
+    <string name="keyword_mass_label">m =</string>
+    <string name="keyword_volume_label">v =</string>
+    <string name="answer_density_display">Javob: %1$d kg/m³</string>
+    <string name="solution_density_calc">ρ = m / V = %1$d / %2$d = %3$d kg/m³</string>
+
+    <string name="unit_kg_value">%1$d kg</string>
+    <string name="question_find_mass">Massani m ni toping. ρ = %1$d kg/m³, v = %2$d m³</string>
+    <string name="keyword_mass_m">massa m</string>
+    <string name="keyword_rho_equals">ρ =</string>
+    <string name="keyword_v_equals">v =</string>
+    <string name="answer_mass_display">Javob: %1$d kg</string>
+    <string name="solution_mass_calc">m = ρ × V = %1$d × %2$d = %3$d kg</string>
+
+    <string name="question_find_ma">Mexanik afzallikni (MA) toping. Yuk = %1$d N, Kuch = %2$d N</string>
+    <string name="keyword_ma">(MA)</string>
+    <string name="keyword_load_equals">Yuk =</string>
+    <string name="keyword_effort_equals">Kuch =</string>
+    <string name="answer_ma_display">Javob: %1$d</string>
+    <string name="solution_ma_calc">MA = Yuk / Kuch = %1$d / %2$d = %3$d</string>
+
+    <string name="unit_joule_value">%1$d J</string>
+    <string name="question_calculate_work">Bajarilgan ishni (A) hisoblang. F = %1$d N, s = %2$d m</string>
+    <string name="keyword_work_a">(A)</string>
+    <string name="keyword_f_equals">F =</string>
+    <string name="keyword_s_equals">s =</string>
+    <string name="answer_work_display">Javob: %1$d J</string>
+    <string name="solution_work_calc">A = F × s = %1$d × %2$d = %3$d J</string>
+
+    <string name="notif_title">Tetragon</string>
+    <string name="notif_message">Kundalik darsi vaqti bo‘ldi!</string>
+    <string name="notif_channel_name">Kundalik eslatmalar</string>
+    <string name="notif_permission_denied">Eslatmalarni olish uchun tizim sozlamalarida bildirishnomalarga ruxsat bering.</string>
+    <string name="current_plan">Joriy reja</string>
+    <string name="go_premium">Premiumga o‘tish</string>
+
+    <string name="premium_plan_free">Bepul</string>
+    <string name="premium_plan_premium">Premium</string>
+    <string name="premium_go_premium">Premiumga o\'tish</string>
+    <string name="premium_nav_title">Obuna sozlamalari</string>
+    <string name="full_stars">YULDUZLAR TO\'LIQ</string>
+    <string name="activated">FAOLLASHTIRLIGAN</string>
 </resources>

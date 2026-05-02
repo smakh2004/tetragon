@@ -68,12 +68,10 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
     }
 
     private fun generateProblem() {
-        // Grade 3: 2-digit * 1-digit logic
         val factor1 = Random.nextInt(10, 100)
         val factor2 = Random.nextInt(2, 10)
         correctAnswer = factor1 * factor2
 
-        // --- BLUE SIGN LOGIC START ---
         val fullText = "$factor1 × $factor2 ="
         val spannable = SpannableStringBuilder(fullText)
         val signIndex = fullText.indexOf("×")
@@ -87,14 +85,12 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
             )
         }
         complexMultEquationText.text = spannable
-        // --- BLUE SIGN LOGIC END ---
 
         complexMultAnswerBox.setImageResource(R.drawable.answer_blue_box)
         complexMultAnswerText.visibility = View.GONE
 
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 3) {
-            // Distractors suitable for Grade 3 multiplication
             val distractor = when (Random.nextInt(3)) {
                 0 -> correctAnswer + factor2
                 1 -> correctAnswer - factor2
@@ -118,7 +114,7 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
 
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -158,13 +154,13 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, selectedOptionIndex!!)
         } else {
             playSound(R.raw.wrong)
             complexMultAnswerBox.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, selectedOptionIndex!!)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -181,7 +177,7 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -232,7 +228,7 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -243,7 +239,7 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
         activity.hideSuccessAnimation()
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 
@@ -257,8 +253,8 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circle.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -267,19 +263,20 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circle.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             complexMultAnswerBox.setImageResource(R.drawable.answer_solution_box)
             complexMultAnswerText.text = correctAnswer.toString()
@@ -290,15 +287,11 @@ class UiComplexMultiplicationFragment : Fragment(R.layout.fragment_ui_complex_mu
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
-            // Loop through all options to reset and then highlight the correct one
             options.forEach { layout ->
                 val tv = layout.getChildAt(0) as TextView
-
                 if (tv.text.toString().toInt() == correctAnswer) {
-                    // Highlight the correct answer
                     layout.setBackgroundResource(R.drawable.option_showed)
                 } else {
-                    // Reset all other options (removes the red incorrect state)
                     layout.setBackgroundResource(R.drawable.custom_background)
                 }
             }

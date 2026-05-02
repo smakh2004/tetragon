@@ -48,13 +48,14 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
             view.findViewById(R.id.option3)
         )
 
-        checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
-        checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
-        btnBack = requireActivity().findViewById(R.id.btnBackground)
-        seeBtn = requireActivity().findViewById(R.id.see_btn_container)
-        seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
-        stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
-        answer = requireActivity().findViewById(R.id.answer)
+        val activity = requireActivity()
+        checkBtn = activity.findViewById(R.id.check_enabled_btn)
+        checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
+        btnBack = activity.findViewById(R.id.btnBackground)
+        seeBtn = activity.findViewById(R.id.see_btn_container)
+        seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
+        stateAnswer = activity.findViewById(R.id.stateAnswer)
+        answer = activity.findViewById(R.id.answer)
 
         setupInitialButtonState()
         generateProblem()
@@ -77,33 +78,39 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
     }
 
     private fun generateProblem() {
-
         val number = Random.nextInt(2, 10)
         val askNext = Random.nextBoolean()
 
         val question: String
+        val wordsToHighlight = mutableListOf<String>()
+        wordsToHighlight.add(number.toString())
 
         if (askNext) {
             correctAnswer = number + 1
-            question = "What is the next number after $number?"
+            question = getString(R.string.question_next_after, number.toString())
+            // Highlight logical keywords if they exist in the current language
+            wordsToHighlight.add("next")
+            wordsToHighlight.add("after")
+            wordsToHighlight.add("следующее")
+            wordsToHighlight.add("после")
         } else {
             correctAnswer = number - 1
-            question = "What is the number before $number?"
+            question = getString(R.string.question_before, number.toString())
+            wordsToHighlight.add("before")
+            wordsToHighlight.add("предыдущее")
+            wordsToHighlight.add("перед")
         }
 
         val spannable = SpannableString(question)
         val color = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val wordsToHighlight = listOf("next", "after", "before", number.toString())
-
         for (word in wordsToHighlight) {
             val start = question.indexOf(word)
             if (start >= 0) {
-                val end = start + word.length
                 spannable.setSpan(
                     ForegroundColorSpan(color),
                     start,
-                    end,
+                    start + word.length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             }
@@ -112,14 +119,12 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
         questionText.text = spannable
 
         val optionSet = mutableSetOf(correctAnswer)
-
         while (optionSet.size < 3) {
             val option = Random.nextInt(1, 12)
             if (option != correctAnswer) optionSet.add(option)
         }
 
         val shuffledOptions = optionSet.shuffled()
-
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
             tv.text = shuffledOptions[index].toString()
@@ -130,11 +135,10 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
-
         seeBtn.visibility = View.GONE
 
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -143,15 +147,10 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
     }
 
     private fun setupOptionClicks() {
-
         options.forEachIndexed { index, layout ->
-
             layout.setOnClickListener {
-
                 if (isAnswerChecked) return@setOnClickListener
-
                 selectedOptionIndex = index
-
                 highlightSelectedOption(index)
                 enableCheckButton()
             }
@@ -159,22 +158,16 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
     }
 
     private fun highlightSelectedOption(selectedIndex: Int) {
-
         options.forEachIndexed { i, layout ->
-
             layout.setBackgroundResource(
-                if (i == selectedIndex)
-                    R.drawable.option_selected
-                else
-                    R.drawable.custom_background
+                if (i == selectedIndex) R.drawable.option_selected
+                else R.drawable.custom_background
             )
         }
     }
 
     private fun enableCheckButton() {
-
         checkBtn.isEnabled = true
-
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
     }
@@ -185,24 +178,19 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
             val circleState = requireActivity().findViewById<ImageView>(R.id.circleState)
 
             if (!isAnswerChecked) {
-                selectedOptionIndex?.let {
-                    checkAnswer(it, stateContainer, circleState)
-                }
+                selectedOptionIndex?.let { checkAnswer(it, stateContainer, circleState) }
             } else {
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
                     val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
-                        // GATE: Trigger milestone ONLY when they click CONTINUE
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
-
                         if (!isMilestoneActive) {
                             resetUIForNext()
                             activity.showRandomQuestion()
-                            setupOptionClicks()
                         }
                     }
                 }
@@ -220,8 +208,6 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
 
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
-
-            // 1. Immediate Visual Reward
             activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
 
@@ -229,16 +215,15 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
             if (isFirstAttempt)
                 activity.totalXp += MathGrade1Type.FIND_NEXT_NUMBER.xp
 
-            // 2. Increment milestone counter in Activity
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -246,107 +231,67 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
     }
 
     private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
-
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-
         options[index].setBackgroundResource(R.drawable.option_correct)
-
-        stateAnswer.text = "Correct!"
-
-        answer.text = "Answer: $correctAnswer"
-
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
     private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
-
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
-
         circleState.setImageResource(R.drawable.wrong_circle)
-
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-
-        stateAnswer.text = "Incorrect!"
-
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answer.visibility = View.GONE
-
         seeBtn.visibility = View.VISIBLE
-
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
-
         seeEnabledButton.setOnClickListener {
-
             seeBtn.visibility = View.GONE
-
-            stateAnswer.text = "Solution"
-
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-
-            checkBtn.text = "CONTINUE"
-
+            checkBtn.text = getString(R.string.btn_continue)
             circleState.setImageResource(R.drawable.solution_lamp_icon)
-
             isAnswerChecked = true
             isIncorrectAttempt = false
-
-            checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_3)
-            checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_2)
-
-            btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
-
+            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
-
-            options.forEach {
-
-                val tv = it.getChildAt(0) as TextView
-
-                it.setBackgroundResource(
-                    if (tv.text.toString().toInt() == correctAnswer)
-                        R.drawable.option_showed
-                    else
-                        R.drawable.custom_background
+            options.forEach { layout ->
+                val tv = layout.getChildAt(0) as TextView
+                layout.setBackgroundResource(
+                    if (tv.text.toString().toInt() == correctAnswer) R.drawable.option_showed
+                    else R.drawable.custom_background
                 )
             }
         }
     }
 
     private fun applyButtonColors(buttonColor: Int, backColor: Int, backgroundColor: Int) {
-
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), buttonColor)
-
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), backColor)
-
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), backgroundColor))
     }
 
     private fun resetForTryAgain() {
-
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-
         isAnswerChecked = false
         isIncorrectAttempt = false
         selectedOptionIndex = null
-
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
-
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-
         setupInitialButtonState()
-
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
-
         seeBtn.visibility = View.GONE
-
         stateAnswer.text = ""
         answer.visibility = View.VISIBLE
     }
@@ -354,15 +299,13 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Reset animation state
-
+        activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
-
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }

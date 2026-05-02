@@ -61,70 +61,72 @@ class OnlineResultBattleMathStormActivity : BaseActivity() {
 
     private fun displayPlayerNamesAndStatus() {
         val model = OnlineGameData.gameModel.value ?: return
-
         val yourUID = OnlineGameData.myID
         val opponentUID = if (yourUID == model.player1) model.player2 else model.player1
 
-        // Determine status correctly
-        val yourStatus: String
-        val opponentStatus: String
+        // Use internal constants for logic, but local variables for UI text
+        val yourStatusInternal: String
+        val opponentStatusInternal: String
 
         if (!model.quitterID.isNullOrEmpty()) {
-            // Quit case
             if (model.quitterID == yourUID) {
-                yourStatus = "LOSER"
-                opponentStatus = "WINNER"
+                yourStatusInternal = "LOSER"
+                opponentStatusInternal = "WINNER"
             } else {
-                yourStatus = "WINNER"
-                opponentStatus = "LOSER"
+                yourStatusInternal = "WINNER"
+                opponentStatusInternal = "LOSER"
             }
         } else {
-            // Normal case: highest score wins
             val yourScore = intent.getIntExtra("YOUR_SCORE", 0)
             val opponentScore = intent.getIntExtra("OPPONENT_SCORE", 0)
 
             when {
                 yourScore > opponentScore -> {
-                    yourStatus = "WINNER"
-                    opponentStatus = "LOSER"
+                    yourStatusInternal = "WINNER"
+                    opponentStatusInternal = "LOSER"
                 }
                 yourScore < opponentScore -> {
-                    yourStatus = "LOSER"
-                    opponentStatus = "WINNER"
+                    yourStatusInternal = "LOSER"
+                    opponentStatusInternal = "WINNER"
                 }
                 else -> {
-                    yourStatus = "DRAW"
-                    opponentStatus = "DRAW"
+                    yourStatusInternal = "DRAW"
+                    opponentStatusInternal = "DRAW"
                 }
             }
         }
 
-        // Update UI texts
-        binding.yourStatus.text = yourStatus
-        binding.opponentStatus.text = opponentStatus
+        // Set Localized Text to UI
+        binding.yourStatus.text = getLocalizedStatus(yourStatusInternal)
+        binding.opponentStatus.text = getLocalizedStatus(opponentStatusInternal)
 
-        // Fetch names from users collection
+        // Fetch names with localized defaults
         if (yourUID.isNotEmpty()) {
             FirebaseFirestore.getInstance().collection("users").document(yourUID)
                 .get().addOnSuccessListener { snap ->
-                    val yourName = snap?.getString("firstName") ?: "Player"
-                    binding.yourName.text = yourName
+                    binding.yourName.text = snap?.getString("firstName") ?: getString(R.string.player_default)
                 }
         }
 
         if (!opponentUID.isNullOrEmpty()) {
             FirebaseFirestore.getInstance().collection("users").document(opponentUID)
                 .get().addOnSuccessListener { snap ->
-                    val opponentName = snap?.getString("firstName") ?: "Opponent"
-                    binding.opponentName.text = opponentName
+                    binding.opponentName.text = snap?.getString("firstName") ?: getString(R.string.opponent_default)
                 }
         }
 
-        // Apply coloring
-        applyResultStyle(yourStatus, binding.yourStatus, binding.yourResultText)
-        applyResultStyle(opponentStatus, binding.opponentStatus, binding.opponentResultText)
+        applyResultStyle(yourStatusInternal, binding.yourStatus, binding.yourResultText)
+        applyResultStyle(opponentStatusInternal, binding.opponentStatus, binding.opponentResultText)
 
-        updateUserOnlineScore(yourStatus)
+        updateUserOnlineScore(yourStatusInternal)
+    }
+
+    private fun getLocalizedStatus(status: String): String {
+        return when (status) {
+            "WINNER" -> getString(R.string.winner)
+            "LOSER" -> getString(R.string.loser)
+            else -> getString(R.string.draw)
+        }
     }
 
     private fun playResultSound(status: String) {

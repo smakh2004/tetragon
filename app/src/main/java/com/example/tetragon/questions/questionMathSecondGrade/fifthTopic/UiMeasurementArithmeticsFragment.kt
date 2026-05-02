@@ -57,6 +57,10 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
     private val INPUT_ANSWERED = "answered"
     private val INPUT_CHOICE = "answerChoice"
 
+    // Localized Unit Strings
+    private val unitM: String by lazy { getString(R.string.unit_m) }
+    private val unitCm: String by lazy { getString(R.string.unit_cm) }
+
     private val mainHandler = Handler(Looper.getMainLooper())
     private val checkRunnable = object : Runnable {
         override fun run() {
@@ -96,7 +100,10 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
             viewModelKeys.forEach { key ->
                 vmi.getNumberProperty(key)?.let { prop -> optionProperties[key] = prop }
             }
-            vmi.getStringProperty("unit")?.let { it.value = "cm" }
+
+            // TRANSLATION IN ANIMATION: Passing localized "cm" to Rive ViewModel
+            vmi.getStringProperty("unit")?.let { it.value = unitCm }
+
         } catch (e: Exception) { e.printStackTrace() }
     }
 
@@ -113,12 +120,11 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
             correctAnswerCm = (targetMeter * 100) - extraCm
         }
 
-        val fullEquation = "${targetMeter}m $operator ${extraCm}cm="
-        setStyledText(firstNumberText, fullEquation, arrayOf("m", "cm"))
+        // PROBLEM TRANSLATION: Using localized units in the equation
+        val fullEquation = "$targetMeter$unitM $operator $extraCm$unitCm="
+        setStyledText(firstNumberText, fullEquation, arrayOf(unitM, unitCm))
 
         optionMapping.clear()
-
-        // 1. Generate 8 unique values (excluding 0)
         val optionsSet = mutableSetOf<Int>()
         optionsSet.add(correctAnswerCm)
         while (optionsSet.size < 8) {
@@ -126,24 +132,18 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
             if (randomVal != correctAnswerCm) optionsSet.add(randomVal)
         }
 
-        // 2. Sort them to make the slider logic smooth
         val sortedList = optionsSet.toList().sorted()
-
-        // 3. Map values 0-8. 0 is ALWAYS 0.
         optionMapping[0] = 0
         optionProperties["0_number"]?.value = 0f
 
         for (i in 1..8) {
             val value = sortedList[i - 1]
             optionMapping[i] = value
-
-            // Map the even indices (2, 4, 6, 8) to ViewModels (1, 2, 3, 4)
             if (i % 2 == 0) {
                 val vmKey = "${i / 2}_number"
                 optionProperties[vmKey]?.value = value.toFloat()
             }
         }
-
         resetFragmentState()
     }
 
@@ -177,13 +177,13 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
             if (isFirstAttempt) activity.totalXp += MathGrade2Type.MEASUREMENT_ARITHMETICS.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -193,10 +193,13 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
             val op = if (isAddition) "+" else "-"
-            val solutionText = "$targetMeter m = ${targetMeter * 100} cm. ${targetMeter * 100} $op $extraCm = $correctAnswerCm cm"
-            setStyledText(answerDisplay, solutionText, arrayOf("m", "cm"))
+
+            // SOLUTION TRANSLATION: Constructing localized step-by-step solution
+            val solutionText = "$targetMeter $unitM = ${targetMeter * 100} $unitCm. ${targetMeter * 100} $op $extraCm = $correctAnswerCm $unitCm"
+
+            answerDisplay.text = getString(R.string.label_answer, solutionText)
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -208,7 +211,7 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
             riveAnimation.setNumberState(STATE_MACHINE, INPUT_CHOICE, correctIdx)
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
         }
@@ -219,6 +222,7 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
         riveAnimation = view.findViewById(R.id.riveAnimation)
         problemImage = view.findViewById(R.id.problemImage)
         problemAnswerText = view.findViewById(R.id.problemAnswerText)
+        instructionText = view.findViewById(R.id.instructionText)
 
         val activity = requireActivity() as Math2GradeQuestionActivity
         checkBtn = activity.findViewById(R.id.check_enabled_btn)
@@ -235,7 +239,7 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
             if (!isAnswerChecked) checkAnswer()
             else if (isIncorrectAttempt) resetForTryAgain()
             else {
-                if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                 else {
                     if (!activity.checkAndTriggerMilestone()) {
                         resetUIForNext()
@@ -251,7 +255,7 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
     private fun resetFragmentState() {
         isAnswerChecked = false
         isIncorrectAttempt = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         problemImage.setImageResource(R.drawable.answer_blue_box)
@@ -281,9 +285,13 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
+        stateAnswer.text = getString(R.string.state_correct)
         val op = if (isAddition) "+" else "-"
-        setStyledText(answerDisplay, "$targetMeter m $op $extraCm cm = $correctAnswerCm cm", arrayOf("m", "cm"))
+
+        // RESULT TRANSLATION: Using localized units
+        val finalResult = "$targetMeter $unitM $op $extraCm $unitCm = $correctAnswerCm $unitCm"
+
+        answerDisplay.text = getString(R.string.label_answer, finalResult)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -291,9 +299,10 @@ class UiMeasurementArithmeticsFragment : Fragment(R.layout.fragment_ui_measureme
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

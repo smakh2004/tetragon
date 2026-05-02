@@ -50,7 +50,6 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Initialize Local fragment views
         derivativeTarget = view.findViewById(R.id.derivativeTarget)
         problemImage = view.findViewById(R.id.problemImage)
         problemAnswerContainer = view.findViewById(R.id.problemAnswerText)
@@ -61,7 +60,6 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
             view.findViewById(R.id.option3)
         )
 
-        // 2. Initialize Activity views
         val activity = requireActivity()
         checkBtn = activity.findViewById(R.id.check_enabled_btn)
         checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
@@ -154,7 +152,7 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.finish_caps)) {
                         activity.navigateToXpGained()
                     } else if (!activity.checkAndTriggerMilestone()) {
                         resetUIForNext()
@@ -184,13 +182,13 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
 
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.finish_caps) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -200,10 +198,14 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerText.text = "Answer: ${correctAnswerStr.replace("_", "/")}"
+            stateAnswer.text = getString(R.string.state_solution)
+
+            // Safe String Formatting (Removes %1$d to prevent error lines/crashes)
+            val labelBase = getString(R.string.label_answer).substringBefore("%")
+            answerText.text = "$labelBase ${correctAnswerStr.replace("_", "/")}"
+
             answerText.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             problemImage.setImageResource(R.drawable.answer_solution_box)
             updateLayoutWithText(problemAnswerContainer, correctAnswerStr, isOption = false)
             circleState.setImageResource(R.drawable.solution_lamp_icon)
@@ -211,7 +213,6 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
             isAnswerChecked = true
             isIncorrectAttempt = false
 
-            // RESET options: remove the red background and highlight the correct one
             options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
             options[currentCorrectIndex].setBackgroundResource(R.drawable.option_showed)
 
@@ -236,8 +237,11 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
         sc.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         cs.setImageResource(R.drawable.correct_tick_icon)
         options[idx].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answerText.text = "Answer: ${correctAnswerStr.replace("_", "/")}"
+        stateAnswer.text = getString(R.string.state_correct)
+
+        val labelBase = getString(R.string.label_answer).substringBefore("%")
+        answerText.text = "$labelBase ${correctAnswerStr.replace("_", "/")}"
+
         answerText.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -246,7 +250,8 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
         sc.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         cs.setImageResource(R.drawable.wrong_circle)
         options[idx].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answerText.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
@@ -272,7 +277,7 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
@@ -288,7 +293,7 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
         problemAnswerContainer.visibility = View.GONE
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -301,7 +306,7 @@ class UiDerivativesProblemFragment : Fragment(R.layout.fragment_ui_derivatives_p
         activity.hideSuccessAnimation()
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 

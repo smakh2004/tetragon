@@ -82,20 +82,23 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
             if (opponentUID.isNotEmpty()) {
                 db.collection("users").document(opponentUID)
                     .addSnapshotListener { snapshot, _ ->
-                        binding.playerTwoTxt.text = snapshot?.getString("firstName") ?: "Opponent"
-                        // 🔹 SWAP ANIMATION FOR IMAGE
+                        // Use translated "Opponent" if name is missing
+                        binding.playerTwoTxt.text = snapshot?.getString("firstName") ?: getString(R.string.opponent_caps)
+
                         binding.searchIcon.visibility = View.GONE
                         binding.playerIconImage.visibility = View.VISIBLE
                     }
             } else {
-                binding.playerTwoTxt.text = "Searching.."
+                // Use translated "Searching.."
+                binding.playerTwoTxt.text = getString(R.string.searching)
             }
 
             // Current user → bottom
             if (youUID.isNotEmpty()) {
                 db.collection("users").document(youUID)
                     .addSnapshotListener { snapshot, _ ->
-                        binding.playerOneTxt.text = snapshot?.getString("firstName") ?: "You"
+                        // Use translated "You" if name is missing
+                        binding.playerOneTxt.text = snapshot?.getString("firstName") ?: getString(R.string.you_caps)
                     }
             }
             // Game start logic

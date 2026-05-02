@@ -68,12 +68,10 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
     }
 
     private fun generateProblem() {
-        // Logic to ensure whole numbers: multiply two numbers to get the dividend
         val divisor = Random.nextInt(2, 10)
         correctAnswer = Random.nextInt(2, 10)
         val dividend = divisor * correctAnswer
 
-        // --- BLUE SIGN LOGIC START ---
         val fullText = "$dividend ÷ $divisor ="
         val spannable = SpannableStringBuilder(fullText)
         val signIndex = fullText.indexOf("÷")
@@ -87,7 +85,6 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
             )
         }
         divEquationText.text = spannable
-        // --- BLUE SIGN LOGIC END ---
 
         divAnswerBox.setImageResource(R.drawable.answer_blue_box)
         divAnswerText.visibility = View.GONE
@@ -111,7 +108,7 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
 
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -147,18 +144,17 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
             divAnswerBox.setImageResource(R.drawable.answer_correct_box)
 
             val isFinished = activity.incrementProgress()
-            // Using multiplication table XP as reference or update to DIV constant if exists
             if (isFirstAttempt) activity.totalXp += MathGrade2Type.DIVISION_SIMPLE.xp
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, selectedOptionIndex!!)
         } else {
             playSound(R.raw.wrong)
             divAnswerBox.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, selectedOptionIndex!!)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -174,7 +170,7 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -225,7 +221,7 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         disableCheckButton()
         setupInitialButtonState()
     }
@@ -236,7 +232,7 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
         activity.hideSuccessAnimation()
         activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
     }
 
@@ -250,8 +246,8 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circle.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -260,19 +256,20 @@ class UiDivisionFragment : Fragment(R.layout.fragment_ui_division) {
         container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circle.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             divAnswerBox.setImageResource(R.drawable.answer_solution_box)
             divAnswerText.text = correctAnswer.toString()

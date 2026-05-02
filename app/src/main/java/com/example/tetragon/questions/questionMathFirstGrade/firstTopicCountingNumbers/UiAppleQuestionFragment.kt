@@ -32,7 +32,7 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
     private var selectedOptionIndex: Int? = null
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
-    private var isFirstAttempt = true // ✅ Track first attempt
+    private var isFirstAttempt = true
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,14 +104,13 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         isIncorrectAttempt = false
         isFirstAttempt = true
 
-        // REINFORCE: Reset the Check Button UI to the "Disabled" state
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
 
         seeBtn.visibility = View.GONE
-        setupInitialButtonState() // Resets colors to default white/blue
+        setupInitialButtonState()
     }
 
     private fun setupOptionClicks() {
@@ -148,16 +147,14 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Math1GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else {
-                    // GATE: Check for milestone ONLY after they click CONTINUE
                     val isMilestoneActive = activity.checkAndTriggerMilestone()
 
                     if (!isMilestoneActive) {
                         resetUIForNext()
                         activity.showRandomQuestion()
-                        // Note: generateProblem() is usually called by the new instance
                     }
                 }
             }
@@ -175,8 +172,6 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         if (chosenNumber == correctAnswer) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
-
-            // 1. Show celebration immediately
             activity.playSuccessAnimation()
 
             val isFinished = activity.incrementProgress()
@@ -184,16 +179,15 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
                 activity.totalXp += MathGrade1Type.APPLE.xp
             }
 
-            // 2. Increment milestone counter
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -204,8 +198,8 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -213,8 +207,9 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answer.visibility = View.GONE
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
@@ -222,10 +217,10 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isAnswerChecked = true
             isIncorrectAttempt = false
             checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_3)
@@ -251,13 +246,13 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
 
     private fun resetForTryAgain() {
         val activity = requireActivity() as Math1GradeQuestionActivity
-        activity.isResultCurrentlyVisible = false // ✅ Reset flag
+        activity.isResultCurrentlyVisible = false
 
         isAnswerChecked = false
         isIncorrectAttempt = false
         selectedOptionIndex = null
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -279,8 +274,7 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
 
-        // Reset Button state
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE

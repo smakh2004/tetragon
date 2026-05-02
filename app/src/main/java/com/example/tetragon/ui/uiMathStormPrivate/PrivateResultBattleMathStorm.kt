@@ -4,6 +4,7 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import com.example.tetragon.R
 import androidx.core.content.ContextCompat
 import com.example.tetragon.databinding.ActivityPrivateResultBattleMathStormBinding
@@ -59,8 +60,9 @@ class PrivateResultBattleMathStorm : BaseActivity() {
             }
         }
 
-        binding.yourStatus.text = yourStatus
-        binding.opponentStatus.text = opponentStatus
+        // --- LOCALIZED UI TEXT ---
+        binding.yourStatus.text = getLocalizedStatus(yourStatus)
+        binding.opponentStatus.text = getLocalizedStatus(opponentStatus)
 
         applyResultStyle(yourStatus, binding.yourStatus, binding.yourResultText)
         applyResultStyle(opponentStatus, binding.opponentStatus, binding.opponentResultText)
@@ -72,6 +74,15 @@ class PrivateResultBattleMathStorm : BaseActivity() {
                 R.anim.slide_in_left,
                 R.anim.slide_out_right
             )
+        }
+    }
+
+    // New helper to keep logic in English but UI in local language
+    private fun getLocalizedStatus(status: String): String {
+        return when (status) {
+            "WINNER" -> getString(R.string.winner)
+            "LOSER" -> getString(R.string.loser)
+            else -> getString(R.string.draw)
         }
     }
 
@@ -103,7 +114,7 @@ class PrivateResultBattleMathStorm : BaseActivity() {
         }
     }
 
-    private fun applyResultStyle(status: String, statusView: android.widget.TextView, scoreView: android.widget.TextView) {
+    private fun applyResultStyle(status: String, statusView: TextView, scoreView: TextView) {
         val color = when (status) {
             "WINNER" -> getColor(R.color.green_1)
             "LOSER" -> getColor(R.color.red_1)
@@ -114,13 +125,14 @@ class PrivateResultBattleMathStorm : BaseActivity() {
     }
 
     private fun fetchUserName(uid: String, callback: (String) -> Unit) {
-        if (uid.isEmpty()) { callback("Unknown"); return }
+        val unknown = getString(R.string.unknown_player)
+        if (uid.isEmpty()) { callback(unknown); return }
         db.collection("users").document(uid).get()
             .addOnSuccessListener { doc ->
-                val name = doc?.getString("firstName") ?: "Unknown"
+                val name = doc?.getString("firstName") ?: unknown
                 callback(name)
             }
-            .addOnFailureListener { callback("Unknown") }
+            .addOnFailureListener { callback(unknown) }
     }
 
     private fun updateUserOnlineScore(yourStatus: String) {
@@ -143,7 +155,7 @@ class PrivateResultBattleMathStorm : BaseActivity() {
         if (winnerUID == null || winnerUID != myUID) return
 
         val gameDoc = db.collection("users")
-            .document(myUID)       // <-- now using actual Firebase UID
+            .document(myUID)
             .collection("games")
             .document("OnlineMathStorm")
 

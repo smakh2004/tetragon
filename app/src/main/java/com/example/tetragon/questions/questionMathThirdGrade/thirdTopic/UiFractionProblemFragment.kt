@@ -28,7 +28,6 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private lateinit var animationOverlay: View
     private lateinit var questionText: TextView
 
-    // Layout piece buttons (Plus/Minus)
     private lateinit var addBtn: LinearLayout
     private lateinit var minusBtn: LinearLayout
     private lateinit var addEnabledContainer: FrameLayout
@@ -36,7 +35,6 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private lateinit var minusEnabledContainer: FrameLayout
     private lateinit var minusDisabledContainer: FrameLayout
 
-    // Shared Activity UI Elements
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
     private lateinit var btnBack: ConstraintLayout
@@ -47,7 +45,6 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private lateinit var stateContainer: FrameLayout
     private lateinit var circleState: ImageView
 
-    // Logic Variables
     private var targetNumerator = 0
     private var targetDenominator = 0
     private var currentDenominator = 1
@@ -109,7 +106,7 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
@@ -202,7 +199,6 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
         stateContainer.visibility = View.VISIBLE
         updateLayoutButtonsUI()
 
-        // 🔥 FIXED FRACTION LOGIC
         val isCorrect = selectedCount * targetDenominator == targetNumerator * currentDenominator
 
         if (isCorrect) {
@@ -215,13 +211,13 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
 
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
 
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -236,8 +232,8 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
             animationOverlay.visibility = View.VISIBLE
 
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "The correct answer is $targetNumerator/$targetDenominator"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.label_fraction_solution_general, targetNumerator, targetDenominator)
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -251,7 +247,7 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
             }
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             updateLayoutButtonsUI()
         }
     }
@@ -279,7 +275,7 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         updateLayoutButtonsUI()
@@ -288,7 +284,7 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
 
     private fun updateQuestionText() {
         val fractionText = "$targetNumerator/$targetDenominator"
-        val sentence = "Show $fractionText of the shape."
+        val sentence = getString(R.string.question_fraction_shape, fractionText)
         val spannable = SpannableString(sentence)
         val start = sentence.indexOf(fractionText)
         if (start != -1) {
@@ -308,7 +304,7 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         resetAllVisualSlices()
@@ -319,8 +315,8 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $targetNumerator/$targetDenominator"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_answer_fraction2, targetNumerator, targetDenominator)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -328,9 +324,10 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
@@ -354,9 +351,7 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
         val activity = requireActivity() as Math3GradeQuestionActivity
-
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        // Hide the shadow background
         checkBtnBack.visibility = View.INVISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
@@ -364,12 +359,9 @@ class UiFractionProblemFragment : Fragment(R.layout.fragment_ui_fraction_problem
     private fun enableCheckButton() {
         checkBtn.isEnabled = true
         val activity = requireActivity() as Math3GradeQuestionActivity
-
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
-        // Show the shadow background
         checkBtnBack.visibility = View.VISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
-
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
     }

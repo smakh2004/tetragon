@@ -64,7 +64,6 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
     }
 
     private fun generateProblem() {
-        // MA = Load / Effort. Ensuring integer results for simplicity.
         effortValue = (10..50 step 10).toList().random()
         correctAnswer = (2..6).random()
         loadValue = effortValue * correctAnswer
@@ -93,9 +92,8 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
-        // Reset option backgrounds to default
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
 
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
@@ -106,11 +104,15 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
     }
 
     private fun updateQuestionText() {
-        val fullText = "Find the mechanical advantage (MA). Load = $loadValue N, Effort = $effortValue N"
+        val fullText = getString(R.string.question_find_ma, loadValue, effortValue)
         val spannable = SpannableStringBuilder(fullText)
         val lightBlue = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val keywords = listOf("(MA)", "Load =", "Effort =")
+        val keywords = listOf(
+            getString(R.string.keyword_ma),
+            getString(R.string.keyword_load_equals),
+            getString(R.string.keyword_effort_equals)
+        )
         keywords.forEach { word ->
             val start = fullText.indexOf(word)
             if (start != -1) {
@@ -144,17 +146,16 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
             playSound(R.raw.correct)
             activity.playSuccessAnimation()
             val isFinished = activity.incrementProgress()
-            // Using a generic machines XP constant - ensure this exists in your Enum
             if (isFirstAttempt) activity.totalXp += PhysicsGrade7Type.MECHANICAL_ADVANTAGE.xp
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -172,7 +173,7 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Physics7GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else if (!activity.checkAndTriggerMilestone()) {
                     resetUIForNext()
@@ -185,10 +186,10 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "MA = Load / Effort = $loadValue / $effortValue = $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.solution_ma_calc, loadValue, effortValue, correctAnswer)
             answerDisplay.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
@@ -197,15 +198,12 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
-            // Loop through all options to reset backgrounds and highlight the correct one
             options.forEach { layout ->
                 val tv = layout.getChildAt(0) as TextView
                 val valInTv = tv.text.toString().toInt()
-
                 if (valInTv == correctAnswer) {
                     layout.setBackgroundResource(R.drawable.option_showed)
                 } else {
-                    // Reset any previously selected/incorrect layouts to default
                     layout.setBackgroundResource(R.drawable.custom_background)
                 }
             }
@@ -228,7 +226,7 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
         stateAnswer.text = ""
         answerDisplay.text = ""
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
@@ -262,8 +260,8 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.answer_ma_display, correctAnswer)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -272,7 +270,8 @@ class UiSimpleMachinesFragment : Fragment(R.layout.fragment_ui_simple_machines) 
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)

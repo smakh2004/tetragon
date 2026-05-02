@@ -87,29 +87,33 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
             targetWidth = allowedValues.random()
             targetHeight = allowedValues.random()
             targetArea = targetWidth * targetHeight
-        } while (targetArea == 4) // Avoid the default 2x2 start size
+        } while (targetArea == 4)
 
         updateQuestionText()
         resetFragmentState(2f, 2f)
     }
 
     private fun updateQuestionText() {
-        val type = if (targetWidth == targetHeight) "square" else "rectangle"
-        val areaValueString = "$targetArea squares"
-        val sentence = "Create a $type with an area of:"
+        val isSquare = targetWidth == targetHeight
+        val typeString = if (isSquare) getString(R.string.label_square) else getString(R.string.label_rectangle)
+        val areaLabel = getString(R.string.label_area)
+
+        // "Create a [square/rectangle] with an area of:"
+        val sentence = getString(R.string.question_create_shape_area, typeString)
+        val areaValueString = getString(R.string.label_area_units, targetArea)
 
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
         val textColor = ContextCompat.getColor(requireContext(), R.color.text_color)
 
         val spannableSentence = SpannableString(sentence)
-        val typeStart = sentence.indexOf(type)
-        val areaWordStart = sentence.indexOf("area")
+        val typeStart = sentence.indexOf(typeString)
+        val areaWordStart = sentence.indexOf(areaLabel)
 
         if (typeStart != -1) {
-            spannableSentence.setSpan(ForegroundColorSpan(blueColor), typeStart, typeStart + type.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableSentence.setSpan(ForegroundColorSpan(blueColor), typeStart, typeStart + typeString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         if (areaWordStart != -1) {
-            spannableSentence.setSpan(ForegroundColorSpan(blueColor), areaWordStart, areaWordStart + "area".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableSentence.setSpan(ForegroundColorSpan(blueColor), areaWordStart, areaWordStart + areaLabel.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         areaQuestionText.text = spannableSentence
 
@@ -141,16 +145,16 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
             if (isFirstAttempt) activity.totalXp += MathGrade3Type.AREA.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(userW, userH)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
 
             if (userArea == targetArea && isTargetSquare && !isUserSquare) {
-                stateAnswer.text = "Almost! Make it a square."
+                stateAnswer.text = getString(R.string.state_almost_square)
             }
             setupSeeSolution()
         }
@@ -160,9 +164,9 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
 
-            val formula = "Formula: Area = w × h"
+            val formula = getString(R.string.label_area_formula)
             val calculation = "$targetWidth × $targetHeight = $targetArea"
             answerDisplay.text = "$formula\n$calculation"
             answerDisplay.visibility = View.VISIBLE
@@ -180,7 +184,7 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
 
             areaRiveView.setBooleanState(STATE_MACHINE, INPUT_ANSWERED, true)
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
         }
     }
@@ -235,7 +239,7 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
         isAnswerChecked = false
         isIncorrectAttempt = false
         isUserInteracting = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
 
@@ -263,7 +267,7 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         disableCheckButton()
@@ -271,7 +275,7 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
     }
 
     private fun handleNavigation(activity: Math3GradeQuestionActivity) {
-        if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+        if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
         else if (!activity.checkAndTriggerMilestone()) {
             resetUIForNext()
             activity.showRandomQuestion()
@@ -288,8 +292,8 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
     private fun showCorrectState(w: Int, h: Int) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Area: $w × $h = $targetArea"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.label_area_calculation, w, h, targetArea)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -297,9 +301,10 @@ class UiFindAreaFragment : Fragment(R.layout.fragment_ui_find_area) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

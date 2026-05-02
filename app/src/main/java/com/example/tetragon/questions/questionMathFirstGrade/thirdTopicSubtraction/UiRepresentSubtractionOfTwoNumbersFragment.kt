@@ -28,18 +28,12 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
     private lateinit var stateAnswer: TextView
     private lateinit var answer: TextView
 
-    // Correct answer stored as (Minuend, Subtrahend) e.g., 10 - 4
     private var correctAnswer: Pair<Int, Int> = 10 to 4
     private var selectedOptionIndex: Int? = null
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
     private var mediaPlayer: MediaPlayer? = null
-
-    private lateinit var checkEnabledContainer: FrameLayout
-    private lateinit var checkDisabledContainer: FrameLayout
-    private lateinit var stateContainer: FrameLayout
-    private lateinit var circleState: ImageView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,81 +54,57 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
             view.findViewById(R.id.option3)
         )
 
-        checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
-        checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
-        btnBack = requireActivity().findViewById(R.id.btnBackground)
-        seeBtn = requireActivity().findViewById(R.id.see_btn_container)
-        seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
-        stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
-        answer = requireActivity().findViewById(R.id.answer)
-        checkEnabledContainer = view.findViewById(R.id.check_enabled_btn_container)
-        checkDisabledContainer = view.findViewById(R.id.check_disabled_btn_container)
-        stateContainer = view.findViewById(R.id.stateContainer)
-        circleState = view.findViewById(R.id.circleState)
+        val activity = requireActivity()
+        checkBtn = activity.findViewById(R.id.check_enabled_btn)
+        checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
+        btnBack = activity.findViewById(R.id.btnBackground)
+        seeBtn = activity.findViewById(R.id.see_btn_container)
+        seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
+        stateAnswer = activity.findViewById(R.id.stateAnswer)
+        answer = activity.findViewById(R.id.answer)
     }
 
     private fun setupInitialButtonState() {
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-        checkBtn.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
-        checkBtnBack.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
+        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
+        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
         checkBtn.isEnabled = false
     }
 
-    // ---------------------- Generate Subtraction Problem ----------------------
     private fun generateProblem() {
-        // 1. Pick the target result the child needs to find (1 to 9)
         val targetResult = Random.nextInt(1, 10)
-
-        // 2. Generate all possible pairs (a - b = targetResult) where a <= 10
         val possiblePairs = mutableListOf<Pair<Int, Int>>()
         for (minuend in (targetResult + 1)..10) {
             val subtrahend = minuend - targetResult
             possiblePairs.add(minuend to subtrahend)
         }
 
-        // 3. Select the correct answer from valid pairs
-        correctAnswer = if (possiblePairs.isNotEmpty()) {
-            possiblePairs.random()
-        } else {
-            // Fallback just in case: if target is 9, only 10-1 works
-            10 to (10 - targetResult)
-        }
+        correctAnswer = if (possiblePairs.isNotEmpty()) possiblePairs.random() else 10 to (10 - targetResult)
 
-        // --- Question Text Styling ---
-        val sentence = "Represent $targetResult as subtraction of two numbers."
+        // --- Localized Question Text Styling ---
+        val keywordSubtraction = getString(R.string.keyword_subtraction)
+        val sentence = getString(R.string.instruction_represent_as_subtraction, targetResult.toString(), keywordSubtraction)
         val spannable = SpannableString(sentence)
         val blue = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
+        // Highlight the Number
         val numberIndex = sentence.indexOf(targetResult.toString())
         if (numberIndex != -1) {
-            spannable.setSpan(
-                ForegroundColorSpan(blue),
-                numberIndex,
-                numberIndex + targetResult.toString().length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+            spannable.setSpan(ForegroundColorSpan(blue), numberIndex, numberIndex + targetResult.toString().length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        val subIndex = sentence.indexOf("subtraction")
+        // Highlight the keyword "subtraction"
+        val subIndex = sentence.indexOf(keywordSubtraction)
         if (subIndex != -1) {
-            spannable.setSpan(
-                ForegroundColorSpan(blue),
-                subIndex,
-                subIndex + "subtraction".length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+            spannable.setSpan(ForegroundColorSpan(blue), subIndex, subIndex + keywordSubtraction.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         questionText.text = spannable
 
         // --- Generate Options ---
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 3) {
-            val fakeMinuend = Random.nextInt(2, 11) // Max 10
-            val fakeSubtrahend = Random.nextInt(1, fakeMinuend) // Ensure positive result
-
-            // Ensure fake answer doesn't accidentally equal targetResult
+            val fakeMinuend = Random.nextInt(2, 11)
+            val fakeSubtrahend = Random.nextInt(1, fakeMinuend)
             if (fakeMinuend - fakeSubtrahend != targetResult) {
                 optionSet.add(fakeMinuend to fakeSubtrahend)
             }
@@ -157,11 +127,12 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
         isFirstAttempt = true
 
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
+        val activity = requireActivity()
+        activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
+        activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+        activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
 
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
@@ -184,10 +155,7 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
 
     private fun highlightSelectedOption(index: Int) {
         options.forEachIndexed { i, layout ->
-            layout.setBackgroundResource(
-                if (i == index) R.drawable.option_selected
-                else R.drawable.custom_background
-            )
+            layout.setBackgroundResource(if (i == index) R.drawable.option_selected else R.drawable.custom_background)
         }
     }
 
@@ -199,8 +167,9 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
 
     private fun setupCheckButton() {
         checkBtn.setOnClickListener {
-            val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
-            val circleState = requireActivity().findViewById<ImageView>(R.id.circleState)
+            val activity = requireActivity() as Math1GradeQuestionActivity
+            val stateContainer = activity.findViewById<FrameLayout>(R.id.stateContainer)
+            val circleState = activity.findViewById<ImageView>(R.id.circleState)
 
             if (!isAnswerChecked) {
                 selectedOptionIndex?.let { checkAnswer(it, stateContainer, circleState) }
@@ -208,13 +177,10 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
-                        // GATE: Trigger milestone only after the user chooses to proceed
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
-
                         if (!isMilestoneActive) {
                             resetUIForNext()
                             activity.showRandomQuestion()
@@ -232,8 +198,6 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
 
         val chosenText = (options[index].getChildAt(0) as TextView).text.toString()
         val parts = chosenText.split("-").map { it.trim().toInt() }
-
-        // Order matters in subtraction representation
         val isCorrect = parts[0] == correctAnswer.first && parts[1] == correctAnswer.second
 
         stateContainer.visibility = View.VISIBLE
@@ -241,26 +205,19 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
         if (isCorrect) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
-
-            // 1. Play success animation (Mr. Square)
             activity.playSuccessAnimation()
-
             val isFinished = activity.incrementProgress()
 
-            if (isFirstAttempt) {
-                activity.totalXp += MathGrade1Type.SUBTRACTION_TWO_REPRESENTATION.xp
-            }
-
-            // 2. Register correct answer for milestones/streaks
+            if (isFirstAttempt) activity.totalXp += MathGrade1Type.SUBTRACTION_TWO_REPRESENTATION.xp
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -271,8 +228,8 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: ${correctAnswer.first} - ${correctAnswer.second}"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer_subtraction, correctAnswer.first.toString(), correctAnswer.second.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -280,7 +237,7 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
@@ -289,8 +246,8 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: ${correctAnswer.first} - ${correctAnswer.second}"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer_subtraction, correctAnswer.first.toString(), correctAnswer.second.toString())
             answer.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -303,7 +260,7 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
             }
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
         }
@@ -323,14 +280,15 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
         isIncorrectAttempt = false
         selectedOptionIndex = null
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+        val activityUi = requireActivity()
+        activityUi.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
+        activityUi.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
-        requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
+        activityUi.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
         answer.visibility = View.VISIBLE
@@ -339,14 +297,14 @@ class UiRepresentSubtractionOfTwoNumbersFragment :
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Clear Mr. Square state
+        activity.hideSuccessAnimation()
 
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }

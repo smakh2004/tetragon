@@ -54,6 +54,10 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
     private val INPUT_ANSWERED = "answered"
     private val INPUT_CHOICE = "answerChoice"
 
+    // Localized Unit Strings
+    private val unitM: String by lazy { getString(R.string.unit_m) }
+    private val unitCm: String by lazy { getString(R.string.unit_cm) }
+
     private val mainHandler = Handler(Looper.getMainLooper())
     private val checkRunnable = object : Runnable {
         override fun run() {
@@ -96,7 +100,10 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
             viewModelKeys.forEach { key ->
                 vmi.getNumberProperty(key)?.let { prop -> optionProperties[key] = prop }
             }
-            vmi.getStringProperty("unit")?.let { it.value = "cm" }
+
+            // LOCALIZATION IN ANIMATION: Send localized "cm" to Rive
+            vmi.getStringProperty("unit")?.let { it.value = unitCm }
+
         } catch (e: Exception) { e.printStackTrace() }
     }
 
@@ -105,8 +112,10 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
         correctAnswerCm = targetMeter * 100
 
         firstNumber.text = targetMeter.toString()
-        // Style the "m =" part blue
-        setStyledText(unitMeterText, "m =", arrayOf("m"))
+
+        // LOCALIZATION IN PROBLEM: Style the localized unit (e.g., "м =")
+        val unitLabel = "$unitM ="
+        setStyledText(unitMeterText, unitLabel, arrayOf(unitM))
 
         optionMapping.clear()
         for (i in 0..8) {
@@ -122,7 +131,11 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
 
     private fun initViews(view: View) {
         instructionText = view.findViewById(R.id.instructionText)
-        setStyledText(instructionText, "Convert meter to centimeter.", arrayOf("meter", "centimeter"))
+
+        val fullInstr = getString(R.string.instruction_meter_to_cm)
+        val styleMeter = getString(R.string.unit_meter_full)
+        val styleCm = getString(R.string.unit_centimeter_full)
+        setStyledText(instructionText, fullInstr, arrayOf(styleMeter, styleCm))
 
         firstNumber = view.findViewById(R.id.firstNumber)
         unitMeterText = view.findViewById(R.id.unitMeterText)
@@ -147,7 +160,7 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
             } else if (isIncorrectAttempt) {
                 resetForTryAgain()
             } else {
-                if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                 else {
                     if (!activity.checkAndTriggerMilestone()) {
                         resetUIForNext()
@@ -181,13 +194,13 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
 
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -197,10 +210,11 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
 
-            val solutionText = "1 m = 100 cm, so $targetMeter m = $correctAnswerCm cm"
-            setStyledText(answerDisplay, solutionText, arrayOf("m", "cm"))
+            // LOCALIZATION IN SOLUTION
+            val solutionText = getString(R.string.solution_meter_to_cm, targetMeter, correctAnswerCm)
+            setStyledText(answerDisplay, solutionText, arrayOf(unitM, unitCm))
 
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
@@ -214,7 +228,7 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
             riveAnimation.setNumberState(STATE_MACHINE, INPUT_CHOICE, correctChoiceIndex)
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
         }
@@ -223,7 +237,7 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
     private fun resetFragmentState() {
         isAnswerChecked = false
         isIncorrectAttempt = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         problemImage.setImageResource(R.drawable.answer_blue_box)
@@ -256,10 +270,11 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
+        stateAnswer.text = getString(R.string.state_correct)
 
-        val resultText = "$targetMeter m = $correctAnswerCm cm"
-        setStyledText(answerDisplay, resultText, arrayOf("m", "cm"))
+        // LOCALIZATION IN CORRECT STATE
+        val resultText = "$targetMeter $unitM = $correctAnswerCm $unitCm"
+        setStyledText(answerDisplay, resultText, arrayOf(unitM, unitCm))
 
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
@@ -268,9 +283,10 @@ class UiMeterToCmFragment : Fragment(R.layout.fragment_ui_meter_to_cm) {
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

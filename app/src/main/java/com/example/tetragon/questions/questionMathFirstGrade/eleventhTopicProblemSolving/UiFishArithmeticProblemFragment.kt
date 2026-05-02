@@ -69,28 +69,25 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
             view.findViewById(R.id.option3)
         )
 
-        // Binding to Activity Layout
-        checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
-        checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
-        btnBack = requireActivity().findViewById(R.id.btnBackground)
-        seeBtn = requireActivity().findViewById(R.id.see_btn_container)
-        seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
-        stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
-        answer = requireActivity().findViewById(R.id.answer)
+        val activity = requireActivity()
+        checkBtn = activity.findViewById(R.id.check_enabled_btn)
+        checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
+        btnBack = activity.findViewById(R.id.btnBackground)
+        seeBtn = activity.findViewById(R.id.see_btn_container)
+        seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
+        stateAnswer = activity.findViewById(R.id.stateAnswer)
+        answer = activity.findViewById(R.id.answer)
     }
 
     private fun generateProblem() {
-        // 1. Generate Logic
-        totalFish = Random.Default.nextInt(2, 11)
-        eatenFish = Random.Default.nextInt(1, totalFish)
+        totalFish = Random.nextInt(2, 11)
+        eatenFish = Random.nextInt(1, totalFish)
         correctAnswer = totalFish - eatenFish
 
-        // 2. Set Styled Question Text
-        val rawText = "Aziz ate $eatenFish fish out of $totalFish, how many fish are left?"
+        val rawText = getString(R.string.problem_fish_arithmetic, eatenFish, totalFish)
         val spannable = SpannableString(rawText)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        // Helper function to color all occurrences of a string
         fun colorize(target: String) {
             var startPos = rawText.indexOf(target)
             while (startPos >= 0) {
@@ -104,14 +101,12 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
             }
         }
 
-        // Apply blue strictly to the numbers and the word "fish" in the question
         colorize(eatenFish.toString())
         colorize(totalFish.toString())
-        colorize("fish")
+        colorize(getString(R.string.keyword_fish))
 
         questionTextView.text = spannable
 
-        // 3. Setup Visuals
         fishImages.forEachIndexed { index, imageView ->
             imageView.clearColorFilter()
             when {
@@ -127,32 +122,27 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
             }
         }
 
-        // 4. Setup Options (Numbers stay default color)
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 3) {
-            optionSet.add(Random.Default.nextInt(1, 11))
+            optionSet.add(Random.nextInt(1, 11))
         }
         val shuffledOptions = optionSet.shuffled()
 
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
             tv.text = shuffledOptions[index].toString()
-            // No setTextColor here - it will use the @color/text_color from your XML
             layout.setBackgroundResource(R.drawable.custom_background)
         }
 
-        // Reset State variables
         selectedOptionIndex = null
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
 
-        // UI Reinforcement
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
-        // Ensure the containers are toggled correctly for a fresh start
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
 
@@ -166,36 +156,28 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
 
         if (chosenNumber == correctAnswer) {
             playSound(R.raw.correct)
-
-            // 1. Progress and XP
             val isFinished = activity.incrementProgress()
             if (isFirstAttempt) activity.totalXp += MathGrade1Type.FISH.xp
-
-            // 2. Increment the internal count
             activity.handleCorrectAnswer()
 
-            // 3. ALWAYS show the success UI immediately
             activity.isResultCurrentlyVisible = true
             stateContainer.visibility = View.VISIBLE
-            activity.playSuccessAnimation() // Trigger Mr. Square
+            activity.playSuccessAnimation()
 
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             isIncorrectAttempt = false
             showCorrectState(stateContainer, circleState, index)
         } else {
-            // Incorrect logic remains the same
             playSound(R.raw.wrong)
             activity.isResultCurrentlyVisible = true
             stateContainer.visibility = View.VISIBLE
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
         isFirstAttempt = false
     }
-
-    // --- REUSED UI LOGIC FROM YOUR TEMPLATE ---
 
     private fun setupOptionClicks() {
         options.forEachIndexed { index, layout ->
@@ -227,23 +209,17 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
 
             if (!isAnswerChecked) {
                 selectedOptionIndex?.let { checkAnswer(it, stateContainer, circleState) }
+            } else if (isIncorrectAttempt) {
+                resetForTryAgain()
             } else {
-                if (isIncorrectAttempt) {
-                    resetForTryAgain()
+                val activity = requireActivity() as Math1GradeQuestionActivity
+                if (checkBtn.text == getString(R.string.btn_finish)) {
+                    activity.navigateToXpGained()
                 } else {
-                    val activity = requireActivity() as Math1GradeQuestionActivity
-
-                    if (checkBtn.text == "FINISH") {
-                        activity.navigateToXpGained()
-                    } else {
-                        // GATE: Check for milestone ONLY on CONTINUE click
-                        val isMilestoneActive = activity.checkAndTriggerMilestone()
-
-                        if (!isMilestoneActive) {
-                            // Regular flow: next question
-                            resetUIForNext()
-                            activity.showRandomQuestion()
-                        }
+                    val isMilestoneActive = activity.checkAndTriggerMilestone()
+                    if (!isMilestoneActive) {
+                        resetUIForNext()
+                        activity.showRandomQuestion()
                     }
                 }
             }
@@ -254,8 +230,8 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer)
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -264,31 +240,31 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
         answer.visibility = View.GONE
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer)
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isAnswerChecked = true
             isIncorrectAttempt = false
-            checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_3)
-            checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_2)
-            btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
             options.forEach { layout ->
                 val tv = layout.getChildAt(0) as TextView
-                layout.setBackgroundResource(
-                    if (tv.text.toString().toInt() == correctAnswer) R.drawable.option_showed
-                    else R.drawable.custom_background
-                )
+                if (tv.text.toString().toInt() == correctAnswer) {
+                    layout.setBackgroundResource(R.drawable.option_showed)
+                } else {
+                    layout.setBackgroundResource(R.drawable.custom_background)
+                }
             }
         }
     }
@@ -307,14 +283,12 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
     }
 
     private fun resetForTryAgain() {
-        val activity = requireActivity() as Math1GradeQuestionActivity
-        activity.isResultCurrentlyVisible = false
-
+        (requireActivity() as Math1GradeQuestionActivity).isResultCurrentlyVisible = false
         isAnswerChecked = false
         isIncorrectAttempt = false
         selectedOptionIndex = null
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -328,24 +302,16 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
     private fun resetUIForNext() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.hideSuccessAnimation() // Clear Mr. Square
-
-        // 1. Reset Activity Shared UI
+        activity.hideSuccessAnimation()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-
-        // 2. Reset Button to DISABLED CHECK state
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
-
-        // 3. Switch containers to show the gray/disabled version
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-
-        // 4. Reset Fragment-specific visuals
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
@@ -353,6 +319,7 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
     private fun playSound(soundResId: Int) {
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer.create(requireContext(), soundResId)
+        mediaPlayer?.setOnCompletionListener { it.release() }
         mediaPlayer?.start()
     }
 

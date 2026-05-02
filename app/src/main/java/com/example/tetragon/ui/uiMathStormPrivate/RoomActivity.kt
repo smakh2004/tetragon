@@ -29,7 +29,6 @@ import kotlin.random.nextInt
 class RoomActivity : BaseActivity() {
     private lateinit var binding: ActivityRoomBinding
 
-    // CONNECTIVITY
     private val viewModel: ConnectivityViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -51,10 +50,10 @@ class RoomActivity : BaseActivity() {
         binding = ActivityRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) { // API 27+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             window.decorView.systemUiVisibility =
                 window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white) // optional: set nav bar color
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
         }
 
         observeConnectivity()
@@ -67,29 +66,16 @@ class RoomActivity : BaseActivity() {
         binding.createOnlineGameBtn.setOnClickListener {
             disableCreateButton()
             createOnlineGame()
-            overridePendingTransition(
-                R.anim.slide_in_right,
-                R.anim.slide_out_left
-            )
         }
 
         binding.joinOnlineGameBtn.setOnClickListener {
             disableJoinButton()
             joinOnlineGame()
-            overridePendingTransition(
-                R.anim.slide_in_right,
-                R.anim.slide_out_left
-            )
         }
 
         binding.gameIdInput.addTextChangedListener { text ->
             toggleJoinButton(text.toString())
-            overridePendingTransition(
-                R.anim.slide_in_right,
-                R.anim.slide_out_left
-            )
         }
-
     }
 
     private fun createOnlineGame() {
@@ -104,12 +90,13 @@ class RoomActivity : BaseActivity() {
 
         hasNavigated = true
         startActivity(Intent(this, PrivateWaitingRoomMathStorm::class.java))
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }
 
     private fun joinOnlineGame() {
         val gameId = binding.gameIdInput.text.toString()
         if (gameId.isEmpty()) {
-            binding.gameIdInput.error = "Please enter Room ID"
+            binding.gameIdInput.error = getString(R.string.error_enter_id)
             resetButtons()
             return
         }
@@ -121,7 +108,7 @@ class RoomActivity : BaseActivity() {
             .addOnSuccessListener { doc ->
                 val model = doc?.toObject(PrivateGameModel::class.java)
                 if (model == null) {
-                    binding.gameIdInput.error = "Invalid game ID"
+                    binding.gameIdInput.error = getString(R.string.error_invalid_id)
                     resetButtons()
                 } else {
                     model.player2 = uid
@@ -129,10 +116,11 @@ class RoomActivity : BaseActivity() {
                     PrivateGameData.saveGameModel(model)
                     hasNavigated = true
                     startActivity(Intent(this, PrivateBattleMathStormActivity::class.java))
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
                 }
             }
             .addOnFailureListener {
-                binding.gameIdInput.error = "Error connecting. Try again."
+                binding.gameIdInput.error = getString(R.string.error_connection)
                 resetButtons()
             }
     }
@@ -145,43 +133,32 @@ class RoomActivity : BaseActivity() {
     private fun disableCreateButton() {
         binding.createOnlineGameBtnEnabled.visibility = View.GONE
         binding.createOnlineGameBtnDisabled.visibility = View.VISIBLE
-        binding.createOnlineGameBtnDisabled.findViewById<TextView>(
-            R.id.create_online_game_btn_disabled_text
-        ).text = "CONNECTING..."
+        binding.createOnlineGameBtnDisabledText.text = getString(R.string.connecting_caps)
     }
 
     private fun disableJoinButton() {
         binding.joinOnlineGameBtnContainer.visibility = View.INVISIBLE
         binding.joinOnlineGameDisabledBtn.visibility = View.VISIBLE
-        binding.joinOnlineGameDisabledBtn.findViewById<TextView>(
-            R.id.join_online_game_disabled_text
-        ).text = "CONNECTING..."
-
+        binding.joinOnlineGameDisabledText.text = getString(R.string.connecting_caps)
         disableCreateButtonStatic()
     }
 
     private fun enableJoinButton() {
         binding.joinOnlineGameBtnContainer.visibility = View.VISIBLE
         binding.joinOnlineGameDisabledBtn.visibility = View.INVISIBLE
-        binding.joinOnlineGameDisabledBtn.findViewById<TextView>(
-            R.id.join_online_game_disabled_text
-        ).text = "JOIN ROOM"
+        binding.joinOnlineGameDisabledText.text = getString(R.string.join_room)
     }
 
     private fun disableJoinButtonStatic() {
         binding.joinOnlineGameBtnContainer.visibility = View.INVISIBLE
         binding.joinOnlineGameDisabledBtn.visibility = View.VISIBLE
-        binding.joinOnlineGameDisabledBtn.findViewById<TextView>(
-            R.id.join_online_game_disabled_text
-        ).text = "JOIN ROOM"
+        binding.joinOnlineGameDisabledText.text = getString(R.string.join_room)
     }
 
     private fun resetButtons() {
         binding.createOnlineGameBtnEnabled.visibility = View.VISIBLE
         binding.createOnlineGameBtnDisabled.visibility = View.GONE
-        binding.createOnlineGameBtnDisabled.findViewById<TextView>(
-            R.id.create_online_game_btn_disabled_text
-        ).text = "CREATE ROOM"
+        binding.createOnlineGameBtnDisabledText.text = getString(R.string.create_room)
 
         val input = binding.gameIdInput.text.toString()
         if (input.length == 4) enableJoinButton() else disableJoinButtonStatic()
@@ -190,15 +167,12 @@ class RoomActivity : BaseActivity() {
     private fun disableCreateButtonStatic() {
         binding.createOnlineGameBtnEnabled.visibility = View.GONE
         binding.createOnlineGameBtnDisabled.visibility = View.VISIBLE
-        binding.createOnlineGameBtnDisabled.findViewById<TextView>(
-            R.id.create_online_game_btn_disabled_text
-        ).text = "CREATE ROOM"
+        binding.createOnlineGameBtnDisabledText.text = getString(R.string.create_room)
     }
 
     override fun onResume() {
         super.onResume()
         if (hasNavigated) {
-            // User returned to this activity
             resetButtons()
             hasNavigated = false
         }
@@ -208,42 +182,22 @@ class RoomActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isConnected.collect { isConnected ->
-
                     if (isConnected) {
-                        // Hide offline banner
                         binding.internetConnection.visibility = View.GONE
-
-                        // Enable buttons
-                        binding.joinOnlineGameBtnContainer.visibility = View.INVISIBLE
-                        binding.joinOnlineGameDisabledBtn.visibility = View.VISIBLE
-                        binding.joinOnlineGameDisabledText.text = "JOIN ROOM"
-
-                        binding.createOnlineGameBtnEnabled.visibility = View.VISIBLE
-                        binding.createOnlineGameBtnDisabled.visibility = View.GONE
-                        binding.createOnlineGameBtnDisabledText.text = "CREATE ROOM"
-
-                        // ✅ Enable room ID input
                         binding.gameIdInput.isEnabled = true
-
+                        resetButtons()
                     } else {
-                        // Show offline banner
                         binding.internetConnection.visibility = View.VISIBLE
+                        binding.gameIdInput.isEnabled = false
 
-                        // Disable buttons
-                        binding.joinOnlineGameBtnContainer.visibility = View.GONE
-                        binding.joinOnlineGameDisabledBtn.visibility = View.VISIBLE
-                        binding.joinOnlineGameDisabledText.text = "JOIN ROOM"
-
+                        // Force disable visual state
                         binding.createOnlineGameBtnEnabled.visibility = View.GONE
                         binding.createOnlineGameBtnDisabled.visibility = View.VISIBLE
-                        binding.createOnlineGameBtnDisabledText.text = "CREATE ROOM"
-
-                        // ✅ Disable room ID input
-                        binding.gameIdInput.isEnabled = false
+                        binding.joinOnlineGameBtnContainer.visibility = View.GONE
+                        binding.joinOnlineGameDisabledBtn.visibility = View.VISIBLE
                     }
                 }
             }
         }
     }
-
 }

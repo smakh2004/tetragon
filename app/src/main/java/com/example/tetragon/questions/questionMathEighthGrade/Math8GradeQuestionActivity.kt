@@ -22,11 +22,12 @@ import com.example.tetragon.questions.FiveCorrectAnswerFragment
 import com.example.tetragon.questions.SubjectConstants
 import com.example.tetragon.questions.XpGainedActivity
 import com.example.tetragon.questions.questionMathEighthGrade.firstTopic.UiSquareRootOneFragment
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class Math8GradeQuestionActivity : AppCompatActivity() {
+class Math8GradeQuestionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMath8GradeQuestionBinding
     private lateinit var selectedTopic: MathGrade8Topic
@@ -186,16 +187,17 @@ class Math8GradeQuestionActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        view.findViewById<TextView>(R.id.titleText).text = "Are you sure?"
-        view.findViewById<TextView>(R.id.messageText).text = "If you exit, you will lose all progress for this lesson."
+        // Using your existing string resources
+        view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
+        view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
 
         view.findViewById<Button>(R.id.noButton).apply {
-            text = "CONTINUE"
+            text = getString(R.string.continue_btn)
             setOnClickListener { dialog.dismiss() }
         }
 
         view.findViewById<Button>(R.id.finishButton).apply {
-            text = "EXIT"
+            text = getString(R.string.exit_btn)
             setOnClickListener {
                 finish()
                 dialog.dismiss()

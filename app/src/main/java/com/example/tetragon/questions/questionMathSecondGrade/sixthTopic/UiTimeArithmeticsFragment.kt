@@ -56,6 +56,10 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
     private val INPUT_ANSWERED = "answered"
     private val INPUT_CHOICE = "answerChoice"
 
+    // Localized Units
+    private val unitH: String by lazy { getString(R.string.unit_h) }
+    private val unitMin: String by lazy { getString(R.string.unit_min) }
+
     private val mainHandler = Handler(Looper.getMainLooper())
     private val checkRunnable = object : Runnable {
         override fun run() {
@@ -95,7 +99,10 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
             viewModelKeys.forEach { key ->
                 vmi.getNumberProperty(key)?.let { prop -> optionProperties[key] = prop }
             }
-            vmi.getStringProperty("unit")?.let { it.value = "min" }
+
+            // LOCALIZATION IN ANIMATION: Pass "min" to Rive
+            vmi.getStringProperty("unit")?.let { it.value = unitMin }
+
         } catch (e: Exception) { e.printStackTrace() }
     }
 
@@ -103,37 +110,30 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
         isAddition = Random.nextBoolean()
         val operator = if (isAddition) "+" else "-"
 
-        // Grade 2 friendly time values
         targetHours = (1..3).random()
         extraMinutes = listOf(10, 15, 20, 30, 45).random()
 
         if (isAddition) {
             correctAnswerTotalMin = (targetHours * 60) + extraMinutes
         } else {
-            // Ensure subtraction results in positive minutes
             targetHours = (2..4).random()
             extraMinutes = listOf(10, 20, 30, 40, 50).random()
             correctAnswerTotalMin = (targetHours * 60) - extraMinutes
         }
 
-        val fullEquation = "${targetHours}h $operator ${extraMinutes}min ="
-        setStyledText(timeProblemText, fullEquation, arrayOf("h", "min"))
+        // LOCALIZATION IN PROBLEM: Use localized units
+        val fullEquation = "$targetHours$unitH $operator $extraMinutes$unitMin ="
+        setStyledText(timeProblemText, fullEquation, arrayOf(unitH, unitMin))
 
         optionMapping.clear()
-
-        // 1. Generate 8 unique values
         val optionsSet = mutableSetOf<Int>()
         optionsSet.add(correctAnswerTotalMin)
         while (optionsSet.size < 8) {
-            // Generate plausible minute values (multiples of 5 or 10)
             val randomVal = (1..30).random() * 10
             if (randomVal != correctAnswerTotalMin && randomVal > 0) optionsSet.add(randomVal)
         }
 
-        // 2. Sort them
         val sortedList = optionsSet.toList().sorted()
-
-        // 3. Map values 0-8
         optionMapping[0] = 0
         optionProperties["0_number"]?.value = 0f
 
@@ -145,7 +145,6 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
                 optionProperties[vmKey]?.value = value.toFloat()
             }
         }
-
         resetFragmentState()
     }
 
@@ -176,17 +175,16 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
             problemImage.setImageResource(R.drawable.answer_correct_box)
             activity.playSuccessAnimation()
             val isFinished = activity.incrementProgress()
-            // Ensure you add TIME_ARITHMETICS to your MathGrade2Type enum
             if (isFirstAttempt) activity.totalXp += MathGrade2Type.TIME_ARITHMETICS.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -196,10 +194,14 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
+            stateAnswer.text = getString(R.string.state_solution)
             val op = if (isAddition) "+" else "-"
-            val solutionText = "$targetHours h = ${targetHours * 60} min. ${targetHours * 60} $op $extraMinutes = $correctAnswerTotalMin min"
-            setStyledText(answerDisplay, solutionText, arrayOf("h", "min"))
+
+            // LOCALIZATION IN SOLUTION
+            val solutionText = "$targetHours $unitH = ${targetHours * 60} $unitMin. " +
+                    "${targetHours * 60} $op $extraMinutes = $correctAnswerTotalMin $unitMin"
+
+            setStyledText(answerDisplay, solutionText, arrayOf(unitH, unitMin))
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -211,14 +213,13 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
             riveAnimation.setNumberState(STATE_MACHINE, INPUT_CHOICE, correctIdx)
 
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             isIncorrectAttempt = false
             isAnswerChecked = true
         }
     }
 
     private fun initViews(view: View) {
-        // Use IDs from your second XML layout
         timeProblemText = view.findViewById(R.id.timeProblemText)
         riveAnimation = view.findViewById(R.id.timeRiveAnimation)
         problemImage = view.findViewById(R.id.timeAnswerBackground)
@@ -239,7 +240,7 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
             if (!isAnswerChecked) checkAnswer()
             else if (isIncorrectAttempt) resetForTryAgain()
             else {
-                if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                 else {
                     if (!activity.checkAndTriggerMilestone()) {
                         resetUIForNext()
@@ -255,7 +256,7 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
     private fun resetFragmentState() {
         isAnswerChecked = false
         isIncorrectAttempt = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         problemImage.setImageResource(R.drawable.answer_blue_box)
@@ -285,9 +286,13 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
+        stateAnswer.text = getString(R.string.state_correct)
         val op = if (isAddition) "+" else "-"
-        setStyledText(answerDisplay, "$targetHours h $op $extraMinutes min = $correctAnswerTotalMin min", arrayOf("h", "min"))
+
+        // LOCALIZATION IN CORRECT STATE
+        val resultText = "$targetHours $unitH $op $extraMinutes $unitMin = $correctAnswerTotalMin $unitMin"
+        setStyledText(answerDisplay, resultText, arrayOf(unitH, unitMin))
+
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -295,9 +300,10 @@ class UiTimeArithmeticsFragment : Fragment(R.layout.fragment_ui_time_arithmetics
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

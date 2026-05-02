@@ -84,7 +84,7 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
                 if (isIncorrectAttempt) {
                     resetForTryAgain()
                 } else {
-                    if (checkBtn.text == "FINISH") activity.navigateToXpGained()
+                    if (checkBtn.text == getString(R.string.btn_finish)) activity.navigateToXpGained()
                     else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
@@ -102,7 +102,6 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
     private fun setupRiveListener() {
         riveAnimation.registerListener(object : RiveFileController.Listener {
             override fun notifyStateChanged(stateMachineName: String, stateName: String) {
-                // Secondary safeguard: Do nothing if the answer is already locked
                 if (isAnswerChecked) return
 
                 if (stateName.contains("_pressed")) {
@@ -160,8 +159,6 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
 
         val isCorrect = (selectedCount == targetNumerator)
         isAnswerChecked = true
-
-        // Show the transparent overlay to block all touches on the pizza
         animationOverlay.visibility = View.VISIBLE
 
         val activity = requireActivity() as Math3GradeQuestionActivity
@@ -175,12 +172,12 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
             if (isFirstAttempt) activity.totalXp += MathGrade3Type.PIZZA_6.xp
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()
         }
@@ -193,12 +190,12 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
 
         isAnswerChecked = false
         isIncorrectAttempt = false
-        animationOverlay.visibility = View.GONE // Hide shield for new question
+        animationOverlay.visibility = View.GONE
         resetAllVisualSlices()
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         disableCheckButton()
@@ -206,7 +203,7 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
 
     private fun updateQuestionText() {
         val fractionText = "$targetNumerator/6"
-        val sentence = "Show $fractionText of the pizza."
+        val sentence = getString(R.string.question_fraction_pizza, fractionText)
         val spannable = SpannableString(sentence)
         val start = sentence.indexOf(fractionText)
         if (start != -1) {
@@ -221,11 +218,11 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
         seeEnabledButton.setOnClickListener {
             isAnswerChecked = true
             isIncorrectAttempt = false
-            animationOverlay.visibility = View.VISIBLE // Keep shield active during solution
+            animationOverlay.visibility = View.VISIBLE
             seeBtn.visibility = View.GONE
 
-            stateAnswer.text = "Solution"
-            answerDisplay.text = "The answer is $targetNumerator out of 6 slices."
+            stateAnswer.text = getString(R.string.state_solution)
+            answerDisplay.text = getString(R.string.label_fraction_solution_pizza, targetNumerator)
             answerDisplay.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
@@ -235,7 +232,7 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
                 riveAnimation.setBooleanState(STATE_MACHINE, "1/6_$i", true)
             }
 
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             enableCheckButton()
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
         }
@@ -254,11 +251,11 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
         activity.isResultCurrentlyVisible = false
         isAnswerChecked = false
         isIncorrectAttempt = false
-        animationOverlay.visibility = View.GONE // Remove shield so user can try again
+        animationOverlay.visibility = View.GONE
 
         stateContainer.visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         resetAllVisualSlices()
@@ -268,8 +265,8 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
     private fun showCorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "Correct!"
-        answerDisplay.text = "Great job!"
+        stateAnswer.text = getString(R.string.state_correct)
+        answerDisplay.text = getString(R.string.state_praise_great_job)
         answerDisplay.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
@@ -277,9 +274,10 @@ class UiFractionPizzaSixPiecesFragment : Fragment(R.layout.fragment_ui_fraction_
     private fun showIncorrectState() {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answerDisplay.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

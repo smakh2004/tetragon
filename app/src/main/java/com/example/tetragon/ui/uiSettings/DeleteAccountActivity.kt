@@ -54,25 +54,23 @@ class DeleteAccountActivity : BaseActivity() {
         binding.passwordEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Immediately hide enabled button
                 binding.deleteEnabledBtnContainer.visibility = View.INVISIBLE
                 binding.deleteDisabledBtnContainer.visibility = View.VISIBLE
 
-                // Cancel previous countdown
                 countdownRunnable?.let { handler.removeCallbacks(it) }
 
                 if (!s.isNullOrEmpty()) {
                     countdownSeconds = 3
-                    binding.deleteDisabledBtn.text = "DELETE ACCOUNT ($countdownSeconds)"
+                    // Using string resource with format for countdown
+                    binding.deleteDisabledBtn.text = getString(R.string.delete_account_caps, countdownSeconds)
 
                     countdownRunnable = object : Runnable {
                         override fun run() {
                             countdownSeconds--
                             if (countdownSeconds > 0) {
-                                binding.deleteDisabledBtn.text = "DELETE ACCOUNT ($countdownSeconds)"
+                                binding.deleteDisabledBtn.text = getString(R.string.delete_account_caps, countdownSeconds)
                                 handler.postDelayed(this, 1000)
                             } else {
-                                // Enable the delete button
                                 binding.deleteEnabledBtnContainer.visibility = View.VISIBLE
                                 binding.deleteDisabledBtnContainer.visibility = View.INVISIBLE
                             }
@@ -80,8 +78,7 @@ class DeleteAccountActivity : BaseActivity() {
                     }
                     handler.postDelayed(countdownRunnable!!, 1000)
                 } else {
-                    // No input → reset
-                    binding.deleteDisabledBtn.text = "DELETE"
+                    binding.deleteDisabledBtn.text = getString(R.string.delete_caps)
                 }
             }
 
@@ -93,15 +90,15 @@ class DeleteAccountActivity : BaseActivity() {
             val password = binding.passwordEditText.text.toString()
             val user = auth.currentUser
             if (user == null || user.email.isNullOrEmpty()) {
-                Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_no_user), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Disable button while deleting & show LOADING.. text
+            // UI Feedback: Loading state
             binding.deleteEnabledBtn.isEnabled = false
             binding.deleteDisabledBtnContainer.visibility = View.VISIBLE
             binding.deleteEnabledBtnContainer.visibility = View.INVISIBLE
-            binding.deleteDisabledBtn.text = "LOADING.."
+            binding.deleteDisabledBtn.text = getString(R.string.loading_caps)
 
             // Reauthenticate
             val credential = EmailAuthProvider.getCredential(user.email!!, password)
@@ -114,22 +111,21 @@ class DeleteAccountActivity : BaseActivity() {
                             // Delete Firebase account
                             user.delete()
                                 .addOnSuccessListener {
-                                    Toast.makeText(this, "Account deleted", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, getString(R.string.account_deleted), Toast.LENGTH_SHORT).show()
                                     auth.signOut()
 
-                                    // Clear all previous activities and navigate to WelcomeActivity
                                     val intent = Intent(this, WelcomeActivity::class.java)
                                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                     startActivity(intent)
-                                    finish() // finish current activity
+                                    finish()
                                 }
                         }
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Reauthentication failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    // Dynamic error message using format
+                    Toast.makeText(this, getString(R.string.reauth_failed, e.message), Toast.LENGTH_LONG).show()
                     resetDeleteButton()
                 }
-
         }
     }
 
@@ -137,7 +133,7 @@ class DeleteAccountActivity : BaseActivity() {
         binding.deleteEnabledBtn.isEnabled = true
         binding.deleteEnabledBtnContainer.visibility = View.INVISIBLE
         binding.deleteDisabledBtnContainer.visibility = View.VISIBLE
-        binding.deleteDisabledBtn.text = "DELETE"
+        binding.deleteDisabledBtn.text = getString(R.string.delete_caps)
     }
 
     override fun onDestroy() {

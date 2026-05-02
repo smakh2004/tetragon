@@ -115,27 +115,27 @@ class ResultMathStormActivity : BaseActivity() {
             }
         }.addOnSuccessListener { isNewRecord ->
             if (isNewRecord) {
-                resultTextShower.text = "New Record!"
+                resultTextShower.text = getString(R.string.new_record_caps)
                 playNewRecordSound()
             } else {
                 resultTextShower.text = getTieredMessage()
                 playNotRecordSound()
             }
         }.addOnFailureListener {
-            resultTextShower.text = "Error saving progress"
+            resultTextShower.text = getString(R.string.error_saving_progress)
         }
     }
 
     private fun getTieredMessage(): String {
         return when {
-            currentScore < 5 -> "Starting Out!"
-            currentScore < 15 -> "Keep Going!"
-            currentScore < 25 -> "Nice Work!"
-            currentScore < 35 -> "Getting Better!"
-            currentScore < 45 -> "Strong Effort!"
-            currentScore < 55 -> "Good Job!"
-            currentScore < 65 -> "Math Master!"
-            else -> "You Rock!"
+            currentScore < 5 -> getString(R.string.tier_starting_out)
+            currentScore < 15 -> getString(R.string.tier_keep_going)
+            currentScore < 25 -> getString(R.string.tier_nice_work)
+            currentScore < 35 -> getString(R.string.tier_getting_better)
+            currentScore < 45 -> getString(R.string.tier_strong_effort)
+            currentScore < 55 -> getString(R.string.tier_good_job)
+            currentScore < 65 -> getString(R.string.tier_math_master)
+            else -> getString(R.string.tier_you_rock)
         }
     }
 

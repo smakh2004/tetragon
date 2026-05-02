@@ -35,7 +35,6 @@ class UiColumnAdditionPairsFragment : Fragment(R.layout.fragment_ui_column_addit
 
         val activity = requireActivity() as Math2GradeQuestionActivity
 
-        // Hide the answer TextView in the Activity layout
         val activityAnswerTv = activity.findViewById<TextView>(R.id.answer)
         activityAnswerTv?.visibility = View.GONE
 
@@ -50,19 +49,16 @@ class UiColumnAdditionPairsFragment : Fragment(R.layout.fragment_ui_column_addit
         setupClickListeners(view)
         setupCheckButton()
         setupInitialButtonState()
-        disableCheckButton() // Hidden by default until all matches found
+        disableCheckButton()
     }
 
     private fun generatePairs(root: View) {
-        // 1. Define the IDs exactly as they appear in your XML
         val problemIds = listOf(R.id.problem1, R.id.problem2, R.id.problem3)
         val answerIds = listOf(R.id.answer1, R.id.answer2, R.id.answer3)
 
-        // Data structures to hold our generated math
-        val problemData = mutableListOf<Pair<Int, Int>>() // Stores num1 and num2
-        val solutionList = mutableListOf<Int>()          // Stores the sums
+        val problemData = mutableListOf<Pair<Int, Int>>()
+        val solutionList = mutableListOf<Int>()
 
-        // 2. Generate the Math Logic
         for (i in 0 until 3) {
             val num1 = Random.nextInt(10, 50)
             val num2 = Random.nextInt(10, 40)
@@ -72,35 +68,26 @@ class UiColumnAdditionPairsFragment : Fragment(R.layout.fragment_ui_column_addit
             solutionList.add(total)
         }
 
-        // 3. Shuffle the lists so they don't line up horizontally
         val shuffledProblems = problemData.shuffled()
         val shuffledAnswers = solutionList.shuffled()
 
-        // 4. Assign Shuffled Problems to the Left Column
         shuffledProblems.forEachIndexed { index, data ->
             val currentProblemId = problemIds[index]
-            solutionMap[currentProblemId] = data.first + data.second // Store correct sum for this ID
+            solutionMap[currentProblemId] = data.first + data.second
 
             val problemLayout = root.findViewById<LinearLayout>(currentProblemId)
             val textViews = mutableListOf<TextView>()
             findAllTextViews(problemLayout, textViews)
 
-            // In your XML column layout:
-            // textViews[0] is the top number
-            // textViews[1] is the "+" sign
-            // textViews[2] is the bottom number
             if (textViews.size >= 3) {
                 textViews[0].text = data.first.toString()
                 textViews[2].text = data.second.toString()
             }
         }
 
-        // 5. Assign Shuffled Answers to the Right Column
         shuffledAnswers.forEachIndexed { index, sumValue ->
             val currentAnswerId = answerIds[index]
             val frame = root.findViewById<FrameLayout>(currentAnswerId)
-
-            // Find the TextView inside the FrameLayout
             val tv = findTextViewInViewGroup(frame)
             tv?.text = sumValue.toString()
         }
@@ -174,7 +161,6 @@ class UiColumnAdditionPairsFragment : Fragment(R.layout.fragment_ui_column_addit
             prob.setBackgroundResource(R.drawable.answer_incorrect_box)
             ans.setBackgroundResource(R.drawable.answer_incorrect_box)
 
-            // Auto-reset the selection after a short delay
             view?.postDelayed({
                 if (!matchedIds.contains(prob.id)) prob.setBackgroundResource(R.drawable.answer_default_box)
                 if (!matchedIds.contains(ans.id)) ans.setBackgroundResource(R.drawable.answer_default_box)
@@ -193,21 +179,19 @@ class UiColumnAdditionPairsFragment : Fragment(R.layout.fragment_ui_column_addit
         stateContainer.visibility = View.VISIBLE
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = "All Matched!"
 
-        // --- PROGRESS & XP LOGIC ---
-        // 1. Increment progress and check if the lesson is done
+        // Localized string for "All Matched!" or "Correct!"
+        stateAnswer.text = getString(R.string.state_correct)
+
         val isFinished = activity.incrementProgress()
 
-        // 2. Award XP ONLY on the first attempt
         if (isFirstAttempt) {
             activity.totalXp += MathGrade2Type.COLUMN_METHOD_ADDITION_MATCH.xp
         }
 
         activity.handleCorrectAnswer()
 
-        // 3. Set button text based on whether it's the last question
-        checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+        checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
 
         enableCheckButton()
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
@@ -217,20 +201,15 @@ class UiColumnAdditionPairsFragment : Fragment(R.layout.fragment_ui_column_addit
         checkBtn.setOnClickListener {
             val activity = requireActivity() as Math2GradeQuestionActivity
 
-            // If the lesson is complete, go to results screen
-            if (checkBtn.text == "FINISH") {
+            if (checkBtn.text == getString(R.string.btn_finish)) {
                 activity.navigateToXpGained()
             } else {
-                // Otherwise, check for milestones or show next random question
                 val isMilestoneActive = activity.checkAndTriggerMilestone()
                 if (!isMilestoneActive) {
                     activity.isResultCurrentlyVisible = false
                     activity.hideSuccessAnimation()
                     stateContainer.visibility = View.INVISIBLE
-
-                    // Reset standard UI colors for the next question
                     setupInitialButtonState()
-
                     activity.showRandomQuestion()
                 }
             }

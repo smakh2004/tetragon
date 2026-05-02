@@ -18,7 +18,7 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
 
     private lateinit var firstNumberText: TextView
     private lateinit var secondNumberText: TextView
-    private lateinit var instructionText: TextView // New reference
+    private lateinit var instructionText: TextView
     private lateinit var problemImage: ImageView
     private lateinit var options: List<LinearLayout>
     private lateinit var checkBtn: Button
@@ -40,10 +40,7 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
         super.onViewCreated(view, savedInstanceState)
 
         initViews(view)
-
-        // Apply blue styling to "missed"
         setupInstructionText()
-
         setupInitialButtonState()
         generateProblem()
         setupOptionClicks()
@@ -73,37 +70,31 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
     }
 
     private fun setupInstructionText() {
-        val fullText = "Find the missed number."
+        val wordToStyle = getString(R.string.instruction_missed_word)
+        val fullText = getString(R.string.instruction_find_missed2, wordToStyle)
         val spannable = SpannableString(fullText)
 
-        val wordToStyle = "missed"
         val start = fullText.indexOf(wordToStyle)
-        val end = start + wordToStyle.length
-
         if (start != -1) {
             spannable.setSpan(
                 ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.blue_2)),
                 start,
-                end,
+                start + wordToStyle.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
         instructionText.text = spannable
     }
 
-    // ---------------------- Problem Generation ----------------------
-
     private fun generateProblem() {
         val maxTotal = 10
         val isAddition = Random.nextBoolean()
-
         val a: Int
         val b: Int
         val c: Int
         val finalResult: Int
         val op1: String
         val op2: String
-
         val useParenthesesAtEnd = Random.nextBoolean()
 
         if (isAddition) {
@@ -135,7 +126,6 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
         }
 
         val hiddenIndex = Random.nextInt(0, 3)
-
         when (hiddenIndex) {
             0 -> {
                 correctAnswer = a
@@ -168,7 +158,6 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
                 }
             }
         }
-
         setupOptions()
     }
 
@@ -194,9 +183,11 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+
+        setupInitialButtonState()
     }
 
     private fun setupOptionClicks() {
@@ -231,7 +222,7 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
                     resetForTryAgain()
                 } else {
                     val activity = requireActivity() as Math1GradeQuestionActivity
-                    if (checkBtn.text == "FINISH") {
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
@@ -265,13 +256,13 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showResultState(stateContainer, circleState, index, true)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showResultState(stateContainer, circleState, index, false)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -283,15 +274,16 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
             container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
             circle.setImageResource(R.drawable.correct_tick_icon)
             options[index].setBackgroundResource(R.drawable.option_correct)
-            stateAnswer.text = "Correct!"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_correct)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
         } else {
             container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
             circle.setImageResource(R.drawable.wrong_circle)
             options[index].setBackgroundResource(R.drawable.option_incorrect)
-            stateAnswer.text = "Incorrect!"
+            stateAnswer.text = getString(R.string.state_incorrect)
             answer.visibility = View.GONE
+            seeEnabledButton.text = getString(R.string.btn_see_solution)
             seeBtn.visibility = View.VISIBLE
             applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
         }
@@ -300,10 +292,10 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
     private fun setupSeeSolution(container: FrameLayout, circle: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
             problemImage.setImageResource(R.drawable.answer_solution_box)
             requireView().findViewById<TextView>(R.id.problemAnswerText).text = correctAnswer.toString()
             circle.setImageResource(R.drawable.solution_lamp_icon)
@@ -341,7 +333,7 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
         requireView().findViewById<TextView>(R.id.problemAnswerText).visibility = View.GONE
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -356,7 +348,7 @@ class UiParenthesesMissedFragment : Fragment(R.layout.fragment_ui_parentheses_mi
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
 
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }

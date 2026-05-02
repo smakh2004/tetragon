@@ -7,6 +7,7 @@ import app.rive.runtime.kotlin.core.Rive
 import com.example.tetragon.R
 import com.example.tetragon.databinding.ActivityXpGainedBinding
 import com.example.tetragon.gameModel.calculateLevel
+import com.example.tetragon.utils.languageChangeUtils.BaseActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,7 +15,7 @@ import com.google.firebase.firestore.SetOptions
 import java.util.Calendar
 import java.util.Date
 
-class XpGainedActivity : AppCompatActivity() {
+class XpGainedActivity : BaseActivity() {
 
     private lateinit var binding: ActivityXpGainedBinding
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
@@ -71,11 +72,13 @@ class XpGainedActivity : AppCompatActivity() {
 
             if (currentTopicProgress >= 100) {
                 binding.textView3.text = "0"
-                binding.description.text = "Topic Mastered! Max XP reached."
+                // Use translation for "Topic Mastered"
+                binding.description.text = getString(R.string.xp_topic_mastered)
                 binding.xpAnimation.setNumberState("State Machine 1", "XP", 0f)
             } else {
                 binding.textView3.text = xpGained.toString()
-                binding.description.text = "Experience points collected!"
+                // Use translation for "Experience points collected"
+                binding.description.text = getString(R.string.xp_collected_desc)
                 binding.xpAnimation.setNumberState("State Machine 1", "XP", xpGained.toFloat())
 
                 saveXpAndLevelToFirestore(xpGained)

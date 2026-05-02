@@ -26,7 +26,6 @@ class RegisterActivity : BaseActivity() {
     private lateinit var binding: ActivityRegisterBinding
     val userData = UserData()
 
-    // CRITICAL FLAGS
     var isRegistrationInProgress = false
     var isProfileSaved = false
 
@@ -45,7 +44,8 @@ class RegisterActivity : BaseActivity() {
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
 
     private val fragments = listOf(
-        AgeFragment(),
+        LanguageFragment(),      // STEP 0
+        AgeFragment(),           // STEP 1
         FullNameFragment(),
         EmailFragment(),
         PasswordFragment(),
@@ -56,7 +56,6 @@ class RegisterActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         val currentUser = auth.currentUser
-
         if (currentUser != null) {
             db.collection("users").document(currentUser.uid).get()
                 .addOnSuccessListener { document ->
@@ -64,9 +63,6 @@ class RegisterActivity : BaseActivity() {
                         isProfileSaved = true
                         startActivity(Intent(this, MainActivity::class.java))
                         finish()
-                    } else {
-                        // User exists in Auth but has no Firestore profile.
-                        // We allow them to continue, but we don't 'finish' yet.
                     }
                 }
         }
@@ -74,10 +70,12 @@ class RegisterActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Check if we are resuming from a language change
+        currentFragmentIndex = intent.getIntExtra("START_STEP", 0)
+
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // START the cleanup service
         startService(Intent(this, RegistrationCleanupService::class.java))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -88,11 +86,20 @@ class RegisterActivity : BaseActivity() {
         observeConnectivity()
         showCurrentFragment()
 
-        binding.exitBtn.setOnClickListener {
-            handleExitCleanup()
-        }
+        binding.exitBtn.setOnClickListener { handleExitCleanup() }
 
         binding.continueEnabledBtn.setOnClickListener {
+            if (currentFragmentIndex == 0) {
+                // SPECIAL CASE: Moving from Language pick to first data fragment
+                // We restart the activity so all Strings/Resources refresh to the new locale
+                val intent = Intent(this, RegisterActivity::class.java)
+                intent.putExtra("START_STEP", 1)
+                startActivity(intent)
+                finish()
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                return@setOnClickListener
+            }
+
             if (currentFragmentIndex < fragments.size - 1) {
                 currentFragmentIndex++
                 setContinueButtonEnabled(false)
@@ -109,7 +116,6 @@ class RegisterActivity : BaseActivity() {
 
     private fun handleExitCleanup() {
         val user = auth.currentUser
-        // If they exit and the Firestore profile isn't saved, wipe the Auth account
         if (user != null && !isProfileSaved) {
             user.delete().addOnCompleteListener {
                 stopService(Intent(this, RegistrationCleanupService::class.java))
@@ -134,8 +140,9 @@ class RegisterActivity : BaseActivity() {
                 if (task.isSuccessful) {
                     auth.currentUser?.sendEmailVerification()
                 } else {
-                    Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                    currentFragmentIndex = 2
+                    val errorMsg = getString(R.string.error_prefix, task.exception?.message ?: "Unknown")
+                    Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show()
+                    currentFragmentIndex = 3 // Go back to Email step if auth fails
                     showCurrentFragment()
                 }
             }
@@ -143,15 +150,12 @@ class RegisterActivity : BaseActivity() {
 
     private fun finishRegistrationAndSaveToFirestore() {
         val user = auth.currentUser ?: return
-
         setContinueButtonEnabled(false)
-        binding.continueDisabledBtn.text = "CREATING ACCOUNT..."
+        binding.continueDisabledBtn.text = getString(R.string.creating_account)
         isRegistrationInProgress = true
 
         user.reload().addOnCompleteListener { task ->
             if (task.isSuccessful && user.isEmailVerified) {
-
-                // --- ADDED THE NEW VALUES HERE ---
                 val userMap = hashMapOf(
                     "uid" to user.uid,
                     "firstName" to userData.firstName,
@@ -159,37 +163,40 @@ class RegisterActivity : BaseActivity() {
                     "age" to userData.age,
                     "email" to userData.email,
                     "xp" to 0L,
+                    "monthlyXP" to 0L,
                     "level" to 1,
                     "registeredAt" to com.google.firebase.Timestamp.now(),
-                    "stars" to 15L,           // New users start with 15 stars
-                    "subscription" to false,  // Default is standard/false
-                    "streak" to 0             // Initialize streak
+                    "stars" to 15L,
+                    "coins" to 30L,
+                    "streak" to 0,
+                    "subscriptionUntil" to null,
+                    "planType" to "free"
                 )
 
-                // Save to Firestore
                 db.collection("users").document(user.uid).set(userMap)
                     .addOnSuccessListener {
                         isProfileSaved = true
                         stopService(Intent(this, RegistrationCleanupService::class.java))
-                        startActivity(Intent(this, MainActivity::class.java))
+                        val intent = Intent(this, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                         finish()
                     }
                     .addOnFailureListener { e ->
                         resetLoadingState()
-                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.error_prefix, e.message), Toast.LENGTH_SHORT).show()
                     }
             } else {
                 resetLoadingState()
-                Toast.makeText(this, "Please verify your email first!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.verify_email_first), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    // Helper to reset the button if verification or saving fails
     private fun resetLoadingState() {
         isRegistrationInProgress = false
         setContinueButtonEnabled(true)
-        binding.continueDisabledBtn.text = "CONTINUE" // Reset to original text
+        binding.continueDisabledBtn.text = getString(R.string.continue_text)
     }
 
     fun updateAge(value: String) { userData.age = value }
@@ -209,12 +216,14 @@ class RegisterActivity : BaseActivity() {
     }
 
     private fun updateProgress(stepIndex: Int) {
-        val percent = stepIndex.toFloat() / (fragments.size - 1).toFloat()
+        val totalSteps = fragments.size - 1
+        val percent = stepIndex.toFloat() / totalSteps.toFloat()
         val params = binding.progressActive.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
         params.matchConstraintPercentWidth = percent
         binding.progressActive.layoutParams = params
 
-        val circles = listOf(binding.step1, binding.step2, binding.step3, binding.step4, binding.step5)
+        // Update step circles (assuming you have 6 steps now)
+        val circles = listOf(binding.step1, binding.step2, binding.step3, binding.step4, binding.step5, binding.step6)
         for (i in circles.indices) {
             circles[i].setBackgroundResource(if (i <= stepIndex) R.drawable.circle_active else R.drawable.circle_inactive)
         }
@@ -233,9 +242,7 @@ class RegisterActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (currentFragmentIndex >= fragments.size - 1) {
-            handleExitCleanup()
-        } else if (currentFragmentIndex > 0) {
+        if (currentFragmentIndex > 0) {
             currentFragmentIndex--
             showCurrentFragment()
         } else {
@@ -245,7 +252,6 @@ class RegisterActivity : BaseActivity() {
 
     override fun onDestroy() {
         val user = auth.currentUser
-        // If the activity dies and Firestore document isn't saved, wipe the user
         if (user != null && !isProfileSaved) {
             user.delete()
         }

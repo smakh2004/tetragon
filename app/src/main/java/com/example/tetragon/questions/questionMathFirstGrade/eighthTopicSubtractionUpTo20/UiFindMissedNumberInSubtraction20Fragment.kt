@@ -71,11 +71,11 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
     }
 
     private fun setupInstructionText() {
-        val fullText = "Find the missed number."
+        val fullText = getString(R.string.instruction_find_missed)
+        val wordToStyle = getString(R.string.keyword_missed)
         val spannable = SpannableString(fullText)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
-        val wordToStyle = "missed"
         val start = fullText.indexOf(wordToStyle)
         if (start != -1) {
             spannable.setSpan(
@@ -94,8 +94,8 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
         val result = firstNumber - missingNumber
 
         correctAnswer = missingNumber
-        firstNumberText.text = "$firstNumber -"
-        secondNumberText.text = "= $result"
+        firstNumberText.text = getString(R.string.subtraction_first_part, firstNumber)
+        secondNumberText.text = getString(R.string.subtraction_result_part, result)
 
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 3) {
@@ -107,7 +107,6 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
             tv.text = shuffledOptions[index].toString()
-            layout.setBackgroundResource(R.drawable.custom_background)
         }
 
         resetFragmentState()
@@ -120,7 +119,12 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
         isFirstAttempt = true
         seeBtn.visibility = View.GONE
         checkBtn.isEnabled = false
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
+
+        // Reset backgrounds of all options
+        options.forEach { layout ->
+            layout.setBackgroundResource(R.drawable.custom_background)
+        }
 
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
@@ -166,13 +170,13 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
             if (isFirstAttempt) activity.totalXp += MathGrade1Type.SUBTRACTION_MISSED_NUMBER_20.xp
 
             activity.handleCorrectAnswer()
-            checkBtn.text = if (isFinished) "FINISH" else "CONTINUE"
+            checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
-            checkBtn.text = "TRY AGAIN"
+            checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)
         }
@@ -182,10 +186,10 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
-            stateAnswer.text = "Solution"
-            answer.text = "Answer: $correctAnswer"
+            stateAnswer.text = getString(R.string.state_solution)
+            answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
-            checkBtn.text = "CONTINUE"
+            checkBtn.text = getString(R.string.btn_continue)
 
             problemImage.setImageResource(R.drawable.answer_solution_box)
             requireView().findViewById<TextView>(R.id.problemAnswerText).text = correctAnswer.toString()
@@ -197,9 +201,14 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
+            // Highlight the correct solution and reset others
             options.forEach { layout ->
                 val tv = layout.getChildAt(0) as TextView
-                layout.setBackgroundResource(if (tv.text.toString().toInt() == correctAnswer) R.drawable.option_showed else R.drawable.custom_background)
+                if (tv.text.toString().toInt() == correctAnswer) {
+                    layout.setBackgroundResource(R.drawable.option_showed)
+                } else {
+                    layout.setBackgroundResource(R.drawable.custom_background)
+                }
             }
         }
     }
@@ -207,7 +216,7 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
     private fun resetForTryAgain() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        resetFragmentState()
+        resetFragmentState() // This now clears option backgrounds
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
@@ -221,8 +230,10 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
         stateAnswer.text = ""
         answer.text = ""
         seeBtn.visibility = View.GONE
-        checkBtn.text = "CHECK"
+        checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
+
+        // Ensure backgrounds are clean for the next problem
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
 
@@ -237,7 +248,7 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
                 resetForTryAgain()
             } else {
                 val activity = requireActivity() as Math1GradeQuestionActivity
-                if (checkBtn.text == "FINISH") {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else if (!activity.checkAndTriggerMilestone()) {
                     resetUIForNext()
@@ -276,8 +287,8 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
         options[index].setBackgroundResource(R.drawable.option_correct)
-        stateAnswer.text = "Correct!"
-        answer.text = "Answer: $correctAnswer"
+        stateAnswer.text = getString(R.string.state_correct)
+        answer.text = getString(R.string.label_answer, correctAnswer.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -285,9 +296,10 @@ class UiFindMissedNumberInSubtraction20Fragment : Fragment(R.layout.fragment_ui_
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
         options[index].setBackgroundResource(R.drawable.option_incorrect)
-        stateAnswer.text = "Incorrect!"
+        stateAnswer.text = getString(R.string.state_incorrect)
         answer.visibility = View.GONE
         seeBtn.visibility = View.VISIBLE
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 

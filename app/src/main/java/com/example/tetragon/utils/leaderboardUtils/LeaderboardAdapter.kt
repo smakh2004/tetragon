@@ -38,7 +38,7 @@ class LeaderboardAdapter(
         val isHighlighted = user.email == currentEmail
 
         holder.name.text = "${user.firstName}"
-        holder.xp.text = "${user.monthlyXP} XP"
+        holder.xp.text = context.getString(R.string.xp_format, user.monthlyXP.toInt())
 
         // Toggle the Green Dot
         if (user.isOnline) {
