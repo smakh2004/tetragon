@@ -408,13 +408,13 @@
     <string name="problem_fish_arithmetic">Aziz %2$d ta baliqdan %1$d tasini yedi. Nechta baliq qoldi?</string>
     <string name="keyword_fish">baliq</string>
     <string name="question_show_cm_ruler">Chizg‘ichda %1$s ko‘rsating.</string>
-    <string name="cm_unit_template">%1$d sm</string>
+    <string name="cm_unit_template">%1$d cm</string>
     <string name="label_correct_length">To‘g‘ri uzunlik — %1$s</string>
     <string name="question_show_dm_in_cm">%1$s ni %2$s da ko‘rsating.</string>
     <string name="dm_unit_template">%1$d dm</string>
-    <string name="keyword_cm">sm</string>
-    <string name="label_dm_to_cm_result">%1$d dm = %2$d sm</string>
-    <string name="solution_dm_to_cm">1 dm = 10 sm, shuning uchun %1$d dm = %2$d sm</string>
+    <string name="keyword_cm">cm</string>
+    <string name="label_dm_to_cm_result">%1$d dm = %2$d cm</string>
+    <string name="solution_dm_to_cm">1 dm = 10 cm, shuning uchun %1$d dm = %2$d cm</string>
     <string name="label_answer_complex_addition">Javob: %1$d + %2$d = %3$d</string>
     <string name="label_answer_complex_subtraction">Javob: %1$d - %2$d = %3$d</string>
     <string name="label_answer_multiplication">Javob: %1$d × %2$d = %3$d</string>
@@ -432,7 +432,7 @@
     <string name="instruction_meter_to_cm">Metrni santimetrga aylantiring.</string>
     <string name="unit_meter_full">metr</string>
     <string name="unit_centimeter_full">santimetr</string>
-    <string name="solution_meter_to_cm">1 m = 100 sm, demak %1$d m = %2$d sm</string>
+    <string name="solution_meter_to_cm">1 m = 100 cm, demak %1$d m = %2$d cm</string>
     <string name="unit_m">m</string>
     <string name="unit_cm">cm</string>
     <string name="instruction_set_time">Ushbu vaqtni o‘rnating: %1$s.</string>
@@ -496,7 +496,7 @@
     <string name="unit_kilometers_full">kilometr</string>
     <string name="unit_centimeters_full">santimetr</string>
     <string name="label_conversion_result">%1$d %2$s = %3$d %4$s</string>
-    <string name="solution_m_to_cm">1 m = 100 sm, to‘g‘ri javob: %1$d sm</string>
+    <string name="solution_m_to_cm">1 m = 100 cm, to‘g‘ri javob: %1$d cm</string>
     <string name="solution_km_to_m">1 km = 1000 m, to‘g‘ri javob: %1$d m</string>
 
     <string name="unit_liter_short">L</string>
