@@ -120,7 +120,7 @@
     <string name="play_online_xp">ONLAYN O\'YIN +30 OCHKO</string>
     <string name="private_game_caps">XUSUSIY O\'YIN</string>
     <string name="_5_attempts_left"> / 5 urinish qoldi</string>
-    <string name="max_streak">Eng yuqori natija</string>
+    <string name="max_streak">Eng yuqori seriya</string>
     <string name="total_xp">Jami ochko</string>
     <string name="unlock_the_tetragon_infinity">Tetragon Infinity-ni oching</string>
     <string name="premium_gives_you_full_access_to_every_features_and_more">Premium barcha funksiyalardan to\'liq foydalanish imkonini beradi</string>
@@ -134,7 +134,7 @@
     <string name="su">Ya</string>
     <string name="joined_format">%1$s da qo\'shilgan</string>
     <string name="level_format">Daraja %1$d</string>
-    <string name="day_streak_format">%1$d kunlik natija</string>
+    <string name="day_streak_format">%1$d kunlik seriya</string>
     <string name="streak_beast">SIZ MAXLUQSIZ!</string>
     <string name="streak_good">BARAKALLA!</string>
     <string name="streak_practice">MASHQLAR VAQTI KELDI!</string>
@@ -266,7 +266,7 @@
     <string name="reward_text_rive">SOVG\'A</string>
     <string name="_5_correct">5-TA TO\'G\'RI!</string>
     <string name="xp_topic_mastered">Mavzu o‘zlashtirildi! Maksimal XP olindi.</string>
-    <string name="xp_collected_desc">Tajriba ballari to‘plandi!</string>
+    <string name="xp_collected_desc">Tajriba ochko to‘plandi!</string>
     <string name="days_of_mindful_problem_solving">Diqqat bilan masalalar yechilgan kunlar</string>
     <string name="topic_derivatives">Hosilalar</string>
     <string name="finish_caps">TUGATISH</string>
@@ -282,7 +282,7 @@
     <!-- Grade 1 Math Topics -->
     <string name="counting_numbers">Sonlarni sanash</string>
     <string name="addition">Qo‘shish</string>
-    <string name="subtraction">Ayiqish</string>
+    <string name="subtraction">Ayirish</string>
     <string name="odd_or_even">Juft yoki toq</string>
     <string name="comparison">Taqqoslash</string>
     <string name="parentheses">Qavslar</string>

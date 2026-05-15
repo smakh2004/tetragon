@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/ageFragment"
-        android:name="com.example.tetragon.fragments.registrationFragments.AgeFragment"
+        android:name="com.tetragon.app.fragments.registrationFragments.AgeFragment"
         android:label="fragment_age"
         tools:layout="@layout/fragment_age" >
         <action
@@ -20,7 +20,7 @@
     </fragment>
     <fragment
         android:id="@+id/fullNameFragment"
-        android:name="com.example.tetragon.fragments.registrationFragments.FullNameFragment"
+        android:name="com.tetragon.app.fragments.registrationFragments.FullNameFragment"
         android:label="fragment_full_name"
         tools:layout="@layout/fragment_full_name" >
         <action
@@ -33,7 +33,7 @@
     </fragment>
     <fragment
         android:id="@+id/emailFragment"
-        android:name="com.example.tetragon.fragments.registrationFragments.EmailFragment"
+        android:name="com.tetragon.app.fragments.registrationFragments.EmailFragment"
         android:label="fragment_email"
         tools:layout="@layout/fragment_email" >
         <action
@@ -46,7 +46,7 @@
     </fragment>
     <fragment
         android:id="@+id/passwordFragment"
-        android:name="com.example.tetragon.fragments.registrationFragments.PasswordFragment"
+        android:name="com.tetragon.app.fragments.registrationFragments.PasswordFragment"
         android:label="fragment_password"
         tools:layout="@layout/fragment_password" />
 </navigation>

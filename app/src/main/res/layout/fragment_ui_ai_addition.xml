@@ -82,7 +82,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.example.tetragon.utils.DrawingView
+            <com.tetragon.app.utils.DrawingView
                 android:id="@+id/drawingView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

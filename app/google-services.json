@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "150411864468",
+    "firebase_url": "https://tetragon-dacc5-default-rtdb.firebaseio.com",
     "project_id": "tetragon-dacc5",
     "storage_bucket": "tetragon-dacc5.firebasestorage.app"
   },
@@ -10,6 +11,25 @@
         "mobilesdk_app_id": "1:150411864468:android:f5b698b0983c7589d58781",
         "android_client_info": {
           "package_name": "com.example.tetragon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl2SkRfK9fhrxkizYms0S7oF0-xnVC8no"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150411864468:android:cea58b3f29d7ada6d58781",
+        "android_client_info": {
+          "package_name": "com.tetragon.app"
         }
       },
       "oauth_client": [],

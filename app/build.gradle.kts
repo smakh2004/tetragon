@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tetragon"
+    namespace = "com.tetragon.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.tetragon"
+        applicationId = "com.tetragon.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -21,6 +21,8 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+
+            ndk.debugSymbolLevel = "FULL"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -59,6 +61,12 @@ android {
     androidResources {
         // Added .ptl to ensure PyTorch models aren't compressed
         noCompress += listOf("tflite", "ptl")
+    }
+
+    bundle {
+        language {
+            enableSplit = false
+        }
     }
 }
 
