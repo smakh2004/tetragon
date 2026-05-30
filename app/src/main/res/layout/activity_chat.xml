@@ -39,7 +39,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -47,6 +46,7 @@
             android:text="History"
             android:textColor="#4FC3F7"
             android:textSize="16sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -56,9 +56,9 @@
         android:id="@+id/chatRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="16dp"
         android:clipToPadding="false"
-        app:layout_constraintBottom_toTopOf="@+id/inputContainer"
+        android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/voiceWaveView"
         app:layout_constraintTop_toBottomOf="@id/topBar" />
 
     <View
@@ -73,7 +73,21 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/fade_bottom"
-        app:layout_constraintBottom_toTopOf="@id/inputContainer" />
+        app:layout_constraintBottom_toTopOf="@id/voiceWaveView" />
+
+    <!--
+        Animated bar visualizer. Hidden by default; shown when voice mode is active.
+        Sits directly above the input bar so it feels anchored to the conversation.
+    -->
+    <com.tetragon.app.aiChatBot.VoiceWaveView
+        android:id="@+id/voiceWaveView"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/inputContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputContainer"
@@ -98,32 +112,38 @@
                 android:id="@+id/etQuestion"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
                 android:background="@null"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="2dp"
                 android:fontFamily="@font/inter_medium"
                 android:hint="@string/write_your_question"
+                android:textColor="@color/text_color"
                 android:textColorHint="#e5e5e5"
                 android:textSize="18sp" />
 
+            <ImageView
+                android:id="@+id/btnMic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:src="@drawable/voice"
+                app:tint="@color/gray_1" />
+
             <FrameLayout
                 android:id="@+id/btnSend"
-                android:layout_width="wrap_content"
+                android:layout_width="48dp"
                 android:layout_height="38dp"
                 android:background="@drawable/custom_background"
-                android:backgroundTint="@color/gray_2"
-                android:paddingHorizontal="20dp">
+                android:backgroundTint="@color/gray_2">
 
-                <TextView
-                    android:id="@+id/tvSendText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/ivSendIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:fontFamily="@font/inter_semibold"
-                    android:text="@string/send"
-                    android:textColor="@color/gray_1"
-                    android:textSize="17sp" />
+                    android:src="@drawable/send"
+                    app:tint="@color/gray_1" />
             </FrameLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

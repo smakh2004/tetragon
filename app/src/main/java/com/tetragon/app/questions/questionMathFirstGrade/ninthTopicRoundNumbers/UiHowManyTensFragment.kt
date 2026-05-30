@@ -127,6 +127,7 @@ class UiHowManyTensFragment : Fragment(R.layout.fragment_ui_how_many_tens) {
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)

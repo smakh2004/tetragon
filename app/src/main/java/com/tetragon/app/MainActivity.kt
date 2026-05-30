@@ -67,7 +67,6 @@ class MainActivity : BaseActivity() {
 
         AppInitializer.getInstance(applicationContext).initializeComponent(RiveInitializer::class.java)
 
-        // Initialize first fragment
         if (savedInstanceState == null) {
             replaceFragment(HomeFragment())
         }
@@ -75,13 +74,20 @@ class MainActivity : BaseActivity() {
         observeConnectivity()
 
         binding.bottomNavigationView.itemIconTintList = null
-        binding.bottomNavigationView.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.home -> replaceFragment(HomeFragment())
-                R.id.mini_games -> replaceFragment(MiniGamesFragment())
-                R.id.leaderboard -> replaceFragment(LeaderboardFragment())
-                R.id.profile -> replaceFragment(ProfileFragment())
-                R.id.shop -> replaceFragment(ShopFragment())
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+
+            // 1. Get the ID of the item currently selected
+            val currentId = binding.bottomNavigationView.selectedItemId
+
+            // 2. Only perform the transaction if the clicked item is different from the current one
+            if (item.itemId != currentId) {
+                when (item.itemId) {
+                    R.id.home -> replaceFragment(HomeFragment())
+                    R.id.mini_games -> replaceFragment(MiniGamesFragment())
+                    R.id.leaderboard -> replaceFragment(LeaderboardFragment())
+                    R.id.profile -> replaceFragment(ProfileFragment())
+                    R.id.shop -> replaceFragment(ShopFragment())
+                }
             }
             true
         }
@@ -107,8 +113,12 @@ class MainActivity : BaseActivity() {
         UserPresenceHelper.startTracking()
         startSessionListener()
 
-        val lastSubject = GradeManager.getSubject(this)
-        setMiniGamesVisible(lastSubject != "PHYSICS")
+        // CHANGE THIS:
+        // val lastSubject = GradeManager.getSubject(this)
+        // setMiniGamesVisible(lastSubject != "PHYSICS")
+
+        // TO THIS:
+        setMiniGamesVisible(true)
     }
 
     // --- MONTHLY RESET LOGIC ---
@@ -243,9 +253,26 @@ class MainActivity : BaseActivity() {
 
         sessionListener = db.collection("users").document(uid)
             .addSnapshotListener { snapshot, _ ->
+                // 1. Existing Session Check
                 val activeDeviceId = snapshot?.getString("activeDeviceId")
                 if (activeDeviceId != null && activeDeviceId != currentDeviceId) {
                     showSessionExpiredDialog()
+                    return@addSnapshotListener
+                }
+
+                // 2. Global Subscription Cleanup Check
+                val isSubscribed = snapshot?.getBoolean("subscription") == true
+                val expiry = snapshot?.getTimestamp("subscriptionUntil")
+                val now = Date()
+
+                // If it's active in DB but the date has passed, reset it globally
+                if (isSubscribed && expiry != null && expiry.toDate().before(now)) {
+                    db.collection("users").document(uid).update(
+                        mapOf(
+                            "subscription" to false,
+                            "planType" to "free"
+                        )
+                    )
                 }
             }
     }
@@ -272,7 +299,11 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        val currentSubject = GradeManager.getSubject(this)
-        setMiniGamesVisible(currentSubject != "PHYSICS")
+        // CHANGE THIS:
+        // val lastSubject = GradeManager.getSubject(this)
+        // setMiniGamesVisible(lastSubject != "PHYSICS")
+
+        // TO THIS:
+        setMiniGamesVisible(true)
     }
 }

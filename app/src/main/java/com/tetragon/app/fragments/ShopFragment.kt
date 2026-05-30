@@ -40,19 +40,24 @@ class ShopFragment : Fragment() {
     private lateinit var infinityPriceContainer: LinearLayout
     private lateinit var infinityStatusText: TextView
 
-    // Claim Container UI Components (Updated for LinearLayout Button)
+    // Claim Container UI Components
     private lateinit var startContainer: FrameLayout
     private lateinit var startLessonLabel: TextView
-    private lateinit var confirmBtn: LinearLayout // Changed from Button
-    private lateinit var confirmCoinAmount: TextView // The new TextView inside button
+    private lateinit var confirmBtn: LinearLayout
+    private lateinit var confirmCoinAmount: TextView
     private lateinit var confirmBtnContainer: FrameLayout
     private lateinit var processingBtnContainer: FrameLayout
     private lateinit var shopScrollView: NestedScrollView
+    private lateinit var shopLineDivider: View
+
+    // --- HOISTED LOADING OVERLAY ---
+    private lateinit var loadingOverlayContainer: FrameLayout
+    private var isInitialDataLoaded = false
 
     // State Variables
     private var currentCoins: Long = 0
     private var currentStars: Long = 0
-    private var pendingPurchaseType: String? = null // "STAR" or "INFINITY"
+    private var pendingPurchaseType: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,6 +75,7 @@ class ShopFragment : Fragment() {
     private fun initViews(view: View) {
         coinCountText = view.findViewById(R.id.coinCountText)
         shopScrollView = view.findViewById(R.id.shopScrollView)
+        shopLineDivider = view.findViewById(R.id.shopLineDivider)
 
         // Purchase Item Views
         itemStar = view.findViewById(R.id.item_star)
@@ -84,12 +90,15 @@ class ShopFragment : Fragment() {
         startContainer = view.findViewById(R.id.start_container)
         startLessonLabel = view.findViewById(R.id.start_lesson_label)
 
-        // References for the new Custom Button structure
+        // References for the Button structure
         confirmBtn = view.findViewById(R.id.continue_enabled_btn)
         confirmCoinAmount = view.findViewById(R.id.confirm_coin_amount)
 
         confirmBtnContainer = view.findViewById(R.id.start_enabled_btn_container)
         processingBtnContainer = view.findViewById(R.id.start_disabled_btn_container)
+
+        // Find reference to full screen overlay layer target
+        loadingOverlayContainer = view.findViewById(R.id.loadingOverlayContainer)
 
         // Initial UI State
         startContainer.visibility = View.GONE
@@ -98,12 +107,14 @@ class ShopFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListeners(view: View) {
-        val topBarShadowGradient = view.findViewById<View>(R.id.topBarShadowGradient)
         val subscribeBtn = view.findViewById<View>(R.id.subscribe_enabled_btn)
 
-        // 1. Scroll Behavior: Handle Shadow & Dismiss Drawer
+        // 1. Scroll Behavior: Dismiss Drawer and Handle Divider Visibility dynamically
         shopScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
-            topBarShadowGradient.visibility = if (scrollY > 0) View.VISIBLE else View.INVISIBLE
+            if (isAdded) {
+                // Toggles divider based on active scrolling offset state
+                shopLineDivider.visibility = if (scrollY > 0) View.VISIBLE else View.INVISIBLE
+            }
 
             if (startContainer.visibility == View.VISIBLE && Math.abs(scrollY - oldScrollY) > 10) {
                 hidePurchaseDrawer()
@@ -120,19 +131,22 @@ class ShopFragment : Fragment() {
 
         // 3. Purchase Triggers
         itemStar.setOnClickListener {
+            val isSubscribed = starStatusText.visibility == View.VISIBLE && !itemStar.isClickable
+            if (isSubscribed) {
+                Toast.makeText(context, getString(R.string.stars_full_toast), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (currentStars < 15) {
                 pendingPurchaseType = "STAR"
-                // Uses: "Refill Stars"
                 showPurchaseDrawer(getString(R.string.refill_stars_label), "15")
             } else {
-                // Uses: "Stars are already full!"
                 Toast.makeText(context, getString(R.string.stars_full_toast), Toast.LENGTH_SHORT).show()
             }
         }
 
         itemInfinity.setOnClickListener {
             pendingPurchaseType = "INFINITY"
-            // Uses: "Monthly Infinity"
             showPurchaseDrawer(getString(R.string.monthly_infinity_label), "1000")
         }
 
@@ -151,7 +165,7 @@ class ShopFragment : Fragment() {
 
     private fun showPurchaseDrawer(label: String, price: String) {
         startLessonLabel.text = label
-        confirmCoinAmount.text = price // Update the price inside the button
+        confirmCoinAmount.text = price
 
         confirmBtnContainer.visibility = View.VISIBLE
         processingBtnContainer.visibility = View.GONE
@@ -184,62 +198,70 @@ class ShopFragment : Fragment() {
 
     private fun handleConfirmPurchase() {
         val type = pendingPurchaseType ?: return
+        val uid = auth.currentUser?.uid ?: return
+        val userDocRef = db.collection("users").document(uid)
 
         confirmBtnContainer.visibility = View.GONE
         processingBtnContainer.visibility = View.VISIBLE
 
-        when (type) {
-            "STAR" -> {
-                if (currentCoins >= 15) {
-                    performPurchase(currentCoins - 15, mapOf("stars" to 15L), getString(R.string.stars_refilled_toast))
-                } else {
-                    showError(getString(R.string.not_enough_coins))
+        // Use a Firestore Transaction to guarantee state isolation and prevent double-spending anomalies
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(userDocRef)
+            val freshCoins = snapshot.getLong("coins") ?: 0L
+            val freshStars = snapshot.getLong("stars") ?: 0L
+
+            when (type) {
+                "STAR" -> {
+                    if (freshCoins >= 15) {
+                        transaction.update(userDocRef, "coins", freshCoins - 15)
+                        transaction.update(userDocRef, "stars", 15L)
+                    } else {
+                        throw Exception(getString(R.string.not_enough_coins))
+                    }
+                }
+                "INFINITY" -> {
+                    if (freshCoins >= 1000) {
+                        val calendar = Calendar.getInstance().apply { add(Calendar.MONTH, 1) }
+                        transaction.update(userDocRef, "coins", freshCoins - 1000)
+                        transaction.update(userDocRef, "subscriptionUntil", Timestamp(calendar.time))
+                        transaction.update(userDocRef, "planType", "monthly")
+                        transaction.update(userDocRef, "subscription", true)
+                    } else {
+                        throw Exception(getString(R.string.not_enough_coins))
+                    }
                 }
             }
-            "INFINITY" -> {
-                if (currentCoins >= 1000) {
-                    val calendar = Calendar.getInstance().apply { add(Calendar.MONTH, 1) }
-                    val updates = mapOf(
-                        "subscriptionUntil" to Timestamp(calendar.time),
-                        "planType" to "monthly",
-                        "subscription" to true
-                    )
-                    performPurchase(currentCoins - 1000, updates, getString(R.string.infinity_activated_toast))
+        }.addOnSuccessListener {
+            if (isAdded) {
+                val successMessage = if (type == "STAR") {
+                    getString(R.string.stars_refilled_toast)
                 } else {
-                    showError(getString(R.string.not_enough_coins))
+                    getString(R.string.infinity_activated_toast)
                 }
+                Toast.makeText(context, successMessage, Toast.LENGTH_SHORT).show()
+                hidePurchaseDrawer()
             }
-        }
-    }
+        }.addOnFailureListener { e ->
+            if (isAdded) {
+                confirmBtnContainer.visibility = View.VISIBLE
+                processingBtnContainer.visibility = View.GONE
 
-    private fun performPurchase(newCoins: Long, updates: Map<String, Any>, message: String) {
-        val uid = auth.currentUser?.uid ?: return
-        val finalMap = updates.toMutableMap()
-        finalMap["coins"] = newCoins
+                val errorMsg = e.message ?: getString(R.string.transaction_failed)
+                Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
 
-        db.collection("users").document(uid).update(finalMap)
-            .addOnSuccessListener {
-                if (isAdded) {
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                if (errorMsg == getString(R.string.not_enough_coins)) {
                     hidePurchaseDrawer()
                 }
             }
-            .addOnFailureListener {
-                confirmBtnContainer.visibility = View.VISIBLE
-                processingBtnContainer.visibility = View.GONE
-                Toast.makeText(context, getString(R.string.transaction_failed), Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun showError(msg: String) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-        hidePurchaseDrawer()
+        }
     }
 
     private fun observeUserStats() {
         val uid = auth.currentUser?.uid ?: return
         userListener = db.collection("users").document(uid)
             .addSnapshotListener { snapshot, _ ->
+                if (!isAdded) return@addSnapshotListener
+
                 if (snapshot != null && snapshot.exists()) {
                     currentCoins = snapshot.getLong("coins") ?: 0L
                     currentStars = snapshot.getLong("stars") ?: 0L
@@ -248,13 +270,22 @@ class ShopFragment : Fragment() {
                     val isSubscriptionActive = snapshot.getBoolean("subscription") == true &&
                             expiry != null && expiry.toDate().after(Date())
 
+                    // Direct binding without modifying configuration attributes
                     coinCountText.text = currentCoins.toString()
+
                     updateItemUI(isSubscriptionActive, currentStars >= 15)
+                }
+
+                if (!isInitialDataLoaded) {
+                    isInitialDataLoaded = true
+                    loadingOverlayContainer.visibility = View.GONE
                 }
             }
     }
 
     private fun updateItemUI(isSubscribed: Boolean, isStarsFull: Boolean) {
+        if (!isAdded) return
+
         // Infinity Item
         if (isSubscribed) {
             infinityPriceContainer.visibility = View.GONE
@@ -267,7 +298,7 @@ class ShopFragment : Fragment() {
         }
 
         // Star Item
-        if (isStarsFull) {
+        if (isStarsFull || isSubscribed) {
             starPriceContainer.visibility = View.GONE
             starStatusText.visibility = View.VISIBLE
             itemStar.isClickable = false
@@ -280,6 +311,8 @@ class ShopFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        isInitialDataLoaded = false
+        loadingOverlayContainer.visibility = View.VISIBLE
         observeUserStats()
     }
 
@@ -290,8 +323,10 @@ class ShopFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        view?.findViewById<FrameLayout>(R.id.start_container)?.visibility = View.GONE
-        view?.findViewById<FrameLayout>(R.id.subscribe_enabled_btn_container)?.visibility = View.VISIBLE
-        view?.findViewById<FrameLayout>(R.id.subscribe_disabled_btn_container)?.visibility = View.INVISIBLE
+        if (view != null) {
+            view?.findViewById<FrameLayout>(R.id.start_container)?.visibility = View.GONE
+            view?.findViewById<FrameLayout>(R.id.subscribe_enabled_btn_container)?.visibility = View.VISIBLE
+            view?.findViewById<FrameLayout>(R.id.subscribe_disabled_btn_container)?.visibility = View.INVISIBLE
+        }
     }
 }

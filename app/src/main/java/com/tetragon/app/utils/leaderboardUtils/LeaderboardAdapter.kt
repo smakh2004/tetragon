@@ -12,7 +12,8 @@ import com.tetragon.app.R
 
 class LeaderboardAdapter(
     private val users: List<LeaderboardUser>,
-    private val currentEmail: String? // Pass current user email here
+    private val currentEmail: String?, // Pass current user email here
+    private val onItemClick: (LeaderboardUser) -> Unit
 ) : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -21,6 +22,9 @@ class LeaderboardAdapter(
         val name: TextView = view.findViewById(R.id.nameText)
         val xp: TextView = view.findViewById(R.id.xpText)
         val onlineStatusDot: View = view.findViewById(R.id.onlineStatusDot)
+
+        // ADDED: Reference for the avatar ImageView
+        val avatar: ImageView = view.findViewById(R.id.avatar)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,6 +43,15 @@ class LeaderboardAdapter(
 
         holder.name.text = "${user.firstName}"
         holder.xp.text = context.getString(R.string.xp_format, user.monthlyXP.toInt())
+
+        // ADDED: Avatar Logic
+        val avatarName = user.avatarName ?: "player_icon"
+        val resId = context.resources.getIdentifier(avatarName, "drawable", context.packageName)
+        if (resId != 0) {
+            holder.avatar.setImageResource(resId)
+        } else {
+            holder.avatar.setImageResource(R.drawable.avatar_1)
+        }
 
         // Toggle the Green Dot
         if (user.isOnline) {
@@ -113,6 +126,10 @@ class LeaderboardAdapter(
             holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.blue_4))
         } else {
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+        }
+
+        holder.itemView.setOnClickListener {
+            onItemClick(user)
         }
     }
 }

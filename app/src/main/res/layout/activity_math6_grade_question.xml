@@ -85,7 +85,7 @@
         android:id="@+id/topBarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
+        android:paddingStart="5dp"
         android:paddingTop="10dp"
         android:paddingEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -24,6 +24,7 @@ class XpGainedActivity : BaseActivity() {
     private lateinit var subject: String
     private var grade: Int = 1
     private var xpGained: Int = 0
+    private val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,18 +95,25 @@ class XpGainedActivity : BaseActivity() {
         val userDocRef = db.collection("users").document(user.uid)
         val progressKey = getFirestoreProgressKey()
 
+        // Create the key for today (e.g., "2026-05-22")
+        val todayKey = dateFormat.format(java.util.Date())
+
         userDocRef.get().addOnSuccessListener { snapshot ->
             val progressMap = snapshot.get(progressKey) as? Map<String, Long>
             val currentTopicProgress = progressMap?.get(topicKey) ?: 0L
 
             if (currentTopicProgress >= 100) return@addOnSuccessListener
 
+            // 1. Update Main Stats
             userDocRef.update(
                 mapOf(
                     "xp" to FieldValue.increment(xp.toLong()),
-                    "monthlyXP" to FieldValue.increment(xp.toLong())
+                    "monthlyXP" to FieldValue.increment(xp.toLong()),
+                    // 2. Increment Daily XP Gain specifically for the graph
+                    "dailyXPGains.$todayKey" to FieldValue.increment(xp.toLong())
                 )
             ).addOnSuccessListener {
+                // Level calculation logic
                 val currentTotalXp = snapshot.getLong("xp") ?: 0L
                 val newLevel = calculateLevel(currentTotalXp + xp)
                 userDocRef.update("level", newLevel)

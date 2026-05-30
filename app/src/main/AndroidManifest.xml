@@ -4,20 +4,22 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- Permission for notifications (Android 13+) -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
-    <!-- Permission to start WorkManager after phone reboot -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+    <queries>
         <package android:name="com.google.android.gms" />
-
         <intent>
             <action android:name="com.google.android.gms.actions.SEARCH_ACTION" />
         </intent>
     </queries>
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -28,13 +30,41 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Tetragon">
+
+        <activity
+            android:name=".accountPicking.StartOrLoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".accountPicking.ControlAccountsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".accountPicking.AccountPickerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".reward.PodiumActivity"
+            android:exported="false" />
+        <activity
+            android:name=".starsBuy.StarsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".otherProfile.OtherUserProfileActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".avatarSelection.AvatarSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".reward.MonthlyRewardActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".questions.questionMathEleventhGrade.Math11GradeQuestionActivity"
+            android:name=".questions.questionMathElevenGrade.Math11GradeQuestionActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
@@ -270,6 +300,7 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.SplashScreenActivity"
             android:exported="true"
@@ -277,17 +308,20 @@
             android:theme="@style/Theme.Tetragon.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.WelcomeActivity"
             android:exported="false"
+            android:theme="@style/Theme.Tetragon"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".MainActivity"
             android:exported="false"
+            android:theme="@style/Theme.Tetragon"
             android:screenOrientation="portrait" />
 
         <meta-data

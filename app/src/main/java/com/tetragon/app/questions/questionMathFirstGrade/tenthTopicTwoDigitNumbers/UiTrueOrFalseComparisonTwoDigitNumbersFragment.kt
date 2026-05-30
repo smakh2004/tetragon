@@ -169,6 +169,7 @@ class UiTrueOrFalseComparisonTwoDigitNumbersFragment : Fragment(R.layout.fragmen
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)

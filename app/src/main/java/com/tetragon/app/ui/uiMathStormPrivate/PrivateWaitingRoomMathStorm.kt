@@ -69,42 +69,44 @@ class PrivateWaitingRoomMathStorm : BaseActivity() {
         }
     }
 
-    private fun fetchUserName(uid: String, callback: (String) -> Unit) {
+    private fun fetchUserData(uid: String, callback: (String, String) -> Unit) {
         val unknown = getString(R.string.unknown_player)
         if (uid.isEmpty()) {
-            callback(unknown)
+            callback(unknown, "")
             return
         }
         db.collection("users").document(uid).get()
             .addOnSuccessListener { doc ->
                 val name = doc?.getString("firstName") ?: unknown
-                callback(name)
+                val avatar = doc?.getString("avatarName") ?: ""
+                callback(name, avatar)
             }
-            .addOnFailureListener { callback(unknown) }
+            .addOnFailureListener { callback(unknown, "") }
     }
 
     private fun updateUI() {
         val model = gameModel ?: return
-
-        // Logic: Identify which UID is "ME" and which is the "OPPONENT"
         val myUID = if (PrivateGameData.myID == "P1") model.player1 else model.player2
         val opponentUID = if (PrivateGameData.myID == "P1") model.player2 else model.player1
 
-        // 1. Set "YOU" (Bottom slot) - Added localized "You" label
-        fetchUserName(myUID) { name ->
+        // 1. Set "YOU" (Bottom slot)
+        fetchUserData(myUID) { name, avatar ->
             binding.playerOneName.text = "$name (${getString(R.string.you_caps)})"
+            loadAvatar(binding.myPlayerIconImage, avatar)
         }
 
         // 2. Set "OPPONENT" (Top slot)
         if (opponentUID.isEmpty()) {
             binding.playerTwoName.text = getString(R.string.searching)
             binding.searchIcon.visibility = View.VISIBLE
-            binding.playerIconImage.visibility = View.GONE
+            binding.opponentAvatarContainer.visibility = View.GONE
         } else {
-            fetchUserName(opponentUID) { name ->
+            fetchUserData(opponentUID) { name, avatar ->
                 binding.playerTwoName.text = name
+                loadAvatar(binding.playerIconImage, avatar)
+
                 binding.searchIcon.visibility = View.GONE
-                binding.playerIconImage.visibility = View.VISIBLE
+                binding.opponentAvatarContainer.visibility = View.VISIBLE
             }
         }
 
@@ -177,5 +179,12 @@ class PrivateWaitingRoomMathStorm : BaseActivity() {
                 }
             }
         }
+    }
+
+    private fun loadAvatar(imageView: android.widget.ImageView, avatarName: String?) {
+        val resId = if (!avatarName.isNullOrEmpty()) {
+            resources.getIdentifier(avatarName, "drawable", packageName)
+        } else { 0 }
+        if (resId != 0) imageView.setImageResource(resId)
     }
 }

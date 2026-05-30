@@ -38,12 +38,13 @@ import com.tetragon.app.questions.questionMathSecondGrade.thirdTopic.UiColumnAdd
 import com.tetragon.app.questions.questionMathSecondGrade.thirdTopic.UiColumnSubtractionThreeDigitNumbersFragment
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.tetragon.app.databinding.ActivityMath2GradeQuestionBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class Math2GradeQuestionActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityQuestionQctivityBinding
+    private lateinit var binding: ActivityMath2GradeQuestionBinding
     private lateinit var selectedTopic: MathGrade2Topic
 
     private var lastQuestionType: MathGrade2Type? = null
@@ -64,7 +65,7 @@ class Math2GradeQuestionActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Rive.init(this)
-        binding = ActivityQuestionQctivityBinding.inflate(layoutInflater)
+        binding = ActivityMath2GradeQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // UI Styling

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -32,6 +33,7 @@ import com.tetragon.app.questions.questionPhysicsNinthGrade.Physics9GradeFragmen
 import com.tetragon.app.questions.questionPhysicsSevenGrade.Physics7GradeFragment
 import com.tetragon.app.questions.questionPhysicsTenthGrade.Physics10GradeFragment
 import com.tetragon.app.aiChatBot.ChatActivity
+import com.tetragon.app.starsBuy.StarsActivity
 import com.tetragon.app.streakCalendar.StreakCalendarActivity
 import com.tetragon.app.ui.NaturalSciencesActivity
 import com.google.firebase.Timestamp
@@ -49,18 +51,28 @@ class HomeFragment : Fragment() {
     private lateinit var classBtn: FrameLayout
     private lateinit var streakContainer: ConstraintLayout
     private lateinit var chatContainer: ConstraintLayout
+    private lateinit var starsContainer: ConstraintLayout
+    private lateinit var chatMrSquareRive: View // Add reference variable here
 
     private lateinit var starCountText: TextView
     private lateinit var starIcon: ImageView
+
+    // UI Layout containers to show/hide dynamically
+    private lateinit var topBar: ConstraintLayout
+    private lateinit var classButtonContainer: FrameLayout
+    private lateinit var homeContentFrame: FrameLayout
+    private lateinit var loadingLayout: LinearLayout
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private var userDataListener: ListenerRegistration? = null
 
     private var countDownTimer: CountDownTimer? = null
-    // 30 Minutes per star
     private val REGEN_TIME_MILLIS = 1800000L
     private val MAX_STARS = 15
+
+    // Class level cache state variable to safely store premium value away from background threads
+    private var isInfinityPlan: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -72,6 +84,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         chatContainer = view.findViewById(R.id.chatContainer)
+        chatMrSquareRive = view.findViewById(R.id.chat_mr_square_rive) // Initialize reference
+        starsContainer = view.findViewById(R.id.constraintLayout2)
         streakContainer = view.findViewById(R.id.constraintLayout6)
         streakNumberTextView = view.findViewById(R.id.streakNumber)
         streakIcon = view.findViewById(R.id.streakIcon)
@@ -81,6 +95,17 @@ class HomeFragment : Fragment() {
         starCountText = view.findViewById(R.id.starCountText)
         starIcon = view.findViewById(R.id.starIcon)
 
+        // Find main dashboard layouts
+        topBar = view.findViewById(R.id.topBar)
+        classButtonContainer = view.findViewById(R.id.class_button_container)
+        homeContentFrame = view.findViewById(R.id.home_content_frame)
+        loadingLayout = view.findViewById(R.id.loadingLayout)
+
+        // Navigation Mappings
+        starsContainer.setOnClickListener {
+            startActivity(Intent(requireContext(), StarsActivity::class.java))
+        }
+
         streakContainer.setOnClickListener {
             startActivity(Intent(requireContext(), StreakCalendarActivity::class.java))
         }
@@ -89,7 +114,12 @@ class HomeFragment : Fragment() {
             startActivity(Intent(requireContext(), NaturalSciencesActivity::class.java))
         }
 
+        // DOUBLE-CLICK SECURITY ASSURANCE: Both container bounds and head asset launch ChatActivity
         chatContainer.setOnClickListener {
+            startActivity(Intent(requireContext(), ChatActivity::class.java))
+        }
+
+        chatMrSquareRive.setOnClickListener {
             startActivity(Intent(requireContext(), ChatActivity::class.java))
         }
 
@@ -106,16 +136,14 @@ class HomeFragment : Fragment() {
 
     private fun displayGrade(grade: Int, subject: String) {
         val mainActivity = activity as? MainActivity
-        mainActivity?.setMiniGamesVisible(subject != "PHYSICS")
+        mainActivity?.setMiniGamesVisible(true)
 
-        // 1. Get the translated Subject Name
         val translatedSubject = when (subject) {
             "MATH" -> getString(R.string.math_label)
             "PHYSICS" -> getString(R.string.physics_label)
-            else -> subject // Fallback
+            else -> subject
         }
 
-        // 2. Select Fragment (Keep your existing logic)
         val fragment = if (subject == "PHYSICS") {
             when (grade) {
                 7 -> Physics7GradeFragment()
@@ -146,7 +174,6 @@ class HomeFragment : Fragment() {
             .replace(R.id.home_content_frame, fragment)
             .commit()
 
-        // 3. Set translated text: e.g., "Math - 5 Grade" or "Математика - 5 класс"
         classLabel.text = getString(R.string.grade_label_format, translatedSubject, grade)
     }
 
@@ -156,9 +183,24 @@ class HomeFragment : Fragment() {
 
     private fun listenToUserData() {
         val user = auth.currentUser ?: return
+
+        // Show white screen loader & completely hide background layout components
+        loadingLayout.visibility = View.VISIBLE
+        topBar.visibility = View.INVISIBLE
+        classButtonContainer.visibility = View.INVISIBLE
+        homeContentFrame.visibility = View.INVISIBLE
+
         userDataListener = db.collection("users").document(user.uid)
             .addSnapshotListener { snapshot, _ ->
-                if (snapshot == null || !isAdded) return@addSnapshotListener
+                if (!isAdded) return@addSnapshotListener
+
+                // Clean restore: Dismiss loading layout and reveal main views safely
+                loadingLayout.visibility = View.GONE
+                topBar.visibility = View.VISIBLE
+                classButtonContainer.visibility = View.VISIBLE
+                homeContentFrame.visibility = View.VISIBLE
+
+                if (snapshot == null) return@addSnapshotListener
 
                 // 1. STREAK LOGIC
                 val streak = snapshot.getLong("streak") ?: 0
@@ -166,34 +208,34 @@ class HomeFragment : Fragment() {
                 streakIcon.setImageResource(if (streak > 0) R.drawable.streak else R.drawable.streak_null)
 
                 // 2. STAR / SUBSCRIPTION LOGIC
-                val isInfinity = snapshot.getBoolean("subscription") ?: false
+                isInfinityPlan = snapshot.getBoolean("subscription") ?: false
                 val stars = snapshot.getLong("stars") ?: 15L
                 val lastStarUsed = snapshot.getTimestamp("lastStarUsedTime")
 
                 countDownTimer?.cancel()
 
-                when {
-                    isInfinity -> {
-                        starCountText.text = "∞"
-                        starIcon.setImageResource(R.drawable.star_infinity)
+                // Keep regeneration tracking active in the background for subscribed users
+                if (stars < MAX_STARS) {
+                    if (lastStarUsed != null) {
+                        startRegenTimer(lastStarUsed, stars.toInt())
+                    } else {
+                        db.collection("users").document(user.uid).update("lastStarUsedTime", Timestamp.now())
+                    }
+                } else {
+                    // If stars are full or haven't been consumed, don't show the timer text
+                    if (!isInfinityPlan) {
+                        starCountText.text = stars.toString()
                         starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
                     }
-                    else -> {
-                        starIcon.setImageResource(if (stars <= 0) R.drawable.star_null else R.drawable.star)
+                }
 
-                        if (stars < MAX_STARS) {
-                            if (lastStarUsed != null) {
-                                startRegenTimer(lastStarUsed, stars.toInt())
-                            } else {
-                                // If user has < 15 stars but no timestamp, we force one to start the recovery
-                                db.collection("users").document(user.uid).update("lastStarUsedTime", Timestamp.now())
-                            }
-                        } else {
-                            // Full stars (15)
-                            starCountText.text = stars.toString()
-                            starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
-                        }
-                    }
+                // Apply correct UI configuration depending on the subscription layer status
+                if (isInfinityPlan) {
+                    starCountText.text = "∞"
+                    starIcon.setImageResource(R.drawable.star_infinity)
+                    starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
+                } else {
+                    starIcon.setImageResource(if (stars <= 0) R.drawable.star_null else R.drawable.star)
                 }
             }
     }
@@ -203,7 +245,6 @@ class HomeFragment : Fragment() {
         val lastUsedMillis = lastUsed.toDate().time
         val elapsedTime = currentTime - lastUsedMillis
 
-        // Calculate total star recovery based on elapsed time (offline recovery)
         val starsToRecover = (elapsedTime / REGEN_TIME_MILLIS).toInt()
         if (starsToRecover > 0) {
             applyRecovery(currentStars, lastUsedMillis, starsToRecover)
@@ -216,14 +257,20 @@ class HomeFragment : Fragment() {
             override fun onTick(millisUntilFinished: Long) {
                 if (!isAdded) return
 
+                if (isInfinityPlan) {
+                    starCountText.text = "∞"
+                    starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
+                    return
+                }
+
                 if (currentStars <= 0) {
-                    // Show timer when user is out of stars
                     val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
                     val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                    starCountText.text = String.format("%02dm %02ds", minutes, seconds)
+
+                    // Loads localized bare clocks "00m 00s" or "00м 00с" straight from resources
+                    starCountText.text = getString(R.string.timer_format, minutes, seconds)
                     starCountText.setTextColor(android.graphics.Color.parseColor("#FA236E"))
                 } else {
-                    // Show current count while timer runs in background
                     starCountText.text = currentStars.toString()
                     starCountText.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
                 }
@@ -241,11 +288,9 @@ class HomeFragment : Fragment() {
         val updates = mutableMapOf<String, Any>("stars" to nextStars)
 
         if (nextStars < MAX_STARS) {
-            // Shift the start time forward by the time consumed to avoid "losing" milliseconds
             val newTimeMillis = lastUsedMillis + (amount * REGEN_TIME_MILLIS)
             updates["lastStarUsedTime"] = Timestamp(java.util.Date(newTimeMillis))
         } else {
-            // Reset reached
             updates["lastStarUsedTime"] = com.google.firebase.firestore.FieldValue.delete()
         }
 

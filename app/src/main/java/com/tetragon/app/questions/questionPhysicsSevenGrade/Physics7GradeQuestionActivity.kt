@@ -28,11 +28,12 @@ import com.tetragon.app.questions.questionPhysicsSevenGrade.thirdTopic.UiSimpleM
 import com.tetragon.app.questions.questionPhysicsSevenGrade.thirdTopic.UiWorkFragment
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.tetragon.app.databinding.ActivityPhysics7GradeQuestionBinding
 import kotlinx.coroutines.launch
 
 class Physics7GradeQuestionActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityQuestionQctivityBinding
+    private lateinit var binding: ActivityPhysics7GradeQuestionBinding
     private lateinit var selectedTopic: PhysicsGrade7Topic
 
     private var lastType: PhysicsGrade7Type? = null
@@ -58,7 +59,7 @@ class Physics7GradeQuestionActivity : BaseActivity() {
 
         Rive.init(this)
 
-        binding = ActivityQuestionQctivityBinding.inflate(layoutInflater)
+        binding = ActivityPhysics7GradeQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {

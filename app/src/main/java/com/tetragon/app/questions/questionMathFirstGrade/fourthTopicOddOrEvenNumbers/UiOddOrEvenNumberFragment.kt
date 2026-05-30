@@ -194,6 +194,7 @@ class UiOddOrEvenNumberFragment : Fragment(R.layout.fragment_ui_odd_or_even_numb
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)

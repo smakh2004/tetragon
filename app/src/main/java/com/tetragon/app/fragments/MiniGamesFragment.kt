@@ -81,7 +81,7 @@ class MiniGamesFragment : Fragment() {
     // --- TIMER ---
     private lateinit var resetTimerText: TextView
     private lateinit var ivClockIcon: RiveAnimationView
-    private var countdownHandler = android.os.Handler()
+    private var countdownHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var countdownRunnable: Runnable? = null
 
     // --- PROGRESS UI ---
@@ -94,7 +94,12 @@ class MiniGamesFragment : Fragment() {
 
     // --- SCROLL LOGIC ---
     private lateinit var nestedScrollView: NestedScrollView
-    private lateinit var topBarShadow: View
+    private lateinit var miniGamesLineDivider: View
+
+    // --- HOISTED LOADING SYSTEM ---
+    private lateinit var loadingOverlayContainer: FrameLayout
+    private var dataTracksNeeded = 4
+    private var dataTracksLoaded = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -116,6 +121,9 @@ class MiniGamesFragment : Fragment() {
                     val state = child.child("state").getValue(String::class.java)
                     if (state == "online") onlineCount++
                 }
+
+                if (!isAdded) return
+
                 if (onlineCount <= 1) {
                     onlinePlayersText.text = getString(R.string.online_count, 0)
                     onlinePlayersText.setTextColor(resources.getColor(R.color.gray_1, null))
@@ -134,11 +142,8 @@ class MiniGamesFragment : Fragment() {
 
     private fun initViews(view: View) {
         nestedScrollView = view.findViewById(R.id.nestedScrollView)
-        topBarShadow = view.findViewById(R.id.topBarShadow)
-
-        nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
-            topBarShadow.visibility = if (scrollY > 0) View.VISIBLE else View.GONE
-        })
+        miniGamesLineDivider = view.findViewById(R.id.miniGamesLineDivider)
+        loadingOverlayContainer = view.findViewById(R.id.loadingOverlayContainer)
 
         // Math Storm
         mathStormScore = view.findViewById(R.id.math_storm_score_text)
@@ -183,6 +188,13 @@ class MiniGamesFragment : Fragment() {
         step3 = view.findViewById(R.id.step3)
         step4 = view.findViewById(R.id.step4)
         step5 = view.findViewById(R.id.step5)
+
+        // Handles your layout's pre-existing divider on content scroll tracking
+        nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
+            if (isAdded) {
+                miniGamesLineDivider.visibility = if (scrollY > 0) View.VISIBLE else View.INVISIBLE
+            }
+        })
     }
 
     private fun setupClickListeners() {
@@ -191,11 +203,11 @@ class MiniGamesFragment : Fragment() {
             if (isStartingOnline) return@setOnClickListener
             isStartingOnline = true
             disableAllButtonsForLoading()
-            // Localized Loading
             playOnlineDisabledTxt.text = getString(R.string.loading_caps)
             val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
             OnlineGameData.myID = uid
             OnlineGameData.findOrCreateRoom(uid) { game ->
+                if (!isAdded) return@findOrCreateRoom
                 OnlineGameData.saveGameModel(game)
                 startActivity(Intent(requireContext(), OnlineWaitingRoomMathStormActivity::class.java))
                 requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
@@ -205,9 +217,9 @@ class MiniGamesFragment : Fragment() {
         mathStormButton.setOnClickListener {
             if (!isSubscribed && remainingAttempts <= 0) return@setOnClickListener
             disableAllButtonsForLoading()
-            // FIXED: Localized Loading
             startMathStormDisabledBtn.text = getString(R.string.loading_caps)
             decreaseAttempt {
+                if (!isAdded) return@decreaseAttempt
                 startActivity(Intent(requireContext(), MathStormActivity::class.java))
                 requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
             }
@@ -215,7 +227,6 @@ class MiniGamesFragment : Fragment() {
 
         playPrivateGame.setOnClickListener {
             disableAllButtonsForLoading()
-            // FIXED: Localized Loading
             playPrivateDisabledButtonGameText.text = getString(R.string.loading_caps)
             startActivity(Intent(requireContext(), RoomActivity::class.java))
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
@@ -224,12 +235,19 @@ class MiniGamesFragment : Fragment() {
         cashStormButton.setOnClickListener {
             if (!isSubscribed && remainingAttempts <= 0) return@setOnClickListener
             disableAllButtonsForLoading()
-            // FIXED: Localized Loading
             cashStormDisabledBtnText.text = getString(R.string.loading_caps)
             decreaseAttempt {
+                if (!isAdded) return@decreaseAttempt
                 startActivity(Intent(requireContext(), UiCashStormActivity::class.java))
                 requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
             }
+        }
+    }
+
+    private fun checkLoadingProgress() {
+        dataTracksLoaded++
+        if (dataTracksLoaded >= dataTracksNeeded) {
+            loadingOverlayContainer.visibility = View.GONE
         }
     }
 
@@ -247,6 +265,10 @@ class MiniGamesFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
+        dataTracksLoaded = 0
+        loadingOverlayContainer.visibility = View.VISIBLE
+
         resetButtons()
         attachScoreListeners()
         ensureOnlineScoreDocumentExists()
@@ -255,6 +277,7 @@ class MiniGamesFragment : Fragment() {
     }
 
     private fun resetButtons() {
+        if (!isAdded) return
         startMathStromEnabledButtonContainer.visibility = View.VISIBLE
         startMathStromDisabledButtonContainer.visibility = View.INVISIBLE
         startMathStormDisabledBtn.text = getString(R.string.start_xp_format, 10)
@@ -287,37 +310,56 @@ class MiniGamesFragment : Fragment() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = FirebaseFirestore.getInstance()
 
+        var scoresLoaded = 0
+        val totalScoresExpected = 3
+
         scoreListener = db.collection("users").document(uid).collection("games").document("MathStorm")
             .addSnapshotListener { doc, _ ->
-                val score = (doc?.getLong("highScore") ?: 0L).toInt() // Cast to Int
+                if (!isAdded) return@addSnapshotListener
+                val score = (doc?.getLong("highScore") ?: 0L).toInt()
                 mathStormScore.text = getString(R.string.record_format, score)
+
+                if (scoresLoaded < totalScoresExpected) { scoresLoaded++; if (scoresLoaded == totalScoresExpected) checkLoadingProgress() }
             }
 
         onlineScoreListener = db.collection("users").document(uid).collection("games").document("OnlineMathStorm")
             .addSnapshotListener { snapshot, _ ->
-                val score = (snapshot?.getLong("onlineScore") ?: 0L).toInt() // Cast to Int
+                if (!isAdded) return@addSnapshotListener
+                val score = (snapshot?.getLong("onlineScore") ?: 0L).toInt()
                 onlineScoreText.text = getString(R.string.wins_format, score)
+
+                if (scoresLoaded < totalScoresExpected) { scoresLoaded++; if (scoresLoaded == totalScoresExpected) checkLoadingProgress() }
             }
 
         cashScoreListener = db.collection("users").document(uid).collection("games").document("CashStorm")
             .addSnapshotListener { doc, _ ->
-                val score = (doc?.getLong("highScore") ?: 0L).toInt() // Cast to Int
+                if (!isAdded) return@addSnapshotListener
+                val score = (doc?.getLong("highScore") ?: 0L).toInt()
                 cashStormBalanceText.text = getString(R.string.record_format, score)
+
+                if (scoresLoaded < totalScoresExpected) { scoresLoaded++; if (scoresLoaded == totalScoresExpected) checkLoadingProgress() }
             }
     }
 
     private fun attachSubscriptionListener() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        var subTrackFired = false
+
         subscriptionListener = FirebaseFirestore.getInstance().collection("users").document(uid)
             .addSnapshotListener { snapshot, _ ->
                 if (snapshot != null && snapshot.exists()) {
                     isSubscribed = snapshot.getBoolean("subscription") ?: false
                     updateSubscriptionUI()
                 }
+                if (!subTrackFired) {
+                    subTrackFired = true
+                    checkLoadingProgress()
+                }
             }
     }
 
     private fun updateSubscriptionUI() {
+        if (!isAdded) return
         if (isSubscribed) {
             attemptsContainer.visibility = View.GONE
             progressContainer.visibility = View.GONE
@@ -327,7 +369,6 @@ class MiniGamesFragment : Fragment() {
         } else {
             attemptsContainer.visibility = View.VISIBLE
             progressContainer.visibility = View.VISIBLE
-            // Note: Timer visibility is handled by the attempts listener logic
         }
     }
 
@@ -335,11 +376,13 @@ class MiniGamesFragment : Fragment() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val docRef = FirebaseFirestore.getInstance().collection("users").document(uid)
             .collection("games").document("Attempts")
+        var attemptsTrackFired = false
 
         attemptsListener = docRef.addSnapshotListener { snapshot, _ ->
+            if (!isAdded) return@addSnapshotListener
             if (snapshot != null && snapshot.exists()) {
                 remainingAttempts = snapshot.getLong("remainingAttempts") ?: 5L
-                attemptsText.text = "$remainingAttempts"
+                attemptsText.text = remainingAttempts.toString()
                 updateProgressUI(remainingAttempts.toInt())
 
                 if (!isSubscribed) {
@@ -348,11 +391,12 @@ class MiniGamesFragment : Fragment() {
                         attemptsText.setTextColor(resources.getColor(R.color.red_1, null))
                     } else {
                         enableAllGameButtons()
+                        attemptsText.setTextColor(resources.getColor(R.color.text_color, null))
                     }
 
                     val lastReset = snapshot.getLong("lastReset") ?: 0L
                     val now = System.currentTimeMillis()
-                    val remainingTime = 60 * 60 * 1000 - (now - lastReset)
+                    val remainingTime = (60 * 60 * 1000) - (now - lastReset)
 
                     if (remainingAttempts.toInt() == 0 && remainingTime > 0) {
                         ivClockIcon.visibility = View.VISIBLE
@@ -370,10 +414,15 @@ class MiniGamesFragment : Fragment() {
             } else {
                 docRef.set(mapOf("remainingAttempts" to 5L, "lastReset" to System.currentTimeMillis()))
             }
+            if (!attemptsTrackFired) {
+                attemptsTrackFired = true;
+                checkLoadingProgress()
+            }
         }
     }
 
     private fun updateProgressUI(attempts: Int) {
+        if (!isAdded) return
         val steps = listOf(step1, step2, step3, step4, step5)
         for (i in steps.indices) {
             steps[i].setBackgroundResource(
@@ -388,11 +437,12 @@ class MiniGamesFragment : Fragment() {
         }
 
         progressActive.post {
+            if (!isAdded) return@post
             val first = step1
             val lastActive = steps.getOrNull(attempts - 1) ?: return@post
-            val firstCenter = first.x + first.width / 2
-            val lastCenter = lastActive.x + lastActive.width / 2
-            val shift = first.width / 2
+            val firstCenter = first.x + (first.width / 2f)
+            val lastCenter = lastActive.x + (lastActive.width / 2f)
+            val shift = first.width / 2f
             val newWidth = (lastCenter - firstCenter + shift).toInt()
 
             val params = progressActive.layoutParams as ConstraintLayout.LayoutParams
@@ -407,6 +457,7 @@ class MiniGamesFragment : Fragment() {
         countdownRunnable = object : Runnable {
             var remaining = timeMillis
             override fun run() {
+                if (!isAdded) return
                 if (remaining <= 0) {
                     ivClockIcon.visibility = View.GONE
                     resetTimerText.text = getString(R.string.refresh_page)
@@ -439,10 +490,13 @@ class MiniGamesFragment : Fragment() {
                 transaction.update(docRef, "remainingAttempts", current - 1)
                 true
             } else false
-        }.addOnSuccessListener { success -> if (success) onSuccess() }
+        }.addOnSuccessListener { success ->
+            if (success && isAdded) onSuccess()
+        }
     }
 
     private fun disableGameButtonsExceptPrivate() {
+        if (!isAdded) return
         val noAttempts = getString(R.string.no_attempts_caps)
         startMathStromEnabledButtonContainer.visibility = View.INVISIBLE
         startMathStromDisabledButtonContainer.visibility = View.VISIBLE
@@ -461,6 +515,7 @@ class MiniGamesFragment : Fragment() {
     }
 
     private fun enableAllGameButtons() {
+        if (!isAdded) return
         startMathStromEnabledButtonContainer.visibility = View.VISIBLE
         startMathStromDisabledButtonContainer.visibility = View.INVISIBLE
         playOnlineContainer.visibility = View.VISIBLE
@@ -475,8 +530,18 @@ class MiniGamesFragment : Fragment() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val docRef = FirebaseFirestore.getInstance().collection("users").document(uid)
             .collection("games").document("OnlineMathStorm")
+        var documentCheckFired = false
+
         docRef.get().addOnSuccessListener { snapshot ->
-            if (!snapshot.exists()) docRef.set(mapOf("onlineScore" to 0L))
+            if (!snapshot.exists()) {
+                docRef.set(mapOf("onlineScore" to 0L)).addOnCompleteListener {
+                    if (!documentCheckFired) { documentCheckFired = true; checkLoadingProgress() }
+                }
+            } else {
+                if (!documentCheckFired) { documentCheckFired = true; checkLoadingProgress() }
+            }
+        }.addOnFailureListener {
+            if (!documentCheckFired) { documentCheckFired = true; checkLoadingProgress() }
         }
     }
 

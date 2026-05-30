@@ -156,6 +156,7 @@ class UiDmInCmFragment : Fragment(R.layout.fragment_ui_dm_in_cm) {
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()

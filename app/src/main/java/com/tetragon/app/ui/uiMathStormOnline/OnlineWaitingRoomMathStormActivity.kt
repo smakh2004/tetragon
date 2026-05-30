@@ -71,47 +71,53 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
     }
 
     private fun observeGame() {
+        fun loadAvatar(imageView: android.widget.ImageView, avatarName: String?) {
+            val resId = if (!avatarName.isNullOrEmpty()) {
+                resources.getIdentifier(avatarName, "drawable", packageName)
+            } else { 0 }
+            if (resId != 0) imageView.setImageResource(resId)
+        }
+
         OnlineGameData.gameModel.observe(this) { model ->
             gameModel = model
-
             val myUID = OnlineGameData.myID
             val opponentUID = if (myUID == model.player1) model.player2 else model.player1
-            val youUID = myUID
 
-            // Opponent → top
+            // Opponent → Top
             if (opponentUID.isNotEmpty()) {
-                db.collection("users").document(opponentUID)
-                    .addSnapshotListener { snapshot, _ ->
-                        // Use translated "Opponent" if name is missing
-                        binding.playerTwoTxt.text = snapshot?.getString("firstName") ?: getString(R.string.opponent_caps)
+                db.collection("users").document(opponentUID).addSnapshotListener { snapshot, _ ->
+                    binding.playerTwoTxt.text = snapshot?.getString("firstName") ?: getString(R.string.opponent_caps)
 
-                        binding.searchIcon.visibility = View.GONE
-                        binding.playerIconImage.visibility = View.VISIBLE
-                    }
+                    // Set Avatar
+                    loadAvatar(binding.playerIconImage, snapshot?.getString("avatarName"))
+
+                    // Hide search, Show avatar container
+                    binding.searchIcon.visibility = View.GONE
+                    binding.opponentAvatarContainer.visibility = View.VISIBLE // Toggle container
+                    binding.playerIconImage.visibility = View.VISIBLE
+                }
             } else {
-                // Use translated "Searching.."
+                // Keep container hidden while searching
+                binding.opponentAvatarContainer.visibility = View.GONE
+                binding.searchIcon.visibility = View.VISIBLE
                 binding.playerTwoTxt.text = getString(R.string.searching)
             }
 
-            // Current user → bottom
-            if (youUID.isNotEmpty()) {
-                db.collection("users").document(youUID)
-                    .addSnapshotListener { snapshot, _ ->
-                        // Use translated "You" if name is missing
-                        binding.playerOneTxt.text = snapshot?.getString("firstName") ?: getString(R.string.you_caps)
-                    }
+            // Current user → Bottom
+            if (myUID.isNotEmpty()) {
+                db.collection("users").document(myUID).addSnapshotListener { snapshot, _ ->
+                    binding.playerOneTxt.text = snapshot?.getString("firstName") ?: getString(R.string.you_caps)
+                    loadAvatar(binding.myPlayerIconImage, snapshot?.getString("avatarName"))
+                }
             }
-            // Game start logic
+
             if (!gameStarted && model.gameStatus == GameStatus.JOINED) {
                 gameStarted = true
                 binding.cancelButton.visibility = View.GONE
-
                 decreaseAttemptOnline()
-
                 startGameWithDelay()
             }
         }
-
         OnlineGameData.fetchGameModel()
     }
 
@@ -196,5 +202,15 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    // Add this helper method to your class
+    private fun loadAvatar(imageView: android.widget.ImageView, avatarName: String?) {
+        val resId = if (!avatarName.isNullOrEmpty()) {
+            resources.getIdentifier(avatarName, "drawable", packageName)
+        } else {
+            0
+        }
+        if (resId != 0) imageView.setImageResource(resId)
     }
 }

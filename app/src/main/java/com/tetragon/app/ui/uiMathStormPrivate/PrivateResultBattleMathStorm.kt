@@ -13,7 +13,6 @@ import com.tetragon.app.utils.mathStormUtils.PrivateGameData
 import com.tetragon.app.utils.soundUtils.SoundManager
 import com.google.firebase.firestore.FirebaseFirestore
 
-
 class PrivateResultBattleMathStorm : BaseActivity() {
 
     private lateinit var binding: ActivityPrivateResultBattleMathStormBinding
@@ -28,7 +27,7 @@ class PrivateResultBattleMathStorm : BaseActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) { // API 27+
             window.decorView.systemUiVisibility =
                 window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white) // optional: set nav bar color
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
         }
 
         deleteRoom()
@@ -43,21 +42,32 @@ class PrivateResultBattleMathStorm : BaseActivity() {
 
         playResultSound(yourStatus)
 
+        // Show loading display layout layer instantly before background query calls initiate
+        binding.loadingOverlayContainer.visibility = View.VISIBLE
+
         // Fetch names
         val model = PrivateGameData.gameModel.value
         if (model != null) {
-            // Fetch both names
-            fetchUserName(model.player1) { name1 ->
-                fetchUserName(model.player2) { name2 ->
-                    if (PrivateGameData.myID == "P1") {
-                        binding.yourName.text = name1
-                        binding.opponentName.text = name2
-                    } else {
-                        binding.yourName.text = name2
-                        binding.opponentName.text = name1
+            fetchUserData(model.player1) { name1, avatar1 ->
+                fetchUserData(model.player2) { name2, avatar2 ->
+                    if (!isFinishing && !isDestroyed) {
+                        if (PrivateGameData.myID == "P1") {
+                            binding.yourName.text = name1
+                            loadAvatar(binding.yourAvatar, avatar1)
+                            binding.opponentName.text = name2
+                            loadAvatar(binding.opponentAvatar, avatar2)
+                        } else {
+                            binding.yourName.text = name2
+                            loadAvatar(binding.yourAvatar, avatar2)
+                            binding.opponentName.text = name1
+                            loadAvatar(binding.opponentAvatar, avatar1)
+                        }
+                        binding.loadingOverlayContainer.visibility = View.GONE
                     }
                 }
             }
+        } else {
+            binding.loadingOverlayContainer.visibility = View.GONE
         }
 
         // --- LOCALIZED UI TEXT ---
@@ -77,7 +87,6 @@ class PrivateResultBattleMathStorm : BaseActivity() {
         }
     }
 
-    // New helper to keep logic in English but UI in local language
     private fun getLocalizedStatus(status: String): String {
         return when (status) {
             "WINNER" -> getString(R.string.winner)
@@ -116,23 +125,26 @@ class PrivateResultBattleMathStorm : BaseActivity() {
 
     private fun applyResultStyle(status: String, statusView: TextView, scoreView: TextView) {
         val color = when (status) {
-            "WINNER" -> getColor(R.color.green_1)
-            "LOSER" -> getColor(R.color.red_1)
-            else -> getColor(R.color.black_3)
+            "WINNER" -> ContextCompat.getColor(this, R.color.green_1)
+            "LOSER" -> ContextCompat.getColor(this, R.color.red_1)
+            else -> ContextCompat.getColor(this, R.color.black_3)
         }
         statusView.setTextColor(color)
         scoreView.setTextColor(color)
     }
 
-    private fun fetchUserName(uid: String, callback: (String) -> Unit) {
+    private fun fetchUserData(uid: String, callback: (String, String) -> Unit) {
         val unknown = getString(R.string.unknown_player)
-        if (uid.isEmpty()) { callback(unknown); return }
+        if (uid.isEmpty()) { callback(unknown, ""); return }
         db.collection("users").document(uid).get()
-            .addOnSuccessListener { doc ->
-                val name = doc?.getString("firstName") ?: unknown
-                callback(name)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val doc = task.result
+                    callback(doc?.getString("firstName") ?: unknown, doc?.getString("avatarName") ?: "")
+                } else {
+                    callback(unknown, "")
+                }
             }
-            .addOnFailureListener { callback(unknown) }
     }
 
     private fun updateUserOnlineScore(yourStatus: String) {
@@ -162,7 +174,22 @@ class PrivateResultBattleMathStorm : BaseActivity() {
         // Use atomic increment
         gameDoc.set(mapOf("onlineScore" to 0)) // ensures document exists
             .addOnCompleteListener {
-                gameDoc.update("onlineScore", com.google.firebase.firestore.FieldValue.increment(1))
+                if (!isFinishing && !isDestroyed) {
+                    gameDoc.update("onlineScore", com.google.firebase.firestore.FieldValue.increment(1))
+                }
             }
+    }
+
+    private fun loadAvatar(imageView: android.widget.ImageView, avatarName: String?) {
+        val resId = if (!avatarName.isNullOrEmpty()) {
+            resources.getIdentifier(avatarName, "drawable", packageName)
+        } else { 0 }
+        if (resId != 0) imageView.setImageResource(resId)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 }

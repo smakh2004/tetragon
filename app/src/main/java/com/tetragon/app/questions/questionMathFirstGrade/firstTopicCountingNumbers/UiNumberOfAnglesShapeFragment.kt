@@ -232,6 +232,7 @@ class UiNumberOfAnglesShapeFragment : Fragment(R.layout.fragment_ui_number_of_an
             if (drawableId != 0) shapeImage.setImageResource(drawableId)
 
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)

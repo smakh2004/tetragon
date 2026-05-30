@@ -203,6 +203,7 @@ class UiAiAdditionFragment : Fragment(R.layout.fragment_ui_ai_addition) {
             playSound(R.raw.wrong)
             boxIndicator.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)

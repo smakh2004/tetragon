@@ -162,6 +162,7 @@ class ShowCmInRullerFragment : Fragment(R.layout.fragment_show_cm_in_ruller) {
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState()
             setupSeeSolution()

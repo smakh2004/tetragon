@@ -145,16 +145,21 @@
                     app:riveResource="@raw/search_animation"
                     app:riveStateMachine="State Machine 1" />
 
-                <ImageView
-                    android:id="@+id/playerIconImage"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:visibility="gone"
-                    android:src="@drawable/player_icon"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                <FrameLayout
+                    android:id="@+id/opponentAvatarContainer"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/avatar_circle_background"
+                    android:padding="5dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/playerIconImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitCenter" />
+                </FrameLayout>
 
                 <!-- CENTER STATUS TEXT -->
                 <TextView
@@ -251,10 +256,19 @@
                 app:layout_constraintBottom_toTopOf="@+id/cancel_button"
                 app:layout_constraintTop_toBottomOf="@+id/vs_line_container">
 
-                <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:src="@drawable/player_icon" />
+                <FrameLayout
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/avatar_circle_background"
+                    android:padding="5dp">
+
+                    <ImageView
+                        android:id="@+id/myPlayerIconImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitCenter" />
+                </FrameLayout>
                 <!-- CENTER STATUS TEXT -->
                 <TextView
                     android:id="@+id/player_one_name"

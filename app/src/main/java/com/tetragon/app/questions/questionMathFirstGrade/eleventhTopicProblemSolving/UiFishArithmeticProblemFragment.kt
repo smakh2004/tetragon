@@ -172,6 +172,7 @@ class UiFishArithmeticProblemFragment : Fragment(R.layout.fragment_ui_fish_arith
             activity.isResultCurrentlyVisible = true
             stateContainer.visibility = View.VISIBLE
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)

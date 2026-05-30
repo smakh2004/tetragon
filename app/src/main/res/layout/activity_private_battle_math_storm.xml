@@ -182,7 +182,7 @@
                             <ImageView
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                android:src="@drawable/player_icon" />
+                                android:src="@drawable/avatar_1" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -290,7 +290,7 @@
                             <ImageView
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                android:src="@drawable/player_icon" />
+                                android:src="@drawable/avatar_1" />
                         </LinearLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,20 +6,29 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.core.Rive
 import com.tetragon.app.R
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.tetragon.app.utils.soundUtils.SoundManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ResultCashStormActivity : BaseActivity() {
 
     private lateinit var resultText: TextView
     private lateinit var continueButton: Button
     private lateinit var resultTextShower: TextView
+    private lateinit var stormMrSquare: RiveAnimationView
+
+    // --- HOISTED LOADING SYSTEM ---
+    private lateinit var loadingOverlayContainer: FrameLayout
 
     private var currentScore: Int = 0
 
@@ -47,6 +56,8 @@ class ResultCashStormActivity : BaseActivity() {
         resultText = findViewById(R.id.resultText)
         continueButton = findViewById(R.id.continueButton)
         resultTextShower = findViewById(R.id.resultTextShower)
+        loadingOverlayContainer = findViewById(R.id.loadingOverlayContainer)
+        stormMrSquare = findViewById(R.id.storm_mr_square)
 
         // Initialize SoundPool
         val audioAttributes = AudioAttributes.Builder()
@@ -73,7 +84,8 @@ class ResultCashStormActivity : BaseActivity() {
         currentScore = intent.getIntExtra("score", 0)
         resultText.text = currentScore.toString()
 
-        // Sync with Firebase Firestore
+        // Enforce the full-screen loader immediately before transaction tasks fire
+        loadingOverlayContainer.visibility = View.VISIBLE
         checkAndUpdateCashStormProgress()
 
         continueButton.setOnClickListener {
@@ -84,10 +96,14 @@ class ResultCashStormActivity : BaseActivity() {
     }
 
     private fun checkAndUpdateCashStormProgress() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: run {
+            loadingOverlayContainer.visibility = View.GONE
+            return
+        }
         val firestore = FirebaseFirestore.getInstance()
+        // Define the date key to match your graph's format
+        val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
-        // Document specific to this game mode
         val gameDocRef = firestore.collection("users").document(uid)
             .collection("games").document("CashStorm")
         val userDocRef = firestore.collection("users").document(uid)
@@ -96,24 +112,38 @@ class ResultCashStormActivity : BaseActivity() {
             val gameSnapshot = transaction.get(gameDocRef)
             val userSnapshot = transaction.get(userDocRef)
 
+            // Fetch existing data
             val savedHighScore = gameSnapshot.getLong("highScore") ?: 0L
             val currentTotalXp = userSnapshot.getLong("xp") ?: 0L
             val currentMonthlyXp = userSnapshot.getLong("monthlyXP") ?: 0L
 
-            // Update XP (+10 for finishing a round)
-            if (currentScore > 0) {
-                transaction.update(userDocRef, "xp", currentTotalXp + 10)
-                transaction.update(userDocRef, "monthlyXP", currentMonthlyXp + 10)
-            }
+            // Fetch current daily map or create a new one
+            val dailyXpMap = userSnapshot.get("dailyXPGains") as? MutableMap<String, Long> ?: mutableMapOf()
+
+            // Calculate gains (10 XP for finishing)
+            val xpGain = 10L
+            val currentTodayXp = dailyXpMap[todayKey] ?: 0L
+
+            // Update the Map
+            dailyXpMap[todayKey] = currentTodayXp + xpGain
+
+            // Perform updates atomically
+            transaction.update(userDocRef, mapOf(
+                "xp" to (currentTotalXp + xpGain),
+                "monthlyXP" to (currentMonthlyXp + xpGain),
+                "dailyXPGains" to dailyXpMap
+            ))
 
             // Check for New Record
-            if (currentScore.toLong() > savedHighScore) {
-                transaction.set(gameDocRef, hashMapOf("highScore" to currentScore))
-                true // Returns true for onSuccessListener
-            } else {
-                false
+            val isNewRecord = currentScore.toLong() > savedHighScore
+            if (isNewRecord) {
+                transaction.set(gameDocRef, hashMapOf("highScore" to currentScore.toLong()))
             }
+
+            isNewRecord // Return result to the onSuccess listener
         }.addOnSuccessListener { isNewRecord ->
+            if (isFinishing || isDestroyed) return@addOnSuccessListener
+
             if (isNewRecord) {
                 resultTextShower.text = getString(R.string.new_profit_record)
                 playNewRecordSound()
@@ -121,8 +151,15 @@ class ResultCashStormActivity : BaseActivity() {
                 resultTextShower.text = getCashStormTierMessage()
                 playNotRecordSound()
             }
+
+            loadingOverlayContainer.visibility = View.GONE
+            stormMrSquare.play()
         }.addOnFailureListener {
+            if (isFinishing || isDestroyed) return@addOnFailureListener
+
             resultTextShower.text = getString(R.string.sync_error)
+            loadingOverlayContainer.visibility = View.GONE
+            stormMrSquare.play()
         }
     }
 

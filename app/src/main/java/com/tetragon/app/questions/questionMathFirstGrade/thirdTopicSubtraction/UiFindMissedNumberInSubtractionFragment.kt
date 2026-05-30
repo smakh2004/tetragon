@@ -237,6 +237,7 @@ class UiFindMissedNumberInSubtractionFragment : Fragment(R.layout.fragment_ui_fi
             playSound(R.raw.wrong)
             problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
             showIncorrectState(stateContainer, circleState, index)
             setupSeeSolution(stateContainer, circleState)

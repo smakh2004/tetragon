@@ -33,6 +33,7 @@ import com.tetragon.app.questions.questionMathFirstGrade.twelvesTopicLengthCenti
 import com.tetragon.app.questions.questionMathFirstGrade.twelvesTopicLengthCentimeter.UiDmInCmFragment
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.tetragon.app.questions.MathComplexity
 import kotlinx.coroutines.launch
 
 class Math1GradeQuestionActivity : BaseActivity() {
@@ -48,6 +49,14 @@ class Math1GradeQuestionActivity : BaseActivity() {
     var isCorrectAnswerShowing: Boolean = false
 
     private var correctAnswersCount = 0
+
+    private var currentComplexity: MathComplexity = MathComplexity.EASY
+
+    // ✅ Track the last displayed complexity level to handle animation filters
+    private var previousComplexity: MathComplexity? = null
+
+    private var consecutiveCorrectAtLevel = 0
+    private var isOnSecondChance = false
 
     private val viewModel: ConnectivityViewModel by viewModels {
         object : ViewModelProvider.Factory {
@@ -69,6 +78,8 @@ class Math1GradeQuestionActivity : BaseActivity() {
 
         binding = ActivityQuestionQctivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        updateComplexityUi(currentComplexity)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             window.decorView.systemUiVisibility =
@@ -98,59 +109,84 @@ class Math1GradeQuestionActivity : BaseActivity() {
 
     fun handleCorrectAnswer() {
         correctAnswersCount++
+        consecutiveCorrectAtLevel++
+        isOnSecondChance = false
+
+        if (consecutiveCorrectAtLevel >= 3) {
+            currentComplexity = when (currentComplexity) {
+                MathComplexity.EASY -> MathComplexity.MEDIUM
+                MathComplexity.MEDIUM -> MathComplexity.HARD
+                MathComplexity.HARD -> MathComplexity.HARD
+            }
+            consecutiveCorrectAtLevel = 0
+        }
+    }
+
+    fun handleIncorrectAnswer() {
+        consecutiveCorrectAtLevel = 0
+
+        if (!isOnSecondChance) {
+            isOnSecondChance = true
+        } else {
+            currentComplexity = when (currentComplexity) {
+                MathComplexity.HARD -> MathComplexity.MEDIUM
+                MathComplexity.MEDIUM -> MathComplexity.EASY
+                MathComplexity.EASY -> MathComplexity.EASY
+            }
+            isOnSecondChance = false
+        }
     }
 
     fun checkAndTriggerMilestone(): Boolean {
         if (correctAnswersCount >= 5) {
             correctAnswersCount = 0
             triggerMilestoneSequence()
-            return true // Milestone is happening
+            return true
         }
-        return false // No milestone, proceed normally
+        return false
     }
 
     private fun triggerMilestoneSequence() {
         isResultCurrentlyVisible = false
 
-        // 1. Hide the interaction UI and result states
         binding.stateContainer.visibility = View.GONE
         binding.correctMrSquare.visibility = View.GONE
         binding.btnBackground.visibility = View.GONE
 
-        // 2. Swap to the milestone fragment
+        // Force reset snapshot tracking during milestone sweeps
+        previousComplexity = null
+
+        binding.complexityContainer.animate()
+            .alpha(0f)
+            .setDuration(300)
+            .withEndAction {
+                binding.complexityContainer.visibility = View.GONE
+            }
+            .start()
+
         supportFragmentManager.beginTransaction()
             .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
             .replace(R.id.questionFragmentContainer, FiveCorrectAnswerFragment())
             .commit()
 
-        // 3. Automated 3-second delay
         lifecycleScope.launch {
             kotlinx.coroutines.delay(2500)
-
-            // Restore UI visibility for the next question
             binding.btnBackground.visibility = View.VISIBLE
-
-            // Load the next question automatically
             showRandomQuestion()
         }
     }
 
-    // Add this helper so fragments can check the count safely
     fun getCorrectAnswersCount(): Int = correctAnswersCount
 
     fun playSuccessAnimation() {
         binding.correctMrSquare.apply {
-            // 1. Randomly decide which animation file to load
             val randomResource = if ((0..1).random() == 0) {
                 R.raw.mr_square_correct
             } else {
                 R.raw.mr_square_correct_2
             }
 
-            // 2. Assign the chosen resource to the RiveAnimationView
             setRiveResource(randomResource)
-
-            // 3. Make it visible and play the state machine
             visibility = View.VISIBLE
             fireState("State Machine 1", "play")
         }
@@ -158,19 +194,14 @@ class Math1GradeQuestionActivity : BaseActivity() {
 
     fun hideSuccessAnimation() {
         binding.correctMrSquare.apply {
-            // ✅ Trigger the exit transition in your State Machine
             fireState("State Machine 1", "finish")
-
-            // Optional: If you want to be 100% sure it stops drawing
             stop()
-
             visibility = View.INVISIBLE
         }
     }
 
     private fun getTypesForTopic(topic: MathGrade1Topic): List<MathGrade1Type> {
         return when (topic) {
-
             MathGrade1Topic.COUNT_NUMBERS -> listOf(
                 MathGrade1Type.APPLE,
                 MathGrade1Type.FIND_MISSED_NUMBER,
@@ -185,7 +216,7 @@ class Math1GradeQuestionActivity : BaseActivity() {
                 MathGrade1Type.ADDITION_THREE_REPRESENTATION,
                 MathGrade1Type.ADDITION_VISUAL_PROBLEM,
                 MathGrade1Type.ADDITION_TREE,
-                MathGrade1Type.BASIC_AI_ADDITION,
+                MathGrade1Type.BASIC_AI_ADDITION
             )
 
             MathGrade1Topic.SUBTRACTION -> listOf(
@@ -250,21 +281,42 @@ class Math1GradeQuestionActivity : BaseActivity() {
 
             MathGrade1Topic.LENGTH_CENTIMETER -> listOf(
                 MathGrade1Type.CM_RULER,
-                MathGrade1Type.DM_IN_CM,
+                MathGrade1Type.DM_IN_CM
             )
         }
     }
 
     fun showRandomQuestion() {
         isResultCurrentlyVisible = false
-
-        // ✅ Reset the animation state immediately
         hideSuccessAnimation()
-
         binding.correctMrSquare.visibility = View.INVISIBLE
 
-        val availableTypes = getTypesForTopic(selectedTopic).toMutableList()
-        lastQuestionType?.let { availableTypes.remove(it) }
+        // ✅ Check if the complexity has actually changed before playing the animation
+        if (currentComplexity != previousComplexity) {
+            updateComplexityUi(currentComplexity)
+
+            binding.complexityContainer.apply {
+                visibility = View.VISIBLE
+                alpha = 0f
+                animate()
+                    .alpha(1f)
+                    .setDuration(400)
+                    .start()
+            }
+            // Update historical memory snapshot
+            previousComplexity = currentComplexity
+        } else {
+            // ✅ Fallback safety case: keeps view visibility sound without triggering transitions
+            binding.complexityContainer.visibility = View.VISIBLE
+            binding.complexityContainer.alpha = 1f
+        }
+
+        val allTypes = getTypesForTopic(selectedTopic)
+        val atLevel = allTypes.filter { it.complexity == currentComplexity }
+        val pool = if (atLevel.isNotEmpty()) atLevel else allTypes
+
+        val availableTypes = pool.toMutableList()
+        if (availableTypes.size > 1) lastQuestionType?.let { availableTypes.remove(it) }
 
         val nextType = availableTypes.random()
         lastQuestionType = nextType
@@ -329,35 +381,25 @@ class Math1GradeQuestionActivity : BaseActivity() {
             MathGrade1Type.DM_IN_CM -> UiDmInCmFragment()
         }
 
-        // Apply the Right-to-Left animation here
         supportFragmentManager.beginTransaction()
             .setCustomAnimations(
-                R.anim.slide_in_right,  // New fragment enters from the right
-                R.anim.slide_out_left,  // Old fragment exits to the left
-                R.anim.slide_in_left,   // For popBackStack (optional)
-                R.anim.slide_out_right  // For popBackStack (optional)
+                R.anim.slide_in_right, R.anim.slide_out_left,
+                R.anim.slide_in_left, R.anim.slide_out_right
             )
             .replace(R.id.questionFragmentContainer, fragment)
             .commit()
     }
 
     fun incrementProgress(): Boolean {
-
         val progressBar = binding.progressBar
         val increment = progressBar.max / 10
-
         val newProgress = (progressBar.progress + increment).coerceAtMost(progressBar.max)
 
-        // ✅ Smooth animation
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             progressBar.setProgress(newProgress, true)
         } else {
-            // fallback for older devices
             val animator = android.animation.ObjectAnimator.ofInt(
-                progressBar,
-                "progress",
-                progressBar.progress,
-                newProgress
+                progressBar, "progress", progressBar.progress, newProgress
             )
             animator.duration = 500
             animator.interpolator = android.view.animation.DecelerateInterpolator()
@@ -371,7 +413,7 @@ class Math1GradeQuestionActivity : BaseActivity() {
         val intent = Intent(this, XpGainedActivity::class.java).apply {
             putExtra(SubjectConstants.EXTRA_XP, totalXp)
             putExtra(SubjectConstants.EXTRA_TOPIC, selectedTopic.name)
-            putExtra(SubjectConstants.EXTRA_GRADE, 1) // Grade 1
+            putExtra(SubjectConstants.EXTRA_GRADE, 1)
             putExtra(SubjectConstants.EXTRA_SUBJECT, SubjectConstants.SUBJECT_MATH)
         }
         startActivity(intent)
@@ -389,17 +431,12 @@ class Math1GradeQuestionActivity : BaseActivity() {
         val continueButton = view.findViewById<Button>(R.id.noButton)
         val finishButton = view.findViewById<Button>(R.id.finishButton)
 
-        // Using your existing XML string keys
         titleText.text = getString(R.string.quit_title)
         messageText.text = getString(R.string.quit_message)
-
         continueButton.text = getString(R.string.continue_btn)
         finishButton.text = getString(R.string.exit_btn)
 
-        continueButton.setOnClickListener {
-            dialog.dismiss()
-        }
-
+        continueButton.setOnClickListener { dialog.dismiss() }
         finishButton.setOnClickListener {
             finish()
             dialog.dismiss()
@@ -409,38 +446,26 @@ class Math1GradeQuestionActivity : BaseActivity() {
     }
 
     private fun observeConnectivity() {
-
         lifecycleScope.launch {
-
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-
                 viewModel.isConnected.collect { isConnected ->
-
                     if (isConnected) {
-
                         binding.internetConnection.visibility = View.GONE
                         binding.offlineContainer.visibility = View.GONE
                         binding.topBarContainer.visibility = View.VISIBLE
                         binding.questionFragmentContainer.visibility = View.VISIBLE
                         binding.btnBackground.visibility = View.VISIBLE
+                        binding.complexityContainer.visibility = View.VISIBLE
 
                         if (isResultCurrentlyVisible) {
-
                             binding.stateContainer.visibility = View.VISIBLE
-
                             binding.correctMrSquare.visibility =
-                                if (isCorrectAnswerShowing)
-                                    View.VISIBLE
-                                else
-                                    View.INVISIBLE
+                                if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
                         } else {
-
                             binding.stateContainer.visibility = View.INVISIBLE
                             binding.correctMrSquare.visibility = View.INVISIBLE
                         }
-
                     } else {
-
                         binding.internetConnection.visibility = View.VISIBLE
                         binding.offlineContainer.visibility = View.VISIBLE
                         binding.topBarContainer.visibility = View.GONE
@@ -448,9 +473,31 @@ class Math1GradeQuestionActivity : BaseActivity() {
                         binding.btnBackground.visibility = View.GONE
                         binding.stateContainer.visibility = View.GONE
                         binding.correctMrSquare.visibility = View.GONE
+                        binding.complexityContainer.visibility = View.GONE
                     }
                 }
             }
         }
+    }
+
+    private fun updateComplexityUi(complexity: MathComplexity) {
+        val (iconRes, textRes, colorRes) = when (complexity) {
+            MathComplexity.EASY -> Triple(
+                R.drawable.easy,
+                R.string.complexity_easy,
+                R.color.green_1
+            )
+
+            MathComplexity.MEDIUM -> Triple(
+                R.drawable.medium,
+                R.string.complexity_medium,
+                R.color.orange_1
+            )
+
+            MathComplexity.HARD -> Triple(R.drawable.hard, R.string.complexity_hard, R.color.red_1)
+        }
+        binding.complexityIcon.setImageResource(iconRes)
+        binding.complexityText.setText(textRes)
+        binding.complexityText.setTextColor(ContextCompat.getColor(this, colorRes))
     }
 }

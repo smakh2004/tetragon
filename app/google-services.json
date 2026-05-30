@@ -13,7 +13,12 @@
           "package_name": "com.example.tetragon"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "150411864468-60ban1a6ecubotujub26i0lc4f95nrhi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAl2SkRfK9fhrxkizYms0S7oF0-xnVC8no"
@@ -21,7 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150411864468-60ban1a6ecubotujub26i0lc4f95nrhi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -32,7 +42,20 @@
           "package_name": "com.tetragon.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "150411864468-q7mk4cerbpk7h8ige85munr0ql0lhjc7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tetragon.app",
+            "certificate_hash": "5fc80a3eff620c84a9d2324aab9abeecb4bb443c"
+          }
+        },
+        {
+          "client_id": "150411864468-60ban1a6ecubotujub26i0lc4f95nrhi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAl2SkRfK9fhrxkizYms0S7oF0-xnVC8no"
@@ -40,7 +63,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150411864468-60ban1a6ecubotujub26i0lc4f95nrhi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

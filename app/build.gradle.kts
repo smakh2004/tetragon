@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+
+    id("kotlin-parcelize")
 }
 
 android {
@@ -12,8 +14,8 @@ android {
         applicationId = "com.tetragon.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
-        versionName = "3.0"
+        versionCode = 11
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -111,4 +113,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // Add this line to fix the GoogleSignInClient error
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 }

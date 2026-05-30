@@ -17,6 +17,9 @@ object UserPresenceHelper {
     private val database = Firebase.database.reference
     private val firestore = Firebase.firestore
 
+    // FIXED: Keeps a reference to the active network listener so it can be un-hooked cleanly
+    private var connectedListener: ValueEventListener? = null
+
     fun startTracking() {
         val currentUser = auth.currentUser ?: return
         val userId = currentUser.uid
@@ -34,14 +37,18 @@ object UserPresenceHelper {
             "lastChanged" to ServerValue.TIMESTAMP
         )
 
+        // Ensure we don't duplicate listeners if called multiple times sequentially
+        stopTracking()
+
         // Get firstName from Firestore
         userStatusFirestoreRef.get().addOnSuccessListener { snapshot ->
-            val firstName = snapshot.getString("firstName") ?: "Unknown"
+            // Safety Check: If user timed out or was kicked while fetching name, cancel operation
+            if (auth.currentUser == null) return@addOnSuccessListener
 
+            val firstName = snapshot.getString("firstName") ?: "Unknown"
             val isOnline = isOnlineBase + mapOf("firstName" to firstName)
 
-            // Listen connection state
-            database.child(".info/connected").addValueEventListener(object : ValueEventListener {
+            connectedListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val connected = snapshot.getValue(Boolean::class.java) ?: false
                     if (connected) {
@@ -70,11 +77,25 @@ object UserPresenceHelper {
                 }
 
                 override fun onCancelled(error: DatabaseError) {}
-            })
+            }
+
+            // Listen connection state
+            database.child(".info/connected").addValueEventListener(connectedListener as ValueEventListener)
+        }
+    }
+
+    // FIXED: New explicit removal strategy called by MainActivity to prevent loops
+    fun stopTracking() {
+        connectedListener?.let {
+            database.child(".info/connected").removeEventListener(it)
+            connectedListener = null
         }
     }
 
     fun setOffline() {
+        // Automatically isolate structural logic during logout
+        stopTracking()
+
         val currentUser = auth.currentUser ?: return
         val userId = currentUser.uid
 

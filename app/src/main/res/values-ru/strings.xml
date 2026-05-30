@@ -64,12 +64,12 @@
     <string name="delete">УДАЛИТЬ</string>
     <string name="age">Возраст</string>
     <string name="chat">ЧАТ</string>
-    <string name="bot_greeting">Привет! Я Мистер Квадрат. Я ваш личный репетитор по математике.</string>
+    <string name="bot_greeting">Привет! Я Мистер Квадрат. Я ваш личный репетитор.</string>
     <string name="bot_thinking">Мистер Квадрат думает...</string>
     <string name="bot_error_generic">У Мистера Квадрата перепутались углы! Попробуйте еще раз чуть позже.</string>
     <string name="bot_error_429">Мистер Квадрат взял небольшой перерыв, чтобы заточить карандаши. Пожалуйста, подождите!</string>
     <string name="bot_no_answer">Извините, я не смог это обработать.</string>
-    <string name="write_your_question">Напишите свой вопрос...</string>
+    <string name="write_your_question">Задать вопрос...</string>
     <string name="send">ОТПРАВИТЬ</string>
     <string name="verify_your_email_address">Подтвердите ваш адрес электронной почты.</string>
     <string name="we_ve_sent_a_verification_link_to">Мы отправили ссылку для подтверждения на</string>
@@ -108,7 +108,7 @@
     <string name="days_left_plural">ОСТАЛОСЬ %1$d ДНЕЙ</string>
     <string name="rank_status_format">Вы на %1$d-м месте</string>
     <string name="start_gaining_xp">Начните набирать ОЧКИ!</string>
-    <string name="math_games">ИГРЫ ПО МАТЕМАТИКЕ</string>
+    <string name="math_games">МИНИ ИГРЫ</string>
     <string name="cash_storm">КЭШ ШТОРМ</string>
     <string name="start_10xp">СТАРТ +10 ОЧКОВ</string>
     <string name="online_count">%1$d в сети</string>
@@ -139,7 +139,7 @@
     <string name="streak_good">ОТЛИЧНАЯ РАБОТА!</string>
     <string name="streak_practice">ПОРА ПОТРЕНИРОВАТЬСЯ!</string>
     <string name="xp_format">%1$d ОЧКОВ</string>
-    <string name="shop">Магазин</string>
+    <string name="shop">МАГАЗИН</string>
     <string name="attempts">Попытки</string>
     <string name="infinity">Бесконечность</string>
     <string name="with_full_of_stars_you_can_solve_more_math_problems">С полным запасом звёзд вы сможете решить больше задач</string>
@@ -566,4 +566,37 @@
     <string name="premium_nav_title">Настройки подписки</string>
     <string name="full_stars">ЗАПАС ПОЛНЫЙ</string>
     <string name="activated">АКТИВИРОВАНО</string>
+
+    <string name="complexity_easy">ЛЕГКИЙ ПРИМЕР</string>
+    <string name="complexity_medium">СРЕДНИЙ ПРИМЕР</string>
+    <string name="complexity_hard">ТЯЖЁЛЫЙ ПРИМЕР</string>
+
+    <string name="subscription_ends_format">Подписка заканчивается: %1$s</string>
+    <string name="choose_avatar">ВЫБЕРИТЕ АВАТАР</string>
+    <string name="scores">Результаты</string>
+    <string name="place">МЕСТО</string>
+    <string name="profile">Профиль</string>
+    <string name="weekly_progress">Прогресс за неделю</string>
+    <string name="star_up">ЗВЁЗДЫ</string>
+    <string name="buy">КУПИТЬ</string>
+
+    <string name="next_star_in">Следующая звезда:\u0020</string>
+    <string name="default_avatars">Обычные</string>
+    <string name="special_avatars">Эксклюзивные</string>
+
+    <string name="default_web_client_id">150411864468-60ban1a6ecubotujub26i0lc4f95nrhi.apps.googleusercontent.com</string>
+    <string name="already_registered_google">You have already registered</string>
+    <string name="or">ИЛИ</string>
+    <string name="continue_with_google">Войдите через Google</string>
+    <string name="create_an_account">Создать аккаунт</string>
+
+    <!-- Registration Activity Localization -->
+    <string name="welcome_back">С возвращением!</string>
+    <string name="google_error_msg">Ошибка Google: %1$d. Проверьте конфигурацию SHA-1.</string>
+    <string name="firebase_empty_user_error">Внутренняя ошибка: пустая ссылка на пользователя Firebase.</string>
+    <string name="database_connection_error">Ошибка подключения к базе данных: %1$s</string>
+    <string name="firebase_auth_failure">Ошибка авторизации Firebase: %1$s</string>
+
+    <string name="signing_in">ВХОД В АККАУНТ…</string>
+
 </resources>

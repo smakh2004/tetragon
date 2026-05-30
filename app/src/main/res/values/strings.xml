@@ -61,12 +61,12 @@
     <string name="delete">DELETE</string>
     <string name="age">Age</string>
     <string name="chat">CHAT</string>
-    <string name="bot_greeting">Hello! I\'m Mr. Square. I am your personal math tutor.</string>
+    <string name="bot_greeting">Hello! I\'m Mr. Square. I am your personal tutor.</string>
     <string name="bot_thinking">Mr. Square is thinking...</string>
     <string name="bot_error_generic">Mr. Square got his angles crossed! Let\'s try again in a bit.</string>
     <string name="bot_error_429">Mr. Square is taking a short math break to sharpen his pencils. Please wait a moment!</string>
     <string name="bot_no_answer">I\'m sorry, I couldn\'t process that.</string>
-    <string name="write_your_question">Write your question...</string>
+    <string name="write_your_question">Ask question...</string>
     <string name="send">SEND</string>
     <string name="verify_your_email_address">Verify your email address.</string>
     <string name="we_ve_sent_a_verification_link_to">We\'ve sent a verification link to</string>
@@ -105,7 +105,7 @@
     <string name="days_left_plural">%1$d DAYS LEFT</string>
     <string name="rank_status_format">You are in %1$d-place</string>
     <string name="start_gaining_xp">Start to gain XP!</string>
-    <string name="math_games">Math Games</string>
+    <string name="math_games">MINI GAMES</string>
     <string name="cash_storm">CASH STORM</string>
     <string name="start_10xp">START +10XP</string>
     <string name="online_count">%1$d online</string>
@@ -136,7 +136,7 @@
     <string name="streak_good">GOOD JOB!</string>
     <string name="streak_practice">TIME FOR PRACTICE!</string>
     <string name="xp_format">%1$d XP</string>
-    <string name="shop">Shop</string>
+    <string name="shop">SHOP</string>
     <string name="attempts">Attempts</string>
     <string name="infinity">Infinity</string>
     <string name="with_full_of_stars_you_can_solve_more_math_problems">With full of stars you can solve more math problems</string>
@@ -567,4 +567,37 @@
     <string name="premium_nav_title">Subscription Settings</string>
     <string name="full_stars">FULL STARS</string>
     <string name="activated">ACTIVATED</string>
+
+    <string name="complexity_easy">EASY PROBLEM</string>
+    <string name="complexity_medium">MEDIUM PROBLEM</string>
+    <string name="complexity_hard">HARD PROBLEM</string>
+
+    <string name="subscription_ends_format">Subscription ends on: %1$s</string>
+    <string name="choose_avatar">CHOOSE AVATAR</string>
+    <string name="scores">Scores</string>
+    <string name="place">PLACE</string>
+    <string name="profile">Profile</string>
+    <string name="weekly_progress">Weekly progress</string>
+    <string name="star_up">STARS</string>
+    <string name="buy">BUY</string>
+
+    <string name="next_star_in">Next star in \u0020</string>
+    <string name="default_avatars">Default</string>
+    <string name="special_avatars">Special</string>
+
+    <string name="default_web_client_id">150411864468-60ban1a6ecubotujub26i0lc4f95nrhi.apps.googleusercontent.com</string>
+    <string name="already_registered_google">You have already registered</string>
+    <string name="or">OR</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="create_an_account">Create an account</string>
+
+    <!-- Registration Activity Localization -->
+    <string name="welcome_back">Welcome back!</string>
+    <string name="google_error_msg">Google Error Code: %1$d. Check SHA-1 configuration.</string>
+    <string name="firebase_empty_user_error">Internal Error: Empty Firebase User reference.</string>
+    <string name="database_connection_error">Database connection error: %1$s</string>
+    <string name="firebase_auth_failure">Firebase Auth Failure: %1$s</string>
+
+    <string name="signing_in">SIGNING IN…</string>
+
 </resources>

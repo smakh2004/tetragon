@@ -24,5 +24,6 @@ data class Candidate(
 data class ChatMessage(
     val text: String,
     val isUser: Boolean,
-    var isAnimated: Boolean = false // New flag
+    var isAnimated: Boolean = false, // New flag
+    var isThinking: Boolean = false
 )

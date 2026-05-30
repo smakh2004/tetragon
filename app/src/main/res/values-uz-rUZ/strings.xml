@@ -3,7 +3,7 @@
     <string name="app_name">Tetragon</string>
     <string name="login_text">KIRISH</string>
     <string name="start_text">START</string>
-    <string name="enter_your_details">Ma\'lumotlaringizni kiriting</string>
+    <string name="enter_your_details">Akkauntga kiring</string>
     <string name="continue_text">DAVOM ETISH</string>
     <string name="email_text">Email</string>
     <string name="password_text">Parol</string>
@@ -64,7 +64,7 @@
     <string name="delete">O\'CHIRISH</string>
     <string name="age">Yosh</string>
     <string name="chat">CHAT</string>
-    <string name="bot_greeting">Salom! Men Janob Kvadratman. Men sizning shaxsiy matematika o\'qituvchingizman.</string>
+    <string name="bot_greeting">Salom! Men Janob Kvadratman. Men sizning shaxsiy o\'qituvchingizman.</string>
     <string name="bot_thinking">Janob Kvadrat o\'ylamoqda...</string>
     <string name="bot_error_generic">Janob Kvadratning burchaklari chalkashib ketdi! Birozdan keyin qayta urinib ko\'ring.</string>
     <string name="bot_error_429">Janob Kvadrat qalamlarini o\'tkirlash uchun tanaffusga chiqdi. Iltimos, biroz kuting!</string>
@@ -108,7 +108,7 @@
     <string name="days_left_plural">%1$d KUN QOLDI</string>
     <string name="rank_status_format">Siz %1$d-o\'rindasiz</string>
     <string name="start_gaining_xp">Ochko to\'plashni boshlang!</string>
-    <string name="math_games">MATEMATIK O‘YINLAR</string>
+    <string name="math_games">MINI O‘YINLAR</string>
     <string name="cash_storm">KESH SHTORM</string>
     <string name="start_10xp">BOSHLASH +10 OCHKO</string>
     <string name="online_count">%1$d onlayn</string>
@@ -139,7 +139,7 @@
     <string name="streak_good">BARAKALLA!</string>
     <string name="streak_practice">MASHQLAR VAQTI KELDI!</string>
     <string name="xp_format">%1$d OCHKO</string>
-    <string name="shop">Do\'kon</string>
+    <string name="shop">DO\'KON</string>
     <string name="attempts">Urinishlar</string>
     <string name="infinity">Cheksiz yulduzlar</string>
     <string name="with_full_of_stars_you_can_solve_more_math_problems">Yulduzlaringiz ko\'p bo\'lsa, ko\'proq misol yechishingiz mumkin</string>
@@ -352,11 +352,11 @@
     <string name="keyword_three_numbers">uchta son</string>
     <string name="instruction_represent_sum_two">%1$s sonini %2$s yig‘indisi ko‘rinishida ifodalang.</string>
     <string name="keyword_two_numbers">ikkita son</string>
-    <string name="instruction_find_missed_number">%1$s sonni toping.</string>
+    <string name="instruction_find_missed_number">Tushib %1$s sonni toping.</string>
     <string name="instruction_represent_as_subtraction">%1$s sonini ikki sonning %2$s ko‘rinishida ifodalang.</string>
     <string name="keyword_subtraction">ayirmasi</string>
     <string name="label_answer_subtraction">Javob: %1$s - %2$s</string>
-    <string name="instruction_find_type_numbers">%1$s sonlarni toping.</string>
+    <string name="instruction_find_type_numbers">Berilgan sonlarni ichidan, %1$s sonlarni toping.</string>
     <string name="type_even">juft</string>
     <string name="type_odd">toq</string>
     <string name="question_is_odd_or_even">%1$s soni %2$s yoki %3$s sonmi?</string>
@@ -371,7 +371,7 @@
     <string name="instruction_sign_word">belgi</string>
     <string name="math_format_addition">%1$d + %2$d</string>
     <string name="math_format_subtraction">%1$d - %2$d</string>
-    <string name="question_true_or_false">Bu %1$smi yoki %2$s?</string>
+    <string name="question_true_or_false">Bu %1$s yoki %2$s?</string>
     <string name="option_true">Rost</string>
     <string name="option_false">Yolg‘on</string>
     <string name="math_problem_equal_template">%1$s =</string>
@@ -563,4 +563,36 @@
     <string name="premium_nav_title">Obuna sozlamalari</string>
     <string name="full_stars">YULDUZLAR TO\'LIQ</string>
     <string name="activated">FAOLLASHTIRLIGAN</string>
+
+    <string name="complexity_easy">ONSON MISOL</string>
+    <string name="complexity_medium">O\'RTACHA MISOL</string>
+    <string name="complexity_hard">QIYIN MISOL</string>
+
+    <string name="subscription_ends_format">Obuna tugash sanasi: %1$s</string>
+    <string name="choose_avatar">AVATAR TANLANG</string>
+    <string name="scores">Natijalar</string>
+    <string name="place">O\'RIN</string>
+    <string name="profile">Profil</string>
+    <string name="weekly_progress">Haftalik progress</string>
+    <string name="star_up">YULDUZLAR</string>
+    <string name="buy">SOTIB OLISH</string>
+
+    <string name="next_star_in">Keyingi yulduz:\u0020 </string>
+    <string name="default_avatars">Oddiy</string>
+    <string name="special_avatars">Maxsus</string>
+
+    <string name="default_web_client_id">150411864468-60ban1a6ecubotujub26i0lc4f95nrhi.apps.googleusercontent.com</string>
+    <string name="already_registered_google">You have already registered</string>
+    <string name="or">YOKI</string>
+    <string name="continue_with_google">Google orqali kiring</string>
+    <string name="create_an_account">Akkaunt yaratish</string>
+
+    <string name="welcome_back">Qaytkaningizdan xursandmiz!</string>
+    <string name="google_error_msg">Google xatolik kodi: %1$d. SHA-1 sozlamalarini tekshiring.</string>
+    <string name="firebase_empty_user_error">Ichki xatolik: Firebase foydalanuvchi ma\'lumoti bo\'sh.</string>
+    <string name="database_connection_error">Ma\'lumotlar bazasiga ulanish xatosi: %1$s</string>
+    <string name="firebase_auth_failure">Firebase identifikatsiya xatosi: %1$s</string>
+
+    <string name="signing_in">KIRISH…</string>
+
 </resources>
