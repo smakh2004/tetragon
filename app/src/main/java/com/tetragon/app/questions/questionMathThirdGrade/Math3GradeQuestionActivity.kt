@@ -2,7 +2,6 @@ package com.tetragon.app.questions.questionMathThirdGrade
 
 import android.animation.ObjectAnimator
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -10,24 +9,19 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import app.rive.runtime.kotlin.core.Rive
 import com.tetragon.app.R
 import com.tetragon.app.connectivityCheck.AndroidConnectivityObserver
 import com.tetragon.app.connectivityCheck.ConnectivityViewModel
-import com.tetragon.app.databinding.ActivityMath3GradeQuestionBinding // Ensure this matches your XML name
+import com.tetragon.app.databinding.ActivityMath3GradeQuestionBinding
 import com.tetragon.app.questions.FiveCorrectAnswerFragment
 import com.tetragon.app.questions.SubjectConstants
 import com.tetragon.app.questions.XpGainedActivity
-import com.tetragon.app.questions.questionMathThirdGrade.firstTopic.UiComplexMultiplicationFragment
-import com.tetragon.app.questions.questionMathThirdGrade.firstTopic.UiComplexMultiplicationInteractiveFragment
-import com.tetragon.app.questions.questionMathThirdGrade.fourthTopic.UiFindAreaFragment
-import com.tetragon.app.questions.questionMathThirdGrade.fourthTopic.UiFindPerimeterFragment
-import com.tetragon.app.questions.questionMathThirdGrade.secondTopic.UiComplexDivisionFragment
-import com.tetragon.app.questions.questionMathThirdGrade.secondTopic.UiComplexDivisionInteractiveFragment
-import com.tetragon.app.questions.questionMathThirdGrade.thirdTopic.UiFractionPizzaSixPiecesFragment
-import com.tetragon.app.questions.questionMathThirdGrade.thirdTopic.UiFractionProblemFragment
+import com.tetragon.app.questions.questionMathThirdGrade.firstTopic.*
+import com.tetragon.app.questions.questionMathThirdGrade.fourthTopic.*
+import com.tetragon.app.questions.questionMathThirdGrade.secondTopic.*
+import com.tetragon.app.questions.questionMathThirdGrade.thirdTopic.*
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
@@ -57,12 +51,6 @@ class Math3GradeQuestionActivity : BaseActivity() {
         Rive.init(this)
         binding = ActivityMath3GradeQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Styling for Android Engineering best practices
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
 
         binding.exitBtn.setOnClickListener { showQuitBottomSheet() }
         onBackPressedDispatcher.addCallback(this) { showQuitBottomSheet() }
@@ -129,25 +117,10 @@ class Math3GradeQuestionActivity : BaseActivity() {
 
     private fun getTypesForTopic(topic: MathGrade3Topic): List<MathGrade3Type> {
         return when (topic) {
-            MathGrade3Topic.COMPLEX_MULTIPLICATION -> listOf(
-                MathGrade3Type.MULTIPLICATION,
-                MathGrade3Type.MULTIPLICATION_INTERACTIVE,
-            )
-
-            MathGrade3Topic.COMPLEX_DIVISION -> listOf(
-                MathGrade3Type.DIVISION,
-                MathGrade3Type.DIVISION_INTERACTIVE,
-            )
-
-            MathGrade3Topic.FRACTIONS -> listOf(
-                MathGrade3Type.PIZZA_6,
-                MathGrade3Type.FRACTION,
-            )
-
-            MathGrade3Topic.PERIMETER_AREA -> listOf(
-                MathGrade3Type.PERIMETER,
-                MathGrade3Type.AREA,
-            )
+            MathGrade3Topic.COMPLEX_MULTIPLICATION -> listOf(MathGrade3Type.MULTIPLICATION, MathGrade3Type.MULTIPLICATION_INTERACTIVE)
+            MathGrade3Topic.COMPLEX_DIVISION -> listOf(MathGrade3Type.DIVISION, MathGrade3Type.DIVISION_INTERACTIVE)
+            MathGrade3Topic.FRACTIONS -> listOf(MathGrade3Type.PIZZA_6, MathGrade3Type.FRACTION)
+            MathGrade3Topic.PERIMETER_AREA -> listOf(MathGrade3Type.PERIMETER, MathGrade3Type.AREA, MathGrade3Type.RADIUS)
         }
     }
 
@@ -165,15 +138,13 @@ class Math3GradeQuestionActivity : BaseActivity() {
         val fragment = when (nextType) {
             MathGrade3Type.MULTIPLICATION -> UiComplexMultiplicationFragment()
             MathGrade3Type.MULTIPLICATION_INTERACTIVE -> UiComplexMultiplicationInteractiveFragment()
-
             MathGrade3Type.DIVISION -> UiComplexDivisionFragment()
             MathGrade3Type.DIVISION_INTERACTIVE -> UiComplexDivisionInteractiveFragment()
-
             MathGrade3Type.PIZZA_6 -> UiFractionPizzaSixPiecesFragment()
             MathGrade3Type.FRACTION -> UiFractionProblemFragment()
-
             MathGrade3Type.PERIMETER -> UiFindPerimeterFragment()
             MathGrade3Type.AREA -> UiFindAreaFragment()
+            MathGrade3Type.RADIUS -> UiShowRadiusFragment()
         }
 
         supportFragmentManager.beginTransaction()
@@ -187,7 +158,7 @@ class Math3GradeQuestionActivity : BaseActivity() {
         val increment = progressBar.max / 10
         val newProgress = (progressBar.progress + increment).coerceAtMost(progressBar.max)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             progressBar.setProgress(newProgress, true)
         } else {
             ObjectAnimator.ofInt(progressBar, "progress", progressBar.progress, newProgress).apply {
@@ -216,23 +187,15 @@ class Math3GradeQuestionActivity : BaseActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        // Localized Title and Message
         view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
         view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
-
-        // Localized "CONTINUE" button
         view.findViewById<Button>(R.id.noButton).apply {
             text = getString(R.string.continue_text)
             setOnClickListener { dialog.dismiss() }
         }
-
-        // Localized "EXIT" button
         view.findViewById<Button>(R.id.finishButton).apply {
             text = getString(R.string.exit_btn)
-            setOnClickListener {
-                finish()
-                dialog.dismiss()
-            }
+            setOnClickListener { finish(); dialog.dismiss() }
         }
         dialog.show()
     }
@@ -248,24 +211,18 @@ class Math3GradeQuestionActivity : BaseActivity() {
     }
 
     private fun updateUIForConnectivity(isConnected: Boolean) {
-        if (isConnected) {
-            binding.internetConnection.visibility = View.GONE
-            binding.offlineContainer.visibility = View.GONE
-            binding.topBarContainer.visibility = View.VISIBLE
-            binding.questionFragmentContainer.visibility = View.VISIBLE
-            binding.btnBackground.visibility = View.VISIBLE
-            if (isResultCurrentlyVisible) {
-                binding.stateContainer.visibility = View.VISIBLE
-                binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
-            }
+        val isVisible = isConnected
+        binding.internetConnection.visibility = if (isVisible) View.GONE else View.VISIBLE
+        binding.offlineContainer.visibility = if (isVisible) View.GONE else View.VISIBLE
+        binding.topBarContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+        binding.questionFragmentContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+        binding.btnBackground.visibility = if (isVisible) View.VISIBLE else View.GONE
+
+        if (isVisible && isResultCurrentlyVisible) {
+            binding.stateContainer.visibility = View.VISIBLE
+            binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
         } else {
-            binding.internetConnection.visibility = View.VISIBLE
-            binding.offlineContainer.visibility = View.VISIBLE
-            binding.topBarContainer.visibility = View.GONE
-            binding.questionFragmentContainer.visibility = View.GONE
-            binding.btnBackground.visibility = View.GONE
             binding.stateContainer.visibility = View.GONE
-            binding.correctMrSquare.visibility = View.GONE
         }
     }
 }

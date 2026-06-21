@@ -42,6 +42,5 @@ class AccountActivity : BaseActivity() {
             startActivity(Intent(this, DeleteAccountActivity::class.java))
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
-
     }
 }

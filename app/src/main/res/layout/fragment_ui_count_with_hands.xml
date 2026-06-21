@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".questions.questionMathFirstGrade.firstTopicCountingNumbers.UiCountWithHandsFragment">
+
+    <TextView
+        android:id="@+id/questionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="@string/question_count_hands_title"
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/handCountImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/hand_six"
+        app:layout_constraintBottom_toTopOf="@id/counterContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/questionText"
+        app:layout_constraintWidth_max="420dp"
+        tools:src="@drawable/hand_six" />
+
+    <LinearLayout
+        android:id="@+id/counterContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <FrameLayout
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <FrameLayout
+                android:id="@+id/minus_enabled_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+                <View
+                    android:id="@+id/minus_btn_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_2"
+                    android:translationY="5dp" />
+                <LinearLayout
+                    android:id="@+id/minus_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_3"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:stateListAnimator="@drawable/button_animator">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_minus_icon"/>
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/minus_disabled_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:translationY="5dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:translationY="5dp">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_disabled_minus_icon"/>
+                </LinearLayout>
+            </FrameLayout>
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_counter_value"
+            android:layout_width="86dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="28dp"
+            android:layout_marginEnd="28dp"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
+            android:text="6"
+            android:textColor="@color/text_color"
+            android:textSize="72sp"
+            android:includeFontPadding="false" />
+
+        <FrameLayout
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <FrameLayout
+                android:id="@+id/add_enabled_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+                <View
+                    android:id="@+id/add_btn_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_2"
+                    android:translationY="5dp" />
+                <LinearLayout
+                    android:id="@+id/add_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/black_3"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:stateListAnimator="@drawable/button_animator">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_add_icon"/>
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/add_disabled_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:translationY="5dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/custom_button"
+                    android:backgroundTint="@color/gray_2"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:translationY="5dp">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_disabled_add_icon"/>
+                </LinearLayout>
+            </FrameLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

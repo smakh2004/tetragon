@@ -11,7 +11,8 @@ object PasswordToggleHelper {
     fun attach(
         editText: EditText,
         eyeOpenIcon: Int,
-        eyeClosedIcon: Int
+        eyeClosedIcon: Int,
+        onVisibilityChanged: ((isVisible: Boolean) -> Unit)? = null
     ) {
         var isPasswordVisible = false
 
@@ -48,6 +49,7 @@ object PasswordToggleHelper {
                         editText.setSelection(editText.text.length)
 
                         isPasswordVisible = !isPasswordVisible
+                        onVisibilityChanged?.invoke(isPasswordVisible)
 
                         return@setOnTouchListener true
                     }

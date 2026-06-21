@@ -10,7 +10,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import app.rive.runtime.kotlin.core.Rive
 import com.tetragon.app.R
@@ -42,27 +41,17 @@ class Physics11GradeQuestionActivity : BaseActivity() {
     private val viewModel: ConnectivityViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ConnectivityViewModel(
-                    AndroidConnectivityObserver(applicationContext)
-                ) as T
+                return ConnectivityViewModel(AndroidConnectivityObserver(applicationContext)) as T
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         Rive.init(this)
 
         binding = ActivityPhysics11GradeQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // UI Styling for Navigation Bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
 
         binding.exitBtn.setOnClickListener { showQuitBottomSheet() }
 
@@ -70,7 +59,6 @@ class Physics11GradeQuestionActivity : BaseActivity() {
             showQuitBottomSheet()
         }
 
-        // Logic to get the topic from intent (expected: "MODERN_PHYSICS")
         val topicName = intent.getStringExtra("TOPIC_KEY")
             ?: throw IllegalArgumentException("TOPIC_KEY missing for Grade 11 Physics")
 
@@ -82,8 +70,6 @@ class Physics11GradeQuestionActivity : BaseActivity() {
             showRandomQuestion()
         }
     }
-
-    // --- Answer Handling ---
 
     fun handleCorrectAnswer() {
         correctAnswersCount++
@@ -118,15 +104,9 @@ class Physics11GradeQuestionActivity : BaseActivity() {
         }
     }
 
-    // --- Animations ---
-
     fun playSuccessAnimation() {
         binding.correctMrSquare.apply {
-            val randomResource = if ((0..1).random() == 0) {
-                R.raw.mr_square_correct
-            } else {
-                R.raw.mr_square_correct_2
-            }
+            val randomResource = if ((0..1).random() == 0) R.raw.mr_square_correct else R.raw.mr_square_correct_2
             setRiveResource(randomResource)
             visibility = View.VISIBLE
             fireState("State Machine 1", "play")
@@ -142,13 +122,9 @@ class Physics11GradeQuestionActivity : BaseActivity() {
         isCorrectAnswerShowing = false
     }
 
-    // --- Question Logic ---
-
     private fun getTypesForTopic(topic: PhysicsGrade11Topic): List<PhysicsGrade11Type> {
         return when (topic) {
-            PhysicsGrade11Topic.MODERN_PHYSICS -> listOf(
-                PhysicsGrade11Type.EINSTEIN // Example type
-            )
+            PhysicsGrade11Topic.MODERN_PHYSICS -> listOf(PhysicsGrade11Type.EINSTEIN)
         }
     }
 
@@ -167,10 +143,7 @@ class Physics11GradeQuestionActivity : BaseActivity() {
         }
 
         supportFragmentManager.beginTransaction()
-            .setCustomAnimations(
-                R.anim.slide_in_right, R.anim.slide_out_left,
-                R.anim.slide_in_left, R.anim.slide_out_right
-            )
+            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
             .replace(R.id.questionFragmentContainer, fragment)
             .commit()
     }
@@ -183,9 +156,7 @@ class Physics11GradeQuestionActivity : BaseActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             progressBar.setProgress(newProgress, true)
         } else {
-            val animator = ObjectAnimator.ofInt(
-                progressBar, "progress", progressBar.progress, newProgress
-            )
+            val animator = ObjectAnimator.ofInt(progressBar, "progress", progressBar.progress, newProgress)
             animator.duration = 500
             animator.interpolator = DecelerateInterpolator()
             animator.start()
@@ -210,55 +181,39 @@ class Physics11GradeQuestionActivity : BaseActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        // Localized Title and Message
         view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
         view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
 
-        // Localized "CONTINUE" button
         view.findViewById<Button>(R.id.noButton).apply {
             text = getString(R.string.continue_text)
             setOnClickListener { dialog.dismiss() }
         }
-
-        // Localized "EXIT" button
         view.findViewById<Button>(R.id.finishButton).apply {
             text = getString(R.string.exit_btn)
-            setOnClickListener {
-                finish()
-                dialog.dismiss()
-            }
+            setOnClickListener { finish(); dialog.dismiss() }
         }
         dialog.show()
     }
-
-    // --- Connectivity ---
 
     private fun observeConnectivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isConnected.collect { isConnected ->
-                    updateUIForConnectivity(isConnected)
+                    val isVisible = isConnected
+                    binding.internetConnection.visibility = if (isVisible) View.GONE else View.VISIBLE
+                    binding.offlineContainer.visibility = if (isVisible) View.GONE else View.VISIBLE
+                    binding.topBarContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+                    binding.questionFragmentContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+                    binding.btnBackground.visibility = if (isVisible) View.VISIBLE else View.GONE
+
+                    if (isVisible && isResultCurrentlyVisible) {
+                        binding.stateContainer.visibility = View.VISIBLE
+                        binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
+                    } else {
+                        binding.stateContainer.visibility = View.GONE
+                    }
                 }
             }
-        }
-    }
-
-    private fun updateUIForConnectivity(isConnected: Boolean) {
-        val visibility = if (isConnected) View.VISIBLE else View.GONE
-        val inverseVisibility = if (isConnected) View.GONE else View.VISIBLE
-
-        binding.internetConnection.visibility = inverseVisibility
-        binding.offlineContainer.visibility = inverseVisibility
-
-        binding.topBarContainer.visibility = visibility
-        binding.questionFragmentContainer.visibility = visibility
-        binding.btnBackground.visibility = visibility
-
-        if (isConnected && isResultCurrentlyVisible) {
-            binding.stateContainer.visibility = View.VISIBLE
-            binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
-        } else {
-            binding.stateContainer.visibility = View.GONE
         }
     }
 }

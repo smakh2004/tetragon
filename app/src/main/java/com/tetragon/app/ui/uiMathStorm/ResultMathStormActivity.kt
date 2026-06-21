@@ -2,13 +2,11 @@ package com.tetragon.app.ui.uiMathStorm
 
 import android.media.AudioAttributes
 import android.media.SoundPool
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.core.Rive
 import com.tetragon.app.R
@@ -44,13 +42,6 @@ class ResultMathStormActivity : BaseActivity() {
         // Initialize Rive audio engine
         Rive.init(this)
         setContentView(R.layout.activity_result_math_storm)
-
-        // Light navigation bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
 
         resultText = findViewById(R.id.resultText)
         continueButton = findViewById(R.id.continueButton)

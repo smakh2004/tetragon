@@ -48,12 +48,6 @@ class PrivateWaitingRoomMathStorm : BaseActivity() {
         binding = ActivityPrivateWaitingRoomMathStormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
-
         observeConnectivity()
 
         binding.cancelButton.setOnClickListener {

@@ -6,28 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:fitsSystemWindows="true"
     tools:context=".ui.WelcomeActivity">
-
-    <app.rive.runtime.kotlin.RiveAnimationView
-        android:id="@+id/welcome_mr_square"
-        android:layout_width="550dp"
-        android:layout_marginBottom="50dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:riveAutoPlay="true"
-        app:riveResource="@raw/welcome_mr_square"
-        app:riveStateMachine="State Machine 1" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout5"
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:background="@drawable/bottom_bar_gradient"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/internetConnection"
@@ -55,230 +35,300 @@
             android:text="@string/you_are_offline"
             android:textColor="@color/black_3"
             android:textSize="14sp" />
-
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout4"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+    <!-- REPLACED VIDEO WITH RIVE ANIMATION CONTAINER -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/welcome_screen_card"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="94dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:clipChildren="true"
+        android:clipToOutline="true"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/text_content_wrapper"
+        app:layout_constraintDimensionRatio="1:1.2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/internetConnection"
+        app:strokeColor="@color/gray_2"
+        app:strokeWidth="2dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
+
+            <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/welcome_rive_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleX="1.25"
+                android:scaleY="1.25"
+                app:riveAutoPlay="true"
+                app:riveResource="@raw/tetragon_intro"
+                app:riveStateMachine="State Machine 1" />
+
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/correct_mr_square"
+        android:layout_width="135dp"
+        android:layout_height="95dp"
+        app:layout_constraintBottom_toTopOf="@+id/welcome_screen_card"
+        app:layout_constraintEnd_toEndOf="@+id/welcome_screen_card"
+        app:layout_constraintStart_toStartOf="@+id/welcome_screen_card"
+        app:riveAutoPlay="true"
+        app:riveResource="@raw/mr_square_correct"
+        app:riveStateMachine="State Machine 1" />
+
+    <LinearLayout
+        android:id="@+id/text_content_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/start_btn_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/logo_branding_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/tetragon_logo"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="6dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/logo_blue"
+                android:tint="@color/gray_2"
+                tools:ignore="UseAppTint" />
 
             <TextView
-                android:id="@+id/tetragon_text"
+                android:id="@+id/tetragon_logo_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
                 android:fontFamily="@font/inter_bold"
+                android:letterSpacing="0.05"
                 android:text="@string/tetragon"
-                android:textColor="@color/blue_2"
-                android:textSize="36sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textColor="@color/gray_2"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tetragon_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
+            android:text="@string/learn_natural_sciences"
+            android:textColor="@color/blue_2"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/tetragon_description_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.2"
+            android:text="@string/transform_the_learning_process_into_an_interactive_and_fun_experience"
+            android:textColor="@color/text_color"
+            android:textSize="17sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/offlineContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/start_btn_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/internetConnection">
+
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/internet_mr_square"
+            android:layout_width="260dp"
+            android:layout_height="180dp"
+            app:riveAutoPlay="true"
+            app:riveResource="@raw/no_internet_mr_square"
+            app:riveStateMachine="State Machine 1" />
+
+        <TextView
+            android:id="@+id/offlineTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/inter_semibold"
+            android:text="@string/app_is_currently_unavailable"
+            android:textColor="@color/black_3"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/offlineSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:text="@string/check_your_connection_or_try_again_later"
+            android:textAlignment="center"
+            android:textColor="@color/gray_1"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/start_btn_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="14dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingBottom="5dp"
+        app:layout_constraintBottom_toTopOf="@id/login_btn_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <FrameLayout
+            android:id="@+id/start_enabled_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="@color/blue_1"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/start_enabled_btn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:fontFamily="@font/inter_semibold"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="@string/start_text"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                app:backgroundTint="@color/blue_2" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/start_disabled_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="@color/gray_2"
+                android:translationY="5dp" />
 
             <TextView
-                android:id="@+id/tetragon_description_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_medium"
-                android:layout_marginTop="-10dp"
-                android:text="@string/learn_with_joy"
-                android:textColor="@color/gray_1"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tetragon_text" />
-
-
-            <!-- START BUTTON -->
-            <LinearLayout
-                android:id="@+id/offlineContainer"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:id="@+id/start_disabled_btn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:fontFamily="@font/inter_semibold"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp"
-                app:layout_constraintBottom_toTopOf="@+id/start_btn_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0">
+                android:text="@string/start_text"
+                android:textColor="@color/gray_1"
+                android:textSize="17sp"
+                android:translationY="5dp" />
+        </FrameLayout>
+    </FrameLayout>
 
-                <app.rive.runtime.kotlin.RiveAnimationView
-                    android:id="@+id/internet_mr_square"
-                    android:layout_width="260dp"
-                    android:layout_height="180dp"
-                    app:riveAutoPlay="true"
-                    app:riveResource="@raw/no_internet_mr_square"
-                    app:riveStateMachine="State Machine 1" />
+    <FrameLayout
+        android:id="@+id/login_btn_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingBottom="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-                <TextView
-                    android:id="@+id/offlineTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="@font/inter_semibold"
-                    android:text="@string/app_is_currently_unavailable"
-                    android:textColor="@color/black_3"
-                    android:textSize="18sp" />
+        <FrameLayout
+            android:id="@+id/login_enabled_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
 
-                <TextView
-                    android:id="@+id/offlineSubtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/inter_medium"
-                    android:gravity="center"
-                    android:text="@string/check_your_connection_or_try_again_later"
-                    android:textAlignment="center"
-                    android:textColor="@color/gray_1"
-                    android:textSize="14sp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="@color/black_2"
+                android:translationY="5dp" />
 
-            </LinearLayout>
+            <Button
+                android:id="@+id/login_enabled_btn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:fontFamily="@font/inter_semibold"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="LOG IN"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                app:backgroundTint="@color/black_3" />
+        </FrameLayout>
 
-            <FrameLayout
-                android:id="@+id/start_btn_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:paddingBottom="5dp"
-                app:layout_constraintBottom_toTopOf="@id/login_btn_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+        <FrameLayout
+            android:id="@+id/login_disabled_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible">
 
-                <!-- ENABLED START BUTTON -->
-                <FrameLayout
-                    android:id="@+id/start_enabled_btn_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="visible">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="@color/gray_2"
+                android:translationY="5dp" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:backgroundTint="@color/blue_1"
-                        android:translationY="5dp" />
+            <TextView
+                android:id="@+id/login_disabled_btn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="LOG IN"
+                android:textColor="@color/gray_1"
+                android:textSize="17sp"
+                android:translationY="5dp" />
+        </FrameLayout>
+    </FrameLayout>
 
-                    <Button
-                        android:id="@+id/start_enabled_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:fontFamily="@font/inter_semibold"
-                        android:stateListAnimator="@drawable/button_animator"
-                        android:text="@string/start_text"
-                        android:textColor="@color/white"
-                        android:textSize="17sp"
-                        app:backgroundTint="@color/blue_2" />
-                </FrameLayout>
-
-                <!-- DISABLED START BUTTON -->
-                <FrameLayout
-                    android:id="@+id/start_disabled_btn_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible">
-
-                    <!-- shadow -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:backgroundTint="@color/gray_2"
-                        android:translationY="5dp" />
-
-                    <!-- text over shadow -->
-                    <TextView
-                        android:id="@+id/start_disabled_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:fontFamily="@font/inter_semibold"
-                        android:gravity="center"
-                        android:text="@string/start_text"
-                        android:textColor="@color/gray_1"
-                        android:textSize="17sp"
-                        android:translationY="5dp" />
-                </FrameLayout>
-            </FrameLayout>
-
-            <!-- LOGIN BUTTON -->
-            <FrameLayout
-                android:id="@+id/login_btn_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:paddingBottom="5dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <!-- ENABLED LOGIN BUTTON -->
-                <FrameLayout
-                    android:id="@+id/login_enabled_btn_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="visible">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:backgroundTint="@color/black_2"
-                        android:translationY="5dp" />
-
-                    <Button
-                        android:id="@+id/login_enabled_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:fontFamily="@font/inter_semibold"
-                        android:stateListAnimator="@drawable/button_animator"
-                        android:text="@string/login_text"
-                        android:textColor="@color/white"
-                        android:textSize="17sp"
-                        app:backgroundTint="@color/black_3" />
-                </FrameLayout>
-
-                <!-- DISABLED LOGIN BUTTON -->
-                <FrameLayout
-                    android:id="@+id/login_disabled_btn_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible">
-
-                    <!-- shadow -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/custom_button"
-                        android:backgroundTint="@color/gray_2"
-                        android:translationY="5dp" />
-
-                    <!-- text over shadow -->
-                    <TextView
-                        android:id="@+id/login_disabled_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:fontFamily="@font/inter_semibold"
-                        android:gravity="center"
-                        android:text="@string/login_text"
-                        android:textColor="@color/gray_1"
-                        android:textSize="17sp"
-                        android:translationY="5dp" />
-                </FrameLayout>
-            </FrameLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

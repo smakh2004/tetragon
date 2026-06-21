@@ -12,4 +12,5 @@ enum class MathGrade3Type(val xp: Int) {
 
     PERIMETER(2),
     AREA(3),
+    RADIUS(2),
 }

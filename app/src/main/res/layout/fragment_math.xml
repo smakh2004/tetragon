@@ -281,7 +281,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_semibold"
-                            android:text="@string/_5_topics"
+                            android:text="@string/_6_topics"
                             android:textColor="@color/gray_2"
                             android:textSize="14sp" />
                     </LinearLayout>

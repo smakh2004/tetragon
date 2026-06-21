@@ -4,9 +4,13 @@ import com.tetragon.app.questions.MathComplexity
 
 enum class MathGrade1Type(val xp: Int, val complexity: MathComplexity) {
     APPLE(1, MathComplexity.EASY),
+    APPLE_COUNT(1, MathComplexity.EASY),
+    NUMBER_DRAWING(1, MathComplexity.EASY),
+    HAND_COUNT(1, MathComplexity.EASY),
     FIND_MISSED_NUMBER(2, MathComplexity.MEDIUM),
-    FIND_NEXT_NUMBER(1, MathComplexity.EASY),
-    ANGLES(3, MathComplexity.HARD),
+    ANGLES(2, MathComplexity.MEDIUM),
+    COUNT_BY(3, MathComplexity.HARD),
+    FIND_NEXT_NUMBER(3, MathComplexity.HARD),
 
     ADDITION_NUMBERS(1, MathComplexity.EASY),
     ADDITION_MISSED_NUMBER(2, MathComplexity.MEDIUM),
@@ -14,7 +18,6 @@ enum class MathGrade1Type(val xp: Int, val complexity: MathComplexity) {
     ADDITION_THREE_REPRESENTATION(3, MathComplexity.HARD),
     ADDITION_VISUAL_PROBLEM(2, MathComplexity.EASY),
     ADDITION_TREE(2, MathComplexity.MEDIUM),
-    BASIC_AI_ADDITION(2, MathComplexity.MEDIUM),
 
     SUBTRACTION_NUMBERS(2, MathComplexity.EASY),
     SUBTRACTION_MISSED_NUMBER(2, MathComplexity.MEDIUM),

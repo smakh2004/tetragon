@@ -14,8 +14,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tetragon.app.R
 import com.tetragon.app.subscriptionModel.IntroSubscriptionActivity
 import com.google.firebase.Timestamp
@@ -49,6 +51,7 @@ class ShopFragment : Fragment() {
     private lateinit var processingBtnContainer: FrameLayout
     private lateinit var shopScrollView: NestedScrollView
     private lateinit var shopLineDivider: View
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     // --- HOISTED LOADING OVERLAY ---
     private lateinit var loadingOverlayContainer: FrameLayout
@@ -76,6 +79,7 @@ class ShopFragment : Fragment() {
         coinCountText = view.findViewById(R.id.coinCountText)
         shopScrollView = view.findViewById(R.id.shopScrollView)
         shopLineDivider = view.findViewById(R.id.shopLineDivider)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
         // Purchase Item Views
         itemStar = view.findViewById(R.id.item_star)
@@ -100,6 +104,13 @@ class ShopFragment : Fragment() {
         // Find reference to full screen overlay layer target
         loadingOverlayContainer = view.findViewById(R.id.loadingOverlayContainer)
 
+        // Minimalist configuration to remove default shadow circles
+        context?.let { ctx ->
+            swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(ctx, R.color.blue_2))
+        }
+        swipeRefreshLayout.setSlingshotDistance(0)
+        swipeRefreshLayout.setProgressViewEndTarget(false, 140)
+
         // Initial UI State
         startContainer.visibility = View.GONE
         startContainer.alpha = 0f
@@ -109,7 +120,12 @@ class ShopFragment : Fragment() {
     private fun setupListeners(view: View) {
         val subscribeBtn = view.findViewById<View>(R.id.subscribe_enabled_btn)
 
-        // 1. Scroll Behavior: Dismiss Drawer and Handle Divider Visibility dynamically
+        // 1. Swipe Refresh Integration
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshShopData(isManualSwipe = true)
+        }
+
+        // 2. Scroll Behavior: Dismiss Drawer and Handle Divider Visibility dynamically
         shopScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (isAdded) {
                 // Toggles divider based on active scrolling offset state
@@ -121,7 +137,7 @@ class ShopFragment : Fragment() {
             }
         })
 
-        // 2. Background Touch: Dismiss Drawer
+        // 3. Background Touch: Dismiss Drawer
         shopScrollView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN && startContainer.visibility == View.VISIBLE) {
                 hidePurchaseDrawer()
@@ -129,7 +145,7 @@ class ShopFragment : Fragment() {
             false
         }
 
-        // 3. Purchase Triggers
+        // 4. Purchase Triggers
         itemStar.setOnClickListener {
             val isSubscribed = starStatusText.visibility == View.VISIBLE && !itemStar.isClickable
             if (isSubscribed) {
@@ -139,7 +155,8 @@ class ShopFragment : Fragment() {
 
             if (currentStars < 15) {
                 pendingPurchaseType = "STAR"
-                showPurchaseDrawer(getString(R.string.refill_stars_label), "15")
+                // 🟢 CHANGED: Set the drawer text display price argument to "50"
+                showPurchaseDrawer(getString(R.string.refill_stars_label), "50")
             } else {
                 Toast.makeText(context, getString(R.string.stars_full_toast), Toast.LENGTH_SHORT).show()
             }
@@ -150,17 +167,28 @@ class ShopFragment : Fragment() {
             showPurchaseDrawer(getString(R.string.monthly_infinity_label), "1000")
         }
 
-        // 4. Drawer Confirmation
+        // 5. Drawer Confirmation
         confirmBtn.setOnClickListener {
             handleConfirmPurchase()
         }
 
-        // 5. Subscription Button
+        // 6. Subscription Button
         subscribeBtn.setOnClickListener {
             val intent = Intent(requireContext(), IntroSubscriptionActivity::class.java)
             startActivity(intent)
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
+    }
+
+    private fun refreshShopData(isManualSwipe: Boolean) {
+        if (!isManualSwipe) {
+            isInitialDataLoaded = false
+            loadingOverlayContainer.visibility = View.VISIBLE
+        }
+
+        // Cycle active Snapshot listeners to force real-time continuous remote updates
+        userListener?.remove()
+        observeUserStats()
     }
 
     private fun showPurchaseDrawer(label: String, price: String) {
@@ -212,9 +240,10 @@ class ShopFragment : Fragment() {
 
             when (type) {
                 "STAR" -> {
-                    if (freshCoins >= 15) {
-                        transaction.update(userDocRef, "coins", freshCoins - 15)
-                        transaction.update(userDocRef, "stars", 15L)
+                    // 🟢 CHANGED: Validate wallet has at least 50 coins, and deduct 50 coins instead of 15
+                    if (freshCoins >= 50) {
+                        transaction.update(userDocRef, "coins", freshCoins - 50)
+                        transaction.update(userDocRef, "stars", 15L) // Keeps your max star count refill limit at 15
                     } else {
                         throw Exception(getString(R.string.not_enough_coins))
                     }
@@ -276,6 +305,9 @@ class ShopFragment : Fragment() {
                     updateItemUI(isSubscriptionActive, currentStars >= 15)
                 }
 
+                // Turn off pulling indicators across both sync configurations
+                swipeRefreshLayout.isRefreshing = false
+
                 if (!isInitialDataLoaded) {
                     isInitialDataLoaded = true
                     loadingOverlayContainer.visibility = View.GONE
@@ -311,9 +343,7 @@ class ShopFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        isInitialDataLoaded = false
-        loadingOverlayContainer.visibility = View.VISIBLE
-        observeUserStats()
+        refreshShopData(isManualSwipe = false)
     }
 
     override fun onStop() {

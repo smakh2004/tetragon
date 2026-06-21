@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:fitsSystemWindows="true"
     tools:context=".ui.LoginActivity">
 
-    <!-- OFFLINE BANNER -->
     <LinearLayout
         android:id="@+id/internetConnection"
         android:layout_width="0dp"
@@ -37,7 +37,6 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- MAIN CONTENT -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainContent"
         android:layout_width="0dp"
@@ -53,7 +52,6 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true">
 
-            <!-- TOP BAR -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/topBar"
                 android:layout_width="0dp"
@@ -89,7 +87,6 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- EMAIL INPUT -->
             <LinearLayout
                 android:id="@+id/emailInputContainer"
                 android:layout_width="0dp"
@@ -117,7 +114,6 @@
                     android:textSize="20sp" />
             </LinearLayout>
 
-            <!-- PASSWORD INPUT -->
             <LinearLayout
                 android:id="@+id/passwordInputContainer"
                 android:layout_width="0dp"
@@ -147,7 +143,20 @@
                     android:textSize="20sp" />
             </LinearLayout>
 
-            <!-- VISUAL DIVIDER SECTION (OR) -->
+            <TextView
+                android:id="@+id/forgotPasswordText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/forgot_password"
+                android:textColor="@color/blue_2"
+                android:textSize="16sp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/passwordInputContainer" />
+
             <LinearLayout
                 android:id="@+id/orDividerContainer"
                 android:layout_width="0dp"
@@ -157,7 +166,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/passwordInputContainer">
+                app:layout_constraintTop_toBottomOf="@+id/forgotPasswordText">
 
                 <View
                     android:layout_width="0dp"
@@ -182,7 +191,6 @@
                     android:background="#E0E0E0" />
             </LinearLayout>
 
-            <!-- GOOGLE SIGN IN BUTTON CONTAINER -->
             <LinearLayout
                 android:id="@+id/googleSignInButton"
                 android:layout_width="0dp"
@@ -213,7 +221,6 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
-            <!-- CONTINUE BUTTON -->
             <FrameLayout
                 android:id="@+id/continue_btn_container"
                 android:layout_width="0dp"
@@ -225,7 +232,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
-                <!-- ENABLED BUTTON -->
                 <FrameLayout
                     android:id="@+id/continue_enabled_btn_container"
                     android:layout_width="match_parent"
@@ -252,7 +258,6 @@
                         app:backgroundTint="@color/black_3" />
                 </FrameLayout>
 
-                <!-- DISABLED BUTTON -->
                 <FrameLayout
                     android:id="@+id/continue_disabled_btn_container"
                     android:layout_width="match_parent"

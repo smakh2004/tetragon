@@ -17,6 +17,7 @@
         android:gravity="center"
         android:padding="10dp"
         android:background="@color/gray_3"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -34,7 +35,6 @@
             android:textColor="@color/black_3"
             android:fontFamily="@font/inter_semibold"
             android:textSize="14sp"/>
-
     </LinearLayout>
 
     <LinearLayout
@@ -44,6 +44,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:padding="16dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/stateContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,9 +79,7 @@
             android:textAlignment="center"
             android:textColor="@color/gray_1"
             android:textSize="14sp" />
-
     </LinearLayout>
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBarContainer"
@@ -93,7 +92,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Exit Button -->
         <ImageView
             android:id="@+id/exit_btn"
             android:layout_width="48dp"
@@ -104,7 +102,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Progress Container -->
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
@@ -118,11 +115,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/exit_btn"
             app:layout_constraintTop_toTopOf="parent"
-            tools:progress="7" />
-
+            tools:progress="3" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- COMPLEXITY INDICATOR -->
     <LinearLayout
         android:id="@+id/complexityContainer"
         android:layout_width="wrap_content"
@@ -148,10 +143,8 @@
             android:textColor="@color/green_1"
             android:layout_marginStart="6dp"
             android:textSize="16dp" />
-
     </LinearLayout>
 
-    <!-- FRAGMENT CONTAINER -->
     <FrameLayout
         android:id="@+id/questionFragmentContainer"
         android:layout_width="0dp"
@@ -161,6 +154,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/complexityContainer" />
+
+    <!-- Clean milestone layer holding exclusively the Rive Animation View -->
+    <FrameLayout
+        android:id="@+id/seven_correct_animation"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/stateContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/sevenCorrectRiveView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            app:riveFit="FIT_HEIGHT"
+            app:riveAutoPlay="false"
+            app:riveResource="@raw/seven_correct_answers"
+            app:riveStateMachine="State Machine 1" />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/stateContainer"
@@ -189,45 +204,47 @@
                     android:id="@+id/circleState"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/correct_tick_icon"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:src="@drawable/correct_tick_icon" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp">
 
                     <TextView
                         android:id="@+id/stateAnswer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
                         android:fontFamily="@font/inter_semibold"
                         android:text="Correct!"
                         android:textColor="@color/text_color"
-                        android:textSize="18sp"
-                        app:layout_constraintStart_toEndOf="@+id/imageView2"
-                        tools:layout_editor_absoluteY="16dp" />
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/answer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
                         android:fontFamily="@font/inter_semibold"
-                        android:text="Answer: 2"
+                        android:text="Answer: 0"
                         android:textColor="@color/text_color"
                         android:textSize="14sp"
-                        android:visibility="gone"
-                        app:layout_constraintStart_toEndOf="@+id/imageView2"
-                        tools:layout_editor_absoluteY="16dp" />
-
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
+
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/correct_mr_square"
+        android:layout_width="170dp"
+        android:layout_height="120dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/stateContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:riveAutoPlay="false"
+        app:riveResource="@raw/mr_square_correct"
+        app:riveStateMachine="State Machine 1" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btnBackground"
@@ -241,7 +258,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- CHECK BUTTON -->
         <FrameLayout
             android:id="@+id/check_btn_container"
             android:layout_width="0dp"
@@ -253,13 +269,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <!-- ENABLED CHECK BUTTON -->
             <FrameLayout
                 android:id="@+id/check_enabled_btn_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="invisible">
-
                 <View
                     android:id="@+id/check_enabled_button_background"
                     android:layout_width="match_parent"
@@ -267,7 +281,6 @@
                     android:background="@drawable/custom_button"
                     android:backgroundTint="@color/blue_1"
                     android:translationY="5dp" />
-
                 <Button
                     android:id="@+id/check_enabled_btn"
                     android:layout_width="match_parent"
@@ -281,22 +294,17 @@
                     app:backgroundTint="@color/blue_2" />
             </FrameLayout>
 
-            <!-- DISABLED CHECK BUTTON -->
             <FrameLayout
                 android:id="@+id/check_disabled_btn_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="visible">
-
-                <!-- shadow -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/custom_button"
                     android:backgroundTint="@color/gray_2"
                     android:translationY="5dp" />
-
-                <!-- text over shadow -->
                 <TextView
                     android:id="@+id/check_disabled_btn"
                     android:layout_width="match_parent"
@@ -310,7 +318,6 @@
             </FrameLayout>
         </FrameLayout>
 
-        <!-- SEE SOLUTION BUTTON -->
         <FrameLayout
             android:id="@+id/see_btn_container"
             android:layout_width="0dp"
@@ -324,13 +331,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <!-- ENABLED SEE BUTTON -->
             <FrameLayout
                 android:id="@+id/see_enabled_btn_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="visible">
-
+                android:layout_height="wrap_content">
                 <View
                     android:id="@+id/see_enabled_button_background"
                     android:layout_width="match_parent"
@@ -338,7 +342,6 @@
                     android:background="@drawable/custom_button"
                     android:backgroundTint="@color/gray_2"
                     android:translationY="5dp" />
-
                 <Button
                     android:id="@+id/see_enabled_btn"
                     android:layout_width="match_parent"
@@ -353,16 +356,4 @@
             </FrameLayout>
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <app.rive.runtime.kotlin.RiveAnimationView
-        android:id="@+id/correct_mr_square"
-        android:layout_width="170dp"
-        android:layout_height="120dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/stateContainer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:riveAutoPlay="false"
-        app:riveResource="@raw/mr_square_correct"
-        app:riveStateMachine="State Machine 1" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

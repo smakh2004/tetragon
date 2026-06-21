@@ -12,7 +12,7 @@
     <string name="first_name_text">First Name</string>
     <string name="last_name_text">Last Name</string>
     <string name="loading">LOADING...</string>
-    <string name="create_a_password">Create a password</string>
+    <string name="create_a_password">Create a password.</string>
     <string name="password">Password</string>
     <string name="mini_games">Mini Games</string>
     <string name="math_storm">MATH STORM</string>
@@ -66,11 +66,12 @@
     <string name="bot_error_generic">Mr. Square got his angles crossed! Let\'s try again in a bit.</string>
     <string name="bot_error_429">Mr. Square is taking a short math break to sharpen his pencils. Please wait a moment!</string>
     <string name="bot_no_answer">I\'m sorry, I couldn\'t process that.</string>
-    <string name="write_your_question">Ask question...</string>
+    <string name="write_your_question">How can I help you?</string>
     <string name="send">SEND</string>
     <string name="verify_your_email_address">Verify your email address.</string>
+    <string name="hello_mr_square">Hello! I am MrSquare!</string>
     <string name="we_ve_sent_a_verification_link_to">We\'ve sent a verification link to</string>
-    <string name="nplease_check_your_inbox_and_click_the_link_n_nthe_continue_button_will_unlock_automatically_once_you_verify">\nPlease check your inbox and click the link. \n\nThe \'Continue\' button will unlock automatically once you verify.</string>
+    <string name="nplease_check_your_inbox_and_click_the_link_n_nthe_continue_button_will_unlock_automatically_once_you_verify">\nPlease check your inbox and click the link. \n\nIf you don\'t see it, **please check your Spam or Junk folder**.\n\nThe \'Continue\' button will unlock automatically once you verify.</string>
     <string name="verify_email_instructions">We\'ve sent a verification link to %1$s.</string>
     <string name="error_prefix">Error: %1$s</string>
     <string name="creating_account">CREATING ACCOUNT...</string>
@@ -94,7 +95,7 @@
     <string name="_12_topics">12 topics</string>
     <string name="_8_topics">8 topics</string>
     <string name="_4_topics">4 topics</string>
-    <string name="_5_topics">5 topics</string>
+    <string name="_6_topics">6 topics</string>
     <string name="_1_topic">1 topic</string>
     <string name="_3_topics">3 topics</string>
     <string name="grade_label_format">%1$s - GRADE %2$d</string>
@@ -274,7 +275,7 @@
     <string name="topic_natural_numbers">Natural numbers</string>
     <string name="topic_fractions">Дроби</string>
     <string name="find_missed_numbers">Find missed numbers.</string>
-    <string name="choose_your_language">Choose your language</string>
+    <string name="choose_your_language">Choose your language.</string>
     <string name="privacy_policy">PRIVACY AND POLICY</string>
     <!-- Grade 1 Math Topics -->
     <string name="counting_numbers">Counting numbers</string>
@@ -306,6 +307,7 @@
     <string name="column_division">Column Division</string>
     <string name="fraction_arithmetics">Fraction Arithmetics</string>
     <string name="mixed_numbers">Mixed Numbers</string>
+    <string name="graphs">Graphs</string>
 
     <!-- Grade 5 Topics -->
     <string name="natural_numbers">Natural Numbers</string>
@@ -599,5 +601,90 @@
     <string name="firebase_auth_failure">Firebase Auth Failure: %1$s</string>
 
     <string name="signing_in">SIGNING IN…</string>
+    <string name="countdown_format">%1$02d\u0020h %2$02d\u0020m %3$02d\u0020s</string>
 
+    <string name="solution_find_xy_explanation">The correct point coordinates are (%1$d, %2$d)</string>
+    <string name="place_the_point_at">Place the point at</string>
+
+    <string name="count_by">Count by %1$d:</string>
+
+    <string name="instruction_trace_number">Trace the number %1$d</string>
+
+    <string name="state_correct_1">Fantastic Job!</string>
+    <string name="state_incorrect_1">Not Quite!</string>
+
+    <string name="desc_correct">Fantastic Job!</string>
+    <string name="desc_incorrect">Try to finish tracing the entire number path.</string>
+
+    <string name="question_show_radius">Show a circle with a radius of:</string>
+    <string name="word_radius">radius</string>
+    <string name="radius_target_template">r = %1$d</string>
+
+    <string name="display_correct_answer">Excellent! Radius = %1$d</string>
+    <string name="display_solution_answer">The correct radius is: %1$d</string>
+
+    <string name="solution_apples_correct">Awesome! You showed exactly %1$d apples.</string>
+    <string name="solution_apples_explanation">Look! Here are the %1$d apples on the screen.</string>
+
+    <string name="question_show_apples">Show %1$d apples</string>
+    <string name="apple">APPLE</string>
+
+    <string name="question_count_hands_title">What number is shown?</string>
+    <string name="sign_up_with_email">Sign up with Email</string>
+    <string name="enter_your_email_address">Enter your email address.</string>
+    <string name="learn_natural_sciences">Learn Sciences</string>
+    <string name="transform_the_learning_process_into_an_interactive_and_fun_experience">Transform the learning process into an interactive and fun experience.</string>
+
+    <string name="forgot_password">Forgot password?</string>
+    <string name="enter_email_reset">Please enter your email to reset your password.</string>
+    <string name="reset_link_sent">Password reset link sent to your email!</string>
+    <string name="no_account_found">No registered account found with this email.</string>
+    <string name="forgot_password_main">Forgot Password</string>
+    <string name="enter_your_email_address_below_to_receive_an_authenticated_reset_verification_code_link_via_email_inbox">Enter your email address below to receive an authenticated reset verification code link via email inbox.</string>
+    <string name="check_email_spam_instructions">Check your email for the reset link. If you don\'t see it, please check your Spam or Junk folder.</string>
+    <string name="back_button_text">BACK</string>
+    <string name="reset_link_sent_success">Reset link sent successfully!</string>
+    <string name="sending_text">SENDING...</string>
+    <string name="enter_email_main">Enter email</string>
+
+    <string name="prefix_write_with_digits">Write with digits: </string>
+    <string name="hint_input_example">Example: 1,300,234</string>
+
+    <string name="num_zero">zero</string>
+    <string name="num_and">and</string>
+    <string name="num_hundred">hundred</string>
+    <string name="num_thousand">thousand</string>
+    <string name="num_million">million</string>
+
+    <string name="format_what_is_after">What is after %s?</string>
+    <string name="format_what_is_before">What is before %s?</string>
+
+    <string name="format_is_natural">Is the number %s a natural number?</string>
+
+    <string name="question_natural_numbers_from_to">How many natural numbers are from %1$d to %2$d?</string>
+    <string name="question_natural_numbers_between">How many natural numbers are between %1$d and %2$d?</string>
+    <string name="type_a_message">Challenge to a battle...</string>
+
+    <string name="hello">Hello!</string>
+    <string name="who_will_play">Who will play?</string>
+    <string name="me">Me</string>
+    <string name="let_s_go">Let\'s go!</string>
+
+    <string name="question_average_numbers_from_to">Find the average of natural numbers from %1$d to %2$d.</string>
+    <string name="question_average_numbers_between">Find the average of natural numbers between %1$d and %2$d.</string>
+
+    <string name="question_sum_even_from_to">Find the sum of all even natural numbers from %1$d to %2$d.</string>
+    <string name="question_sum_even_between">Find the sum of all even natural numbers between %1$d and %2$d.</string>
+
+    <string name="question_select_match_inequality">Select the correct match:\nx %1$s %2$d</string>
+    <string name="label_math_result">Correct match found for: x %1$s %2$d</string>
+    <string name="solution_math_inequality">Solution: Look for the segment highlighting numbers %1$s %2$d.</string>
+
+    <string name="question_sum_of_natural_numbers">Find the sum of the first %d natural numbers.</string>
+
+    <string name="question_find_n_from_sum_natural">If the sum of first n natural numbers is %d, find n.</string>
+
+    <string name="question_sum_divisible_by_three">Find the sum of all natural numbers divisible by 3 from 1 to %d.</string>
+
+    <string name="question_sum_of_squares">If n = %1$d, find the sum of squares 1² + 2² + ... + %2$d².</string>
 </resources>

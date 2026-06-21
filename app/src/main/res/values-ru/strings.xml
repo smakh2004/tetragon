@@ -13,7 +13,7 @@
     <string name="first_name_text">Имя</string>
     <string name="last_name_text">Фамилия</string>
     <string name="loading">ЗАГРУЗКА...</string>
-    <string name="create_a_password">Создайте пароль</string>
+    <string name="create_a_password">Создайте пароль.</string>
     <string name="password">Пароль</string>
     <string name="mini_games">Мини-игры</string>
     <string name="math_storm">МАТЕМАТИЧЕСКИЙ ШТОРМ</string>
@@ -69,11 +69,11 @@
     <string name="bot_error_generic">У Мистера Квадрата перепутались углы! Попробуйте еще раз чуть позже.</string>
     <string name="bot_error_429">Мистер Квадрат взял небольшой перерыв, чтобы заточить карандаши. Пожалуйста, подождите!</string>
     <string name="bot_no_answer">Извините, я не смог это обработать.</string>
-    <string name="write_your_question">Задать вопрос...</string>
+    <string name="write_your_question">Как могу вам помочь?</string>
     <string name="send">ОТПРАВИТЬ</string>
     <string name="verify_your_email_address">Подтвердите ваш адрес электронной почты.</string>
     <string name="we_ve_sent_a_verification_link_to">Мы отправили ссылку для подтверждения на</string>
-    <string name="nplease_check_your_inbox_and_click_the_link_n_nthe_continue_button_will_unlock_automatically_once_you_verify">\nПожалуйста, проверьте почту и перейдите по ссылке. \n\nКнопка «Продолжить» разблокируется автоматически после подтверждения.</string>
+    <string name="nplease_check_your_inbox_and_click_the_link_n_nthe_continue_button_will_unlock_automatically_once_you_verify">\nПожалуйста, проверьте почту и перейдите по ссылке. \n\nЕсли вы не видите письма, **проверьте папку «Спам» или «Нежелательная почта»**.\n\nКнопка «Продолжить» разблокируется автоматически после подтверждения.</string>
     <string name="verify_email_instructions">Мы отправили ссылку для подтверждения на %1$s.</string>
     <string name="error_prefix">Ошибка: %1$s</string>
     <string name="creating_account">СОЗДАНИЕ АККАУНТА...</string>
@@ -97,7 +97,7 @@
     <string name="_12_topics">12 тем</string>
     <string name="_8_topics">8 тем</string>
     <string name="_4_topics">4 темы</string>
-    <string name="_5_topics">5 тем</string>
+    <string name="_6_topics">6 тем</string>
     <string name="_1_topic">1 тема</string>
     <string name="_3_topics">3 темы</string>
     <string name="grade_label_format">%1$s - %2$d КЛАСС</string>
@@ -277,7 +277,7 @@
     <string name="topic_natural_numbers">Натуральные числа</string>
     <string name="topic_fractions">Дроби</string>
     <string name="find_missed_numbers">Найдите пропущенные числа.</string>
-    <string name="choose_your_language">Выберите ваш язык</string>
+    <string name="choose_your_language">Выберите ваш язык.</string>
     <string name="privacy_policy">ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</string>
     <!-- Grade 1 Math Topics -->
     <string name="counting_numbers">Счет чисел</string>
@@ -309,6 +309,7 @@
     <string name="column_division">Деление столбиком</string>
     <string name="fraction_arithmetics">Арифметика дробей</string>
     <string name="mixed_numbers">Смешанные числа</string>
+    <string name="graphs">Графики</string>
 
     <!-- Grade 5 Topics -->
     <string name="natural_numbers">Натуральные числа</string>
@@ -598,5 +599,92 @@
     <string name="firebase_auth_failure">Ошибка авторизации Firebase: %1$s</string>
 
     <string name="signing_in">ВХОД В АККАУНТ…</string>
+    <string name="countdown_format">%1$02d\u0020ч %2$02d\u0020мин %3$02d\u0020сек</string>
+    <string name="solution_find_xy_explanation">Правильные координаты точки: (%1$d, %2$d)</string>
+    <string name="place_the_point_at">Разместите точку на</string>
 
+    <string name="count_by">Считай по %1$d:</string>
+
+    <string name="instruction_trace_number">Обведи цифру %1$d</string>
+
+    <string name="state_correct_1">Отлично!</string>
+    <string name="state_incorrect_1">Не совсем так!</string>
+
+    <string name="desc_correct">Великолепная работа!</string>
+    <string name="desc_incorrect">Попробуй обвести всю линию цифры до конца.</string>
+
+    <string name="question_show_radius">Покажи круг с радиусом:</string>
+    <string name="word_radius">радиусом</string>
+    <string name="radius_target_template">r = %1$d</string>
+
+    <string name="display_correct_answer">Отлично! Радиус = %1$d</string>
+    <string name="display_solution_answer">Правильный радиус: %1$d</string>
+
+    <string name="solution_apples_correct">Отлично! Ты показал ровно %1$d яблок.</string>
+    <string name="solution_apples_explanation">Посмотри! Вот %1$d яблок на экране.</string>
+
+    <string name="question_show_apples">Покажи %1$d яблок(а)</string>
+
+    <string name="apple">ЯБЛОКА</string>
+
+    <string name="question_count_hands_title">Какое число показано?</string>
+    <string name="sign_up_with_email">Зарегистрироваться через Email</string>
+    <string name="enter_your_email_address">Введите ваш адрес электронной почты.</string>
+    <string name="learn_natural_sciences">Изучайте науки</string>
+    <string name="transform_the_learning_process_into_an_interactive_and_fun_experience">Превратите процесс обучения в интерактивное и увлекательное приключение.</string>
+
+    <string name="forgot_password">Забыли пароль?</string>
+    <string name="enter_email_reset">Пожалуйста, введите ваш email для сброса пароля.</string>
+    <string name="reset_link_sent">Ссылка для сброса пароля отправлена на ваш email!</string>
+    <string name="no_account_found">Аккаунт с таким email не найден.</string>
+
+    <string name="forgot_password_main">Забыли Пароль</string>
+    <string name="enter_your_email_address_below_to_receive_an_authenticated_reset_verification_code_link_via_email_inbox">Введите свой адрес электронной почты ниже, чтобы получить ссылку для подтверждения сброса пароля.</string>
+    <string name="check_email_spam_instructions">Проверьте свою электронную почту для получения ссылки на сброс пароля. Если вы её не видите, проверьте папку «Спам».</string>
+    <string name="back_button_text">НАЗАД</string>
+    <string name="reset_link_sent_success">Ссылка для сброса пароля успешно отправлена!</string>
+    <string name="sending_text">ОТПРАВКА...</string>
+    <string name="enter_email_main">Введите почту</string>
+
+    <string name="prefix_write_with_digits">Запишите цифрами: </string>
+    <string name="hint_input_example">Пример: 1 300 234</string>
+
+    <string name="num_zero">ноль</string>
+    <string name="num_and"></string>
+    <string name="num_hundred">сто</string>
+    <string name="num_thousand">тысяч</string>
+    <string name="num_million">миллионов</string>
+
+    <string name="format_what_is_after">Какое число следует за %s?</string>
+    <string name="format_what_is_before">Какое число предшествует %s?</string>
+
+    <string name="format_is_natural">Является ли число %s натуральным?</string>
+
+    <string name="question_natural_numbers_from_to">Сколько натуральных чисел от %1$d до %2$d?</string>
+    <string name="question_natural_numbers_between">Сколько натуральных чисел между %1$d и %2$d?</string>
+    <string name="hello_mr_square">Привет! Я Мистер Квадрат!</string>
+    <string name="type_a_message">Вызвать на батл...</string>
+
+    <string name="hello">Привет!</string>
+    <string name="who_will_play">Кто будет играть?</string>
+    <string name="me">Я</string>
+    <string name="let_s_go">Погнали!</string>
+
+    <string name="question_average_numbers_from_to">Найдите среднее арифметическое натуральных чисел от %1$d до %2$d.</string>
+    <string name="question_average_numbers_between">Найдите среднее арифметическое натуральных чисел между %1$d и %2$d.</string>
+
+    <string name="question_sum_even_from_to">Найдите сумму всех чётных натуральных чисел от %1$d до %2$d.</string>
+    <string name="question_sum_even_between">Найдите сумму всех чётных натуральных чисел между %1$d и %2$d.</string>
+
+    <string name="question_select_match_inequality">Выберите правильное соответствие:\nx %1$s %2$d</string>
+    <string name="label_math_result">Найдено правильное соответствие для: x %1$s %2$d</string>
+    <string name="solution_math_inequality">Решение: Ищите отрезок, который выделяет числа %1$s %2$d.</string>
+
+    <string name="question_sum_of_natural_numbers">Найдите сумму первых %d натуральных чисел.</string>
+
+    <string name="question_find_n_from_sum_natural">Если сумма первых n натуральных чисел равна %d, найдите n.</string>
+
+    <string name="question_sum_divisible_by_three">Найдите сумму всех натуральных чисел от 1 до %d, делящихся на 3.</string>
+
+    <string name="question_sum_of_squares">Если n = %1$d, найдите сумму квадратов 1² + 2² + ... + %2$d².</string>
 </resources>

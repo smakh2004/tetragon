@@ -2,7 +2,6 @@ package com.tetragon.app.questions.questionMathTenthGrade
 
 import android.animation.ObjectAnimator
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -10,7 +9,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import app.rive.runtime.kotlin.core.Rive
 import com.tetragon.app.R
@@ -40,7 +38,6 @@ class Math10GradeQuestionActivity : BaseActivity() {
     private val viewModel: ConnectivityViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
                 return ConnectivityViewModel(AndroidConnectivityObserver(applicationContext)) as T
             }
         }
@@ -52,19 +49,12 @@ class Math10GradeQuestionActivity : BaseActivity() {
         binding = ActivityMath10GradeQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Custom styling for navigation bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
-
         binding.exitBtn.setOnClickListener { showQuitBottomSheet() }
         onBackPressedDispatcher.addCallback(this) { showQuitBottomSheet() }
 
         val topicName = intent.getStringExtra("TOPIC_KEY")
             ?: throw IllegalArgumentException("TOPIC_KEY missing")
 
-        // Using Grade 10 Enum
         selectedTopic = MathGrade10Topic.valueOf(topicName)
 
         observeConnectivity()
@@ -122,12 +112,9 @@ class Math10GradeQuestionActivity : BaseActivity() {
         }
     }
 
-    // Mapping for Grade 10 Topics
     private fun getTypesForTopic(topic: MathGrade10Topic): List<MathGrade10Type> {
         return when (topic) {
-            MathGrade10Topic.TRIGONOMETRY -> listOf(
-                MathGrade10Type.TRIGONOMETRY_PROBLEM
-            )
+            MathGrade10Topic.TRIGONOMETRY -> listOf(MathGrade10Type.TRIGONOMETRY_PROBLEM)
         }
     }
 
@@ -142,7 +129,6 @@ class Math10GradeQuestionActivity : BaseActivity() {
 
         lastQuestionType = nextType
 
-        // Fragment mapping for Grade 10
         val fragment = when (nextType) {
             MathGrade10Type.TRIGONOMETRY_PROBLEM -> UiTrigonometryProblemFragment()
         }
@@ -158,7 +144,7 @@ class Math10GradeQuestionActivity : BaseActivity() {
         val increment = progressBar.max / 10
         val newProgress = (progressBar.progress + increment).coerceAtMost(progressBar.max)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             progressBar.setProgress(newProgress, true)
         } else {
             ObjectAnimator.ofInt(progressBar, "progress", progressBar.progress, newProgress).apply {
@@ -174,7 +160,7 @@ class Math10GradeQuestionActivity : BaseActivity() {
         val intent = Intent(this, XpGainedActivity::class.java).apply {
             putExtra(SubjectConstants.EXTRA_XP, totalXp)
             putExtra(SubjectConstants.EXTRA_TOPIC, selectedTopic.name)
-            putExtra(SubjectConstants.EXTRA_GRADE, 10) // Set explicitly to Grade 10
+            putExtra(SubjectConstants.EXTRA_GRADE, 10)
             putExtra(SubjectConstants.EXTRA_SUBJECT, SubjectConstants.SUBJECT_MATH)
         }
         startActivity(intent)
@@ -187,23 +173,15 @@ class Math10GradeQuestionActivity : BaseActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        // Localized Title and Message
         view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
         view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
-
-        // Localized "CONTINUE" button
         view.findViewById<Button>(R.id.noButton).apply {
             text = getString(R.string.continue_text)
             setOnClickListener { dialog.dismiss() }
         }
-
-        // Localized "EXIT" button
         view.findViewById<Button>(R.id.finishButton).apply {
             text = getString(R.string.exit_btn)
-            setOnClickListener {
-                finish()
-                dialog.dismiss()
-            }
+            setOnClickListener { finish(); dialog.dismiss() }
         }
         dialog.show()
     }
@@ -219,24 +197,18 @@ class Math10GradeQuestionActivity : BaseActivity() {
     }
 
     private fun updateUIForConnectivity(isConnected: Boolean) {
-        if (isConnected) {
-            binding.internetConnection.visibility = View.GONE
-            binding.offlineContainer.visibility = View.GONE
-            binding.topBarContainer.visibility = View.VISIBLE
-            binding.questionFragmentContainer.visibility = View.VISIBLE
-            binding.btnBackground.visibility = View.VISIBLE
-            if (isResultCurrentlyVisible) {
-                binding.stateContainer.visibility = View.VISIBLE
-                binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
-            }
+        val isVisible = isConnected
+        binding.internetConnection.visibility = if (isVisible) View.GONE else View.VISIBLE
+        binding.offlineContainer.visibility = if (isVisible) View.GONE else View.VISIBLE
+        binding.topBarContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+        binding.questionFragmentContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+        binding.btnBackground.visibility = if (isVisible) View.VISIBLE else View.GONE
+
+        if (isVisible && isResultCurrentlyVisible) {
+            binding.stateContainer.visibility = View.VISIBLE
+            binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
         } else {
-            binding.internetConnection.visibility = View.VISIBLE
-            binding.offlineContainer.visibility = View.VISIBLE
-            binding.topBarContainer.visibility = View.GONE
-            binding.questionFragmentContainer.visibility = View.GONE
-            binding.btnBackground.visibility = View.GONE
             binding.stateContainer.visibility = View.GONE
-            binding.correctMrSquare.visibility = View.GONE
         }
     }
 }

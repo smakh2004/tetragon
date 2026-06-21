@@ -3,7 +3,6 @@ package com.tetragon.app.reward
 import android.animation.ValueAnimator
 import android.content.Intent
 import android.media.MediaPlayer
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,7 +12,6 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.controllers.RiveFileController
 import app.rive.runtime.kotlin.core.PlayableInstance
@@ -39,7 +37,7 @@ class BagTapActivity : BaseActivity() {
     private var openSound: MediaPlayer? = null
     private var isRewardProcessed = false
     private var currentUserCoins: Long = 0
-    private var droppedCoins: Int = 0 // Store this globally to save/restore
+    private var droppedCoins: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,21 +46,14 @@ class BagTapActivity : BaseActivity() {
 
         setContentView(R.layout.activity_bag_tap)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-        }
-
         initViews()
 
-        // RESTORE LOGIC: Check if activity was recreated
         if (savedInstanceState != null) {
             isRewardProcessed = savedInstanceState.getBoolean("IS_PROCESSED", false)
             droppedCoins = savedInstanceState.getInt("DROPPED_COINS", 0)
             currentUserCoins = savedInstanceState.getLong("CURRENT_COINS", 0)
 
             if (isRewardProcessed) {
-                // If reward was already claimed, keep the button enabled and show final count
                 disabledContainer.visibility = View.INVISIBLE
                 enabledContainer.visibility = View.VISIBLE
                 currentCoinCountText.text = currentUserCoins.toString()
@@ -77,7 +68,6 @@ class BagTapActivity : BaseActivity() {
             finish()
         }
 
-        // Only fetch from DB if we don't have restored coins
         if (currentUserCoins == 0L) {
             fetchInitialCoins()
         }
@@ -85,7 +75,6 @@ class BagTapActivity : BaseActivity() {
         setupRiveListener()
     }
 
-    // SAVE LOGIC: Keep the state safe during rotation/resize
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean("IS_PROCESSED", isRewardProcessed)
@@ -118,7 +107,6 @@ class BagTapActivity : BaseActivity() {
     private fun setupRiveListener() {
         riveBag.registerListener(object : RiveFileController.Listener {
             override fun notifyStateChanged(stateMachineName: String, stateName: String) {
-                // Only process if we haven't already processed a reward in this session OR restored session
                 if (stateName == "Open" && !isRewardProcessed) {
                     isRewardProcessed = true
                     handleReward()
@@ -132,7 +120,6 @@ class BagTapActivity : BaseActivity() {
     }
 
     private fun handleReward() {
-        // Pick the random amount once
         droppedCoins = Random.nextInt(10, 21)
 
         runOnUiThread {

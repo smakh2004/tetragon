@@ -32,7 +32,14 @@ class UiVerificationFragment : Fragment() {
             user.reload().addOnCompleteListener { task ->
                 if (isAdded && activity != null) {
                     if (task.isSuccessful && user.isEmailVerified) {
-                        (activity as? RegisterActivity)?.setContinueButtonEnabled(true)
+                        val registerActivity = activity as? RegisterActivity
+
+                        // 1. Enable the layout continue button layout setups
+                        registerActivity?.setContinueButtonEnabled(true)
+
+                        // 2. Safely instruct the activity to trigger the "yahoo" Rive state machine item
+                        registerActivity?.fireMrSquareAnimation("yahoo")
+
                         handler.removeCallbacks(this)
                     } else {
                         handler.postDelayed(this, 3000)
@@ -55,19 +62,12 @@ class UiVerificationFragment : Fragment() {
 
         val textViewInstructions = view.findViewById<TextView>(R.id.textViewInstructions)
 
-        // 1. Get the email from activity
         val email = (activity as? RegisterActivity)?.userData?.email ?: "your email"
-
-        // 2. Get the localized string and format it with the email
-        // This inserts the email into the %1$s position
         val fullText = getString(R.string.verify_email_instructions, email)
-
         val spannable = SpannableString(fullText)
 
-        // 3. Find the email position within the translated text
         val start = fullText.indexOf(email)
 
-        // Safety check: only apply span if email string was found
         if (start != -1) {
             val end = start + email.length
             val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
@@ -81,8 +81,18 @@ class UiVerificationFragment : Fragment() {
         }
 
         textViewInstructions.text = spannable
+    }
 
+    override fun onResume() {
+        super.onResume()
+        // Force immediate check when user returns focus to app from email client
         handler.post(checkVerificationRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Avoid loose loops scheduling tasks while application is out of context focus
+        handler.removeCallbacks(checkVerificationRunnable)
     }
 
     override fun onDestroyView() {

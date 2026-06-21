@@ -74,10 +74,6 @@ class MathStormActivity : BaseActivity() {
         binding = ActivityMathStormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
-
         observeConnectivity()
         initViews()
         initSounds()

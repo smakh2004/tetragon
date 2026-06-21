@@ -126,6 +126,13 @@
             </LinearLayout>
 
             <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/topic6"
+                android:layout_width="match_parent"
+                android:layout_height="530dp"
+                app:riveResource="@raw/progress_path_even"
+                app:riveStateMachine="State Machine 1" />
+
+            <app.rive.runtime.kotlin.RiveAnimationView
                 android:id="@+id/topic5"
                 android:layout_width="match_parent"
                 android:layout_height="530dp"

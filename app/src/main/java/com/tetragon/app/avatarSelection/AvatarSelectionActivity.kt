@@ -26,6 +26,7 @@ class AvatarSelectionActivity : BaseActivity() {
         "hafizibrohim2002@gmail.com",
         "mail@ziyodov.uz",
         "smakh04@bk.ru",
+        "bilkhamzhanov@bk.ru"
     )
 
     // 2. HARDCODED SPECIAL USERS LIST (Add future emails here manually)

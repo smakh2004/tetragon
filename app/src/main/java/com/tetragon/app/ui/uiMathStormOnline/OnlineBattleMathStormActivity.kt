@@ -86,12 +86,6 @@ class OnlineBattleMathStormActivity : BaseActivity() {
         binding = ActivityOnlineBattleMathStormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) { // API 27+
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white) // optional: set nav bar color
-        }
-
         observeConnectivity()
 
         // Init sounds
@@ -373,7 +367,6 @@ class OnlineBattleMathStormActivity : BaseActivity() {
 
         // Toggle check button visibility dynamically
         toggleCheckButton()
-
     }
 
     // ---------------- Game End Check ----------------
@@ -456,13 +449,11 @@ class OnlineBattleMathStormActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isConnected.collect { isConnected ->
-
                     if (isConnected) {
                         // Hide banner
                         binding.internetConnection.visibility = View.GONE
                         binding.offlineContainer.visibility = View.GONE
                         binding.mainContent.visibility = View.VISIBLE
-
                     } else {
                         // Show banner
                         binding.offlineContainer.visibility = View.VISIBLE

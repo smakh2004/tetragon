@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tetragon.app.R
@@ -86,31 +87,29 @@ class OtherUserProfileActivity : BaseActivity() {
                     val weeklyStreakMap = doc.get("weeklyStreakDays") as? Map<String, Boolean> ?: emptyMap()
                     val today = getLocalMidnight()
 
-                    // 1. Logic for Progress Graph (Right-aligned: -6 to 0)
                     val graphScores = FloatArray(7)
                     val graphLabels = Array(7) { "" }
                     for (i in -6..0) {
                         val cal = today.clone() as Calendar
                         cal.add(Calendar.DAY_OF_YEAR, i)
                         val dateKey = dateFormat.format(cal.time)
-                        val index = i + 6 // Maps -6..0 to 0..6 (Today is at index 6)
+                        val index = i + 6
 
                         graphScores[index] = (dailyXpMap[dateKey] as? Number)?.toFloat() ?: 0f
                         graphLabels[index] = getShortDayName(cal)
                     }
                     weeklyProgressGraph.setData(graphScores, graphLabels)
 
-                    // 2. Logic for Streak Ticks (Centered: -3 to 3)
                     for (i in -3..3) {
                         val cal = today.clone() as Calendar
                         cal.add(Calendar.DAY_OF_YEAR, i)
                         val dateKey = dateFormat.format(cal.time)
-                        val index = i + 3 // Maps -3..3 to 0..6 (Today is at index 3)
+                        val index = i + 3
 
                         val isVisited = weeklyStreakMap[dateKey] == true
                         dayLabels[index].text = getShortDayName(cal)
                         tickViews[index].setImageResource(if (isVisited) R.drawable.streak_activated else R.drawable.streak_not_activated)
-                        dayLabels[index].setTextColor(resources.getColor(if (isVisited) R.color.text_color else R.color.gray_1, null))
+                        dayLabels[index].setTextColor(ContextCompat.getColor(this, if (isVisited) R.color.text_color else R.color.gray_1))
                     }
                 }
             }
@@ -136,7 +135,9 @@ class OtherUserProfileActivity : BaseActivity() {
         }
     }
 
-    private fun getLocalMidnight(): Calendar = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }
+    private fun getLocalMidnight(): Calendar = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+    }
 
     private fun getShortDayName(c: Calendar): String = when (c.get(Calendar.DAY_OF_WEEK)) {
         Calendar.MONDAY -> getString(R.string.mo); Calendar.TUESDAY -> getString(R.string.tu)

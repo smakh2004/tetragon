@@ -10,7 +10,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import app.rive.runtime.kotlin.core.Rive
 import com.tetragon.app.R
@@ -51,18 +50,10 @@ class Physics10GradeQuestionActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         Rive.init(this)
 
         binding = ActivityPhysics10GradeQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // UI Styling for Navigation Bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
 
         binding.exitBtn.setOnClickListener { showQuitBottomSheet() }
 
@@ -70,7 +61,6 @@ class Physics10GradeQuestionActivity : BaseActivity() {
             showQuitBottomSheet()
         }
 
-        // Logic to get the topic from intent
         val topicName = intent.getStringExtra("TOPIC_KEY")
             ?: throw IllegalArgumentException("TOPIC_KEY missing for Grade 10 Physics")
 
@@ -82,8 +72,6 @@ class Physics10GradeQuestionActivity : BaseActivity() {
             showRandomQuestion()
         }
     }
-
-    // --- Answer Handling ---
 
     fun handleCorrectAnswer() {
         correctAnswersCount++
@@ -118,8 +106,6 @@ class Physics10GradeQuestionActivity : BaseActivity() {
         }
     }
 
-    // --- Animations ---
-
     fun playSuccessAnimation() {
         binding.correctMrSquare.apply {
             val randomResource = if ((0..1).random() == 0) {
@@ -142,13 +128,9 @@ class Physics10GradeQuestionActivity : BaseActivity() {
         isCorrectAnswerShowing = false
     }
 
-    // --- Question Logic ---
-
     private fun getTypesForTopic(topic: PhysicsGrade10Topic): List<PhysicsGrade10Type> {
         return when (topic) {
-            PhysicsGrade10Topic.MAGNETISM -> listOf(
-                PhysicsGrade10Type.FORCE_BIL
-            )
+            PhysicsGrade10Topic.MAGNETISM -> listOf(PhysicsGrade10Type.FORCE_BIL)
         }
     }
 
@@ -210,17 +192,14 @@ class Physics10GradeQuestionActivity : BaseActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        // Localized Title and Message
         view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
         view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
 
-        // Localized "CONTINUE" button
         view.findViewById<Button>(R.id.noButton).apply {
             text = getString(R.string.continue_text)
             setOnClickListener { dialog.dismiss() }
         }
 
-        // Localized "EXIT" button
         view.findViewById<Button>(R.id.finishButton).apply {
             text = getString(R.string.exit_btn)
             setOnClickListener {
@@ -230,8 +209,6 @@ class Physics10GradeQuestionActivity : BaseActivity() {
         }
         dialog.show()
     }
-
-    // --- Connectivity ---
 
     private fun observeConnectivity() {
         lifecycleScope.launch {

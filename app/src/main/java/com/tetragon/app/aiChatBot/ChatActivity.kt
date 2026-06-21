@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import app.rive.runtime.kotlin.RiveAnimationView
 import com.tetragon.app.R
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.tetragon.app.utils.languageChangeUtils.LocaleHelper
@@ -37,9 +38,9 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
     private lateinit var ivSendIcon: ImageView
     private lateinit var btnMic: ImageView
     private lateinit var voiceWaveView: VoiceWaveView
+    private lateinit var riveAnimationView: RiveAnimationView
 
     private var speechRecognizer: SpeechRecognizer? = null
-    private var bargeInRecognizer: SpeechRecognizer? = null
     private var tts: TextToSpeech? = null
 
     private var voiceModeActive = false
@@ -50,10 +51,6 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
     private var startSound: MediaPlayer? = null
     private var stopSound: MediaPlayer? = null
     private var hasGreeted = false
-
-    private val BARGE_IN_RMS_THRESHOLD = 4.0f
-    private val BARGE_IN_REQUIRED_FRAMES = 3
-    private var bargeInFrameCount = 0
 
     private val API_KEY = "AIzaSyC3cqE-6HW8xRZKB_eZiWjL43rfTY3xi-w"
 
@@ -78,6 +75,7 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
         ivSendIcon = findViewById(R.id.ivSendIcon)
         btnMic = findViewById(R.id.btnMic)
         voiceWaveView = findViewById(R.id.voiceWaveView)
+        riveAnimationView = findViewById(R.id.main_mr_square_rive)
 
         findViewById<ImageView>(R.id.btnClose).setOnClickListener { finish() }
 
@@ -123,7 +121,6 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
         voiceModeActive = false
         isCurrentlyListening = false
         isBotSpeaking = false
-        bargeInFrameCount = 0
 
         stopSound?.start()
         tts?.stop()
@@ -137,7 +134,7 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
     // -------- Main listening --------
 
     private fun startListening() {
-        if (!voiceModeActive) return
+        if (!voiceModeActive || isBotSpeaking) return // Do not start if bot is still talking
         speechRecognizer?.destroy()
         speechRecognizer = null
 
@@ -199,82 +196,6 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
         recyclerView.post { startListening() }
     }
 
-    // -------- Barge-in listener --------
-
-    private fun startBargeInListener() {
-        if (!voiceModeActive) return
-        bargeInRecognizer?.destroy()
-        bargeInRecognizer = null
-        bargeInFrameCount = 0
-
-        val recognizer = SpeechRecognizer.createSpeechRecognizer(this)
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-            )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, getRecognitionLocale())
-        }
-
-        recognizer.setRecognitionListener(object : RecognitionListener {
-            override fun onRmsChanged(rmsdB: Float) {
-                if (!isBotSpeaking) return
-                if (rmsdB > BARGE_IN_RMS_THRESHOLD) {
-                    bargeInFrameCount++
-                    if (bargeInFrameCount >= BARGE_IN_REQUIRED_FRAMES) {
-                        handleBargeIn()
-                    }
-                } else if (bargeInFrameCount > 0) {
-                    bargeInFrameCount--
-                }
-            }
-
-            override fun onError(error: Int) {
-                if (isBotSpeaking && voiceModeActive) {
-                    recyclerView.post {
-                        if (isBotSpeaking && voiceModeActive) startBargeInListener()
-                    }
-                }
-            }
-
-            override fun onResults(results: Bundle?) {
-                if (isBotSpeaking) {
-                    val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                    val spoken = matches?.firstOrNull()?.trim().orEmpty()
-                    if (spoken.isNotEmpty()) {
-                        isBotSpeaking = false
-                        tts?.stop()
-                        bargeInRecognizer?.destroy()
-                        bargeInRecognizer = null
-                        sendMessage(spoken, isVoice = true)
-                    }
-                }
-            }
-
-            override fun onReadyForSpeech(params: Bundle?) {}
-            override fun onBeginningOfSpeech() {}
-            override fun onBufferReceived(buffer: ByteArray?) {}
-            override fun onEndOfSpeech() {}
-            override fun onPartialResults(partialResults: Bundle?) {}
-            override fun onEvent(eventType: Int, params: Bundle?) {}
-        })
-
-        bargeInRecognizer = recognizer
-        recognizer.startListening(intent)
-    }
-
-    private fun handleBargeIn() {
-        if (!isBotSpeaking) return
-        isBotSpeaking = false
-        bargeInFrameCount = 0
-        tts?.stop()
-        bargeInRecognizer?.destroy()
-        bargeInRecognizer = null
-        startListening()
-    }
-
-    // -------- Sending a message --------
-
     // -------- Sending a message --------
 
     private fun sendMessage(text: String, isVoice: Boolean) {
@@ -285,6 +206,9 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
         isCurrentlyListening = false
 
         if (voiceModeActive) voiceWaveView.setMode(VoiceWaveView.Mode.IDLE)
+
+        // Set Rive animation thinking state to true
+        riveAnimationView.setBooleanState("State Machine 1", "Thinking", true)
 
         // 1. Add User Message
         adapter.chatList.add(ChatMessage(text, true))
@@ -307,7 +231,7 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
 
         aiJob = lifecycleScope.launch {
             try {
-                val instruction = "You are Mr. Square, a Science tutor for Math, Physics, Biology, and Chemistry. Answer only questions related to these. Do not greet or introduce yourself again. Respond in $aiLanguage. Question: $text"
+                val instruction = "You are Mr. Square, a Science tutor for Math and Physics. Answer only questions related to these. Do not greet or introduce yourself again. Respond in $aiLanguage. Question: $text"
                 val response = RetrofitClient.api.getResponse(
                     API_KEY,
                     GeminiRequest(contents = listOf(Content(role = "user", parts = listOf(Part(instruction)))))
@@ -316,6 +240,9 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
                     response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
                         ?: "No answer"
                 )
+
+                // Turn off thinking state before showing/speaking the answer
+                riveAnimationView.setBooleanState("State Machine 1", "Thinking", false)
 
                 // 3. Update the thinking position with the real answer and isThinking = false
                 adapter.chatList[thinkingPos] = ChatMessage(answer, isUser = false, isThinking = false)
@@ -326,6 +253,9 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
                     speakAnswer(answer)
                 }
             } catch (e: Exception) {
+                // Turn off thinking state on error
+                riveAnimationView.setBooleanState("State Machine 1", "Thinking", false)
+
                 // Update with error message
                 adapter.chatList[thinkingPos] = ChatMessage(getString(R.string.bot_error_generic), isUser = false, isThinking = false)
                 adapter.notifyItemChanged(thinkingPos)
@@ -339,7 +269,6 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
     private fun speakAnswer(answer: String) {
         isBotSpeaking = true
         voiceWaveView.setMode(VoiceWaveView.Mode.BOT_SPEAKING)
-        startBargeInListener()
 
         val params = Bundle()
         params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, UTTERANCE_ID)
@@ -353,10 +282,7 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
             override fun onDone(utteranceId: String?) {
                 runOnUiThread {
                     isBotSpeaking = false
-                    bargeInRecognizer?.destroy()
-                    bargeInRecognizer = null
-                    bargeInFrameCount = 0
-                    if (voiceModeActive) startListening()
+                    if (voiceModeActive) startListening() // Safe to start mic listening here!
                 }
             }
 
@@ -364,8 +290,6 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
             override fun onError(utteranceId: String?) {
                 runOnUiThread {
                     isBotSpeaking = false
-                    bargeInRecognizer?.destroy()
-                    bargeInRecognizer = null
                     if (voiceModeActive) startListening()
                 }
             }
@@ -373,8 +297,6 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
             override fun onError(utteranceId: String?, errorCode: Int) {
                 runOnUiThread {
                     isBotSpeaking = false
-                    bargeInRecognizer?.destroy()
-                    bargeInRecognizer = null
                     if (voiceModeActive) startListening()
                 }
             }
@@ -430,7 +352,13 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
 
     private fun setupRecycler() {
         adapter = ChatAdapter(mutableListOf())
-        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // This configuration pushes the items down to pin them to the bottom
+        val layoutManager = LinearLayoutManager(this).apply {
+            stackFromEnd = true
+        }
+
+        recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
     }
 
@@ -461,8 +389,6 @@ class ChatActivity : BaseActivity(), TextToSpeech.OnInitListener {
     private fun destroyRecognizers() {
         speechRecognizer?.destroy()
         speechRecognizer = null
-        bargeInRecognizer?.destroy()
-        bargeInRecognizer = null
     }
 
     private fun getRecognitionLocale(): String {

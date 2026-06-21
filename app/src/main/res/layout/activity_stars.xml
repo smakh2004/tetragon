@@ -420,7 +420,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:fontFamily="@font/inter_semibold"
-                        android:text="15"
+                        android:text="50"
                         android:textColor="#F4D03F"
                         android:textSize="14sp" />
                 </LinearLayout>

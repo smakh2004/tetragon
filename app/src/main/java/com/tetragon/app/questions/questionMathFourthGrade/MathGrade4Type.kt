@@ -11,4 +11,6 @@ enum class MathGrade4Type(val xp: Int) {
     FRACTION(3),
 
     MIXED_NUMBERS_ARITHMETICS(3),
+
+    FIND_X_Y(3),
 }

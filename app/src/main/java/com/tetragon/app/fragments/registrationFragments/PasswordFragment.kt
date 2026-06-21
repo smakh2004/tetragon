@@ -15,12 +15,12 @@ import com.tetragon.app.ui.RegisterActivity
 class PasswordFragment : Fragment() {
 
     private lateinit var passwordEditText: EditText
+    private var isPasswordCurrentlyVisible = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_password, container, false)
     }
 
@@ -28,40 +28,27 @@ class PasswordFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         passwordEditText = view.findViewById(R.id.passwordEditText)
 
-        // Set up password eye toggle functionality
         PasswordToggleHelper.attach(
             passwordEditText,
             R.drawable.ic_eye_open,
-            R.drawable.ic_eye_closed
+            R.drawable.ic_eye_closed,
+            onVisibilityChanged = { isPasswordVisible ->
+                isPasswordCurrentlyVisible = isPasswordVisible
+                val registerActivity = activity as? RegisterActivity
+                if (isPasswordVisible) {
+                    registerActivity?.fireMrSquareAnimation("password_close")
+                } else {
+                    registerActivity?.fireMrSquareAnimation("password_open")
+                }
+            }
         )
 
         passwordEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                // not implemented
+            override fun afterTextChanged(p0: Editable?) {}
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                onTextPresent(!p0.isNullOrEmpty())
             }
-
-            override fun beforeTextChanged(
-                p0: CharSequence?,
-                p1: Int,
-                p2: Int,
-                p3: Int
-            ) {
-                // not implemented
-            }
-
-            override fun onTextChanged(
-                p0: CharSequence?,
-                p1: Int,
-                p2: Int,
-                p3: Int
-            ) {
-                if(!p0.isNullOrEmpty()) {
-                    onTextPresent(true)
-                } else {
-                    onTextPresent(false)
-                }
-            }
-
         })
     }
 
@@ -69,5 +56,14 @@ class PasswordFragment : Fragment() {
         val activity = activity as? RegisterActivity
         activity?.userData?.password = passwordEditText.text.toString()
         activity?.setContinueButtonEnabled(hasText)
+    }
+
+    override fun onDestroyView() {
+        // If the user navigates away while the password is still visible,
+        // fire password_open so MrSquare resets to the eyes-open state.
+        if (isPasswordCurrentlyVisible) {
+            (activity as? RegisterActivity)?.fireMrSquareAnimation("password_open")
+        }
+        super.onDestroyView()
     }
 }

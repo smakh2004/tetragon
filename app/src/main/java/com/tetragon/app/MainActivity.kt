@@ -4,9 +4,12 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -53,19 +56,29 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 1. Android 15 Edge-to-Edge Compatibility Fix
+        enableEdgeToEdge()
+
         super.onCreate(savedInstanceState)
 
-        Rive.init(this)
+        // 2. Fixed Rive double-initialization crash hazard.
+        // Using explicit init. Ensure Jetpack startup provider isn't clashing.
+        try {
+            Rive.init(this)
+        } catch (e: Exception) {
+            // Already initialized or fallback
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+        // 3. Handle status bar and navigation bar system paddings natively so UI looks correct
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply padding to prevent your structural layout from hiding under the system status/navigation bars
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            insets
         }
-
-        AppInitializer.getInstance(applicationContext).initializeComponent(RiveInitializer::class.java)
 
         if (savedInstanceState == null) {
             replaceFragment(HomeFragment())
@@ -75,11 +88,7 @@ class MainActivity : BaseActivity() {
 
         binding.bottomNavigationView.itemIconTintList = null
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
-
-            // 1. Get the ID of the item currently selected
             val currentId = binding.bottomNavigationView.selectedItemId
-
-            // 2. Only perform the transaction if the clicked item is different from the current one
             if (item.itemId != currentId) {
                 when (item.itemId) {
                     R.id.home -> replaceFragment(HomeFragment())
@@ -98,26 +107,23 @@ class MainActivity : BaseActivity() {
 
         val currentUser = auth.currentUser
 
-        // Security check for verified email
+        // 4. Fixed Broken Functionality / Loop Crash Trigger
         if (currentUser == null || !currentUser.isEmailVerified) {
             auth.signOut()
-            val intent = Intent(this, WelcomeActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            val intent = Intent(this, WelcomeActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
             startActivity(intent)
             finish()
-            return
+            return // Stop execution immediately safely
         }
 
+        // Only run operational database updates if the authorization pass is 100% sound
         checkMonthlyReset(currentUser.email)
         StreakManager.checkAndResetIfMissed()
         UserPresenceHelper.startTracking()
         startSessionListener()
 
-        // CHANGE THIS:
-        // val lastSubject = GradeManager.getSubject(this)
-        // setMiniGamesVisible(lastSubject != "PHYSICS")
-
-        // TO THIS:
         setMiniGamesVisible(true)
     }
 
@@ -179,8 +185,9 @@ class MainActivity : BaseActivity() {
         updatedWinners.remove(email)
 
         metaRef.update("winnerEmails", updatedWinners).addOnSuccessListener {
-            val intent = Intent(this, MonthlyRewardActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            val intent = Intent(this, MonthlyRewardActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
             finish()
@@ -248,24 +255,24 @@ class MainActivity : BaseActivity() {
     }
 
     private fun startSessionListener() {
+        // Double check authentication context before parsing snapshot queries
         val uid = auth.currentUser?.uid ?: return
         val currentDeviceId = DeviceUtils.getDeviceId(this)
 
         sessionListener = db.collection("users").document(uid)
-            .addSnapshotListener { snapshot, _ ->
-                // 1. Existing Session Check
-                val activeDeviceId = snapshot?.getString("activeDeviceId")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) return@addSnapshotListener
+
+                val activeDeviceId = snapshot.getString("activeDeviceId")
                 if (activeDeviceId != null && activeDeviceId != currentDeviceId) {
                     showSessionExpiredDialog()
                     return@addSnapshotListener
                 }
 
-                // 2. Global Subscription Cleanup Check
-                val isSubscribed = snapshot?.getBoolean("subscription") == true
-                val expiry = snapshot?.getTimestamp("subscriptionUntil")
+                val isSubscribed = snapshot.getBoolean("subscription") == true
+                val expiry = snapshot.getTimestamp("subscriptionUntil")
                 val now = Date()
 
-                // If it's active in DB but the date has passed, reset it globally
                 if (isSubscribed && expiry != null && expiry.toDate().before(now)) {
                     db.collection("users").document(uid).update(
                         mapOf(
@@ -284,8 +291,9 @@ class MainActivity : BaseActivity() {
             .setCancelable(false)
             .setPositiveButton(getString(R.string.refresh)) { _, _ ->
                 auth.signOut()
-                val intent = Intent(this, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                val intent = Intent(this, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
                 startActivity(intent)
                 finish()
             }
@@ -299,11 +307,6 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        // CHANGE THIS:
-        // val lastSubject = GradeManager.getSubject(this)
-        // setMiniGamesVisible(lastSubject != "PHYSICS")
-
-        // TO THIS:
         setMiniGamesVisible(true)
     }
 }

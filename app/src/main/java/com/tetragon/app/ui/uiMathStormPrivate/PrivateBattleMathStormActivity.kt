@@ -79,12 +79,6 @@ class PrivateBattleMathStormActivity : BaseActivity() {
         binding = ActivityPrivateBattleMathStormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) { // API 27+
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white) // optional: set nav bar color
-        }
-
         observeConnectivity()
 
         // Init sounds
@@ -273,6 +267,7 @@ class PrivateBattleMathStormActivity : BaseActivity() {
                 }
         }
     }
+
     private fun startCountdownOverlay() {
         binding.countdownOverlay.visibility = View.VISIBLE
         binding.checkBtn.visibility = View.GONE  // hide buttons
@@ -419,6 +414,7 @@ class PrivateBattleMathStormActivity : BaseActivity() {
             binding.checkBtnDisabled.visibility = View.VISIBLE
         }
     }
+
     override fun onBackPressed() {
         // Instead of default behavior, show the quit dialog
         showQuitDialog()
@@ -440,19 +436,16 @@ class PrivateBattleMathStormActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isConnected.collect { isConnected ->
-
                     if (isConnected) {
                         // Hide banner
                         binding.internetConnection.visibility = View.GONE
                         binding.offlineContainer.visibility = View.GONE
                         binding.mainContent.visibility = View.VISIBLE
-
                     } else {
                         // Show banner
                         binding.internetConnection.visibility = View.VISIBLE
                         binding.offlineContainer.visibility = View.VISIBLE
                         binding.mainContent.visibility = View.GONE
-
                     }
                 }
             }

@@ -65,8 +65,6 @@ class SplashScreenActivity : BaseActivity() {
         progressBar = findViewById(R.id.progressBar)
         progressTextView = findViewById(R.id.progressTextView)
 
-        applySystemUiStyle()
-
         // Wait for 2 seconds (2000ms) while keeping the logo stationary and 1.2x scale in the middle
         logoContainer.postDelayed({
             if (!isFinishing && !isDestroyed) {
@@ -257,15 +255,6 @@ class SplashScreenActivity : BaseActivity() {
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
                 finish()
             }
-        }
-    }
-
-    private fun applySystemUiStyle() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
         }
     }
 

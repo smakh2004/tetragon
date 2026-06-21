@@ -1,172 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     tools:context=".fragments.LeaderboardFragment">
 
-    <LinearLayout
-        android:id="@+id/headerTextContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="24dp"
-        android:orientation="vertical"
-        android:visibility="visible"
-        app:layout_constraintEnd_toStartOf="@+id/leaderboardImage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/titleLeaderboard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_semibold"
-            android:text="@string/leaderboard"
-            android:textColor="@color/blue_2"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/rewardText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/inter_semibold"
-            android:text="@string/get_a_reward_at_the_end_of_the_month"
-            android:textColor="@color/gray_1"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/monthText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/custom_background"
-            android:backgroundTint="@color/blue_2"
-            android:fontFamily="@font/inter_semibold"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="6dp"
-            android:textSize="14sp"
-            android:text="DECEMBER"
-            android:textColor="@color/white" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
         <LinearLayout
-            android:id="@+id/daysContainer"
-            android:layout_width="wrap_content"
+            android:id="@+id/headerTextContainer"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <app.rive.runtime.kotlin.RiveAnimationView
-                android:id="@+id/ivClockIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:riveAutoPlay="true"
-                app:riveResource="@raw/timer_leaderboard"
-                app:riveStateMachine="State Machine 1" />
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:layout_constraintEnd_toStartOf="@+id/leaderboardImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/daysText"
+                android:id="@+id/titleLeaderboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/leaderboard"
+                android:textColor="@color/blue_2"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/rewardText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/get_a_reward_at_the_end_of_the_month"
+                android:textColor="@color/gray_1"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/monthText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/custom_background"
+                android:backgroundTint="@color/blue_2"
                 android:fontFamily="@font/inter_semibold"
-                android:text="29 DAYS"
-                android:textColor="@color/blue_2"
-                android:textSize="15sp" />
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="6dp"
+                android:textSize="14sp"
+                android:text="DECEMBER"
+                android:textColor="@color/white" />
+
+            <LinearLayout
+                android:id="@+id/daysContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/ivClockIcon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveAutoPlay="true"
+                    app:riveResource="@raw/timer_leaderboard"
+                    app:riveStateMachine="State Machine 1" />
+
+                <TextView
+                    android:id="@+id/daysText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="@font/inter_semibold"
+                    tools:text="24h 00m 00s"
+                    android:textColor="@color/blue_2"
+                    android:textSize="15sp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
 
-    <ImageView
-        android:id="@+id/leaderboardImage"
-        android:layout_width="160dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="16dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_leaderboard"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@id/headerTextContainer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/headerTextContainer" />
-
-    <TextView
-        android:id="@+id/positionText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/inter_semibold"
-        android:text="@string/loading"
-        android:textColor="@color/text_color"
-        android:textSize="20sp"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/headerTextContainer" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/leaderboardCard"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="16dp"
-        android:visibility="visible"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/positionText"
-        app:strokeColor="@color/gray_2"
-        app:strokeWidth="2dp">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/leaderboardRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            tools:listitem="@layout/iteam_leaderboard" />
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- FULL-SCREEN SOLID WHITE LOADING SYSTEM -->
-    <LinearLayout
-        android:id="@+id/loadingLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#FFFFFF"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone">
-
-        <ProgressBar
-            android:id="@+id/loadingProgressBar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:indeterminate="true"
-            android:indeterminateTint="@color/blue_2" />
+        <ImageView
+            android:id="@+id/leaderboardImage"
+            android:layout_width="160dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="16dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_leaderboard"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@id/headerTextContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/headerTextContainer" />
 
         <TextView
-            android:id="@+id/loadingText"
+            android:id="@+id/positionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/inter_semibold"
             android:text="@string/loading"
-            android:textColor="@color/text_color" />
-    </LinearLayout>
+            android:textColor="@color/text_color"
+            android:textSize="20sp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/headerTextContainer" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/leaderboardCard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="16dp"
+            android:visibility="visible"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/positionText"
+            app:strokeColor="@color/gray_2"
+            app:strokeWidth="2dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/leaderboardRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                tools:listitem="@layout/iteam_leaderboard" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/loadingLayout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#FFFFFF"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/loadingProgressBar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/blue_2" />
+
+            <TextView
+                android:id="@+id/loadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/loading"
+                android:textColor="@color/text_color" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

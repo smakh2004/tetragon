@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_bold"
-            android:text="TETRAGON"
+            android:text="@string/tetragon"
             android:textColor="#00BFFF"
             android:textSize="24sp"
             android:textStyle="bold" />

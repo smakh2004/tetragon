@@ -57,8 +57,9 @@ class Math4GradeFragment : Fragment() {
     private lateinit var topic3: RiveAnimationView
     private lateinit var topic4: RiveAnimationView
     private lateinit var topic5: RiveAnimationView
+    private lateinit var topic6: RiveAnimationView
 
-    private val topicViews by lazy { listOf(topic1, topic2, topic3, topic4, topic5) }
+    private val topicViews by lazy { listOf(topic1, topic2, topic3, topic4, topic5, topic6) }
 
     // Grade 4 Topics - Localized using the pattern from Grade 1
     private val topicNames by lazy {
@@ -67,13 +68,14 @@ class Math4GradeFragment : Fragment() {
             getString(R.string.column_multiplication),
             getString(R.string.column_division),
             getString(R.string.fraction_arithmetics),
-            getString(R.string.mixed_numbers)
+            getString(R.string.mixed_numbers),
+            getString(R.string.graphs),
         )
     }
 
     private val topicKeys = listOf(
-        "COMPLEX_ARITHMETICS", "COLUMN_MULTIPLICATION",
-        "COLUMN_DIVISION", "FRACTION_ARITHMETICS", "MIXED_NUMBERS"
+        "COMPLEX_ARITHMETICS", "COLUMN_MULTIPLICATION", "COLUMN_DIVISION",
+        "FRACTION_ARITHMETICS", "MIXED_NUMBERS", "GRAPHS",
     )
 
     // Grade 5 Data for Preview - Localized
@@ -169,7 +171,7 @@ class Math4GradeFragment : Fragment() {
 
         topic1 = view.findViewById(R.id.topic1); topic2 = view.findViewById(R.id.topic2)
         topic3 = view.findViewById(R.id.topic3); topic4 = view.findViewById(R.id.topic4)
-        topic5 = view.findViewById(R.id.topic5)
+        topic5 = view.findViewById(R.id.topic5); topic6 = view.findViewById(R.id.topic6)
 
         startContainer.visibility = View.GONE
         scrollTargetContainer.visibility = View.GONE

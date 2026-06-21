@@ -7,7 +7,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingBottom="24dp"
-    tools:context=".questions.questionMathFifthGrade.firstTopic.UiAdditionNaturalNumbersFragment">
+    tools:context=".questions.questionMathFifthGrade.firstTopic.easy.UiAdditionNaturalNumbersFragment">
 
     <TextView
         android:id="@+id/tvInstruction"

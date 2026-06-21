@@ -8,6 +8,7 @@ data class UserData(
     var lastName: String = "",
     var email: String = "",
     var password: String = "",
+    var language: String = "",
     var online: Boolean = false,
     var lastOnline: Timestamp? = null,
     var registeredAt: Timestamp? = null,

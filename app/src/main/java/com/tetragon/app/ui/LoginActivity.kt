@@ -1,7 +1,6 @@
 package com.tetragon.app.ui
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -9,9 +8,9 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -28,6 +27,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -35,13 +35,10 @@ import kotlinx.coroutines.launch
 
 class LoginActivity : BaseActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private val auth: FirebaseAuth by lazy {
-        FirebaseAuth.getInstance()
-    }
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db = FirebaseFirestore.getInstance()
     private var isLoginInProgress = false
 
-    // Google Sign-In Client variable
     private lateinit var googleSignInClient: GoogleSignInClient
 
     private val viewModel: ConnectivityViewModel by viewModels {
@@ -57,7 +54,6 @@ class LoginActivity : BaseActivity() {
         }
     }
 
-    // Launcher that catches the result after user picks their Google account
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -65,19 +61,15 @@ class LoginActivity : BaseActivity() {
         try {
             val account = task.getResult(ApiException::class.java)!!
             Log.d("TetragonAuth", "Google account selected: ${account.email}")
-
-            // Now pass this account's token over to Firebase
             firebaseAuthWithGoogle(account.idToken!!)
         } catch (e: ApiException) {
-            isLoginInProgress = false
-            updateLoadingUi(false)
-            checkFields()
+            resetLoginState()
             Log.e("TetragonAuth", "Google sign in failed! Status Code: ${e.statusCode}")
             Toast.makeText(this, getString(R.string.auth_failed), Toast.LENGTH_SHORT).show()
         }
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -91,15 +83,17 @@ class LoginActivity : BaseActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
-
-        // Initialize Google Sign-In options
         setupGoogleSignIn()
         observeConnectivity()
+
+        // --- SYSTEM BACK PRESS NAVIGATION HANDLING ---
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isLoginInProgress) return
+                finish()
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+            }
+        })
 
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -119,9 +113,19 @@ class LoginActivity : BaseActivity() {
         )
 
         binding.exitBtn.setOnClickListener {
-            startActivity(Intent(this, WelcomeActivity::class.java))
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+            if (isLoginInProgress) return@setOnClickListener
             finish()
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+        }
+
+        // --- FORGOT PASSWORD NAVIGATION ROUTING INTERFACE ---
+        binding.forgotPasswordText.setOnClickListener {
+            if (isLoginInProgress) return@setOnClickListener
+
+            // Route execution loop forward to ForgotPasswordActivity
+            val intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
         binding.googleSignInButton.setOnClickListener {
@@ -130,7 +134,8 @@ class LoginActivity : BaseActivity() {
             isLoginInProgress = true
             updateLoadingUi(true)
 
-            // Clear out the sticky session history before launching to show account picker every time
+            Toast.makeText(this, "Redirecting to sign in with Google...", Toast.LENGTH_SHORT).show()
+
             googleSignInClient.signOut().addOnCompleteListener {
                 val signInIntent = googleSignInClient.signInIntent
                 googleSignInLauncher.launch(signInIntent)
@@ -138,6 +143,8 @@ class LoginActivity : BaseActivity() {
         }
 
         binding.continueEnabledBtn.setOnClickListener {
+            if (isLoginInProgress) return@setOnClickListener
+
             val email = binding.emailEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
 
@@ -156,27 +163,33 @@ class LoginActivity : BaseActivity() {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        Log.d("TetragonAuth", "Email auth successful.")
                         handleSuccessfulLogin(auth.currentUser!!)
                     } else {
-                        isLoginInProgress = false
-                        updateLoadingUi(false)
-                        checkFields()
-                        Toast.makeText(this, getString(R.string.auth_failed), Toast.LENGTH_SHORT).show()
+                        Log.e("TetragonAuth", "Email sign in failed directly from Firebase!", task.exception)
+                        resetLoginState()
+
+                        if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                            Toast.makeText(this, "Incorrect email or password. Please try again.", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(this, task.exception?.localizedMessage ?: getString(R.string.auth_failed), Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
         }
+
+        checkFields()
     }
 
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
-            .requestProfile() // Forces profile verification criteria
+            .requestProfile()
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
-
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -185,45 +198,60 @@ class LoginActivity : BaseActivity() {
                 if (task.isSuccessful) {
                     handleSuccessfulLogin(auth.currentUser!!)
                 } else {
-                    isLoginInProgress = false
-                    updateLoadingUi(false)
-                    checkFields()
+                    resetLoginState()
                     Log.e("TetragonAuth", "Firebase credential swap failed", task.exception)
                     Toast.makeText(this, getString(R.string.auth_failed), Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    // Unified handler ensuring your activeDeviceId strategy remains enforced
     private fun handleSuccessfulLogin(user: FirebaseUser) {
         val uid = user.uid
         val deviceId = DeviceUtils.getDeviceId(this)
 
         db.collection("users")
             .document(uid)
-            .update("activeDeviceId", deviceId)
-            .addOnSuccessListener {
-                isLoginInProgress = false
-                Toast.makeText(this, getString(R.string.login_successful), Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, MainActivity::class.java))
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-                finish()
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    db.collection("users")
+                        .document(uid)
+                        .update("activeDeviceId", deviceId)
+                        .addOnSuccessListener {
+                            isLoginInProgress = false
+                            Toast.makeText(this, getString(R.string.login_successful), Toast.LENGTH_SHORT).show()
+
+                            val intent = Intent(this, MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                            startActivity(intent)
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                            finish()
+                        }
+                        .addOnFailureListener { e ->
+                            resetLoginState()
+                            Log.e("TetragonAuth", "Failed to update device ID in Firestore", e)
+                            Toast.makeText(this, "Session error. Please try again.", Toast.LENGTH_SHORT).show()
+                        }
+                } else {
+                    Log.w("TetragonAuth", "User authenticated but missing Firestore Doc UID: $uid")
+                    auth.signOut()
+                    googleSignInClient.signOut()
+                    resetLoginState()
+                    Toast.makeText(this, "Account not found. Please register first.", Toast.LENGTH_LONG).show()
+                }
             }
             .addOnFailureListener { e ->
-                // Fallback for new Google accounts to prevent crash if document doesn't exist
-                val userMap = hashMapOf(
-                    "uid" to uid,
-                    "email" to user.email,
-                    "activeDeviceId" to deviceId
-                )
-                db.collection("users").document(uid).set(userMap)
-                    .addOnSuccessListener {
-                        isLoginInProgress = false
-                        startActivity(Intent(this, MainActivity::class.java))
-                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-                        finish()
-                    }
+                resetLoginState()
+                Log.e("TetragonAuth", "Firestore user look-up failed entirely", e)
+                Toast.makeText(this, getString(R.string.auth_failed), Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun resetLoginState() {
+        isLoginInProgress = false
+        updateLoadingUi(false)
+        checkFields()
     }
 
     private fun updateLoadingUi(loading: Boolean) {
@@ -241,7 +269,6 @@ class LoginActivity : BaseActivity() {
 
         val email = binding.emailEditText.text.toString().trim()
         val password = binding.passwordEditText.text.toString().trim()
-
         val isValid = email.isNotEmpty() && password.isNotEmpty()
 
         if (isValid) {
@@ -264,6 +291,8 @@ class LoginActivity : BaseActivity() {
                     binding.continueEnabledBtn.isEnabled = isConnected
                     binding.googleSignInButton.isEnabled = isConnected
                     binding.googleSignInButton.alpha = if (isConnected) 1.0f else 0.5f
+                    binding.forgotPasswordText.isEnabled = isConnected
+                    binding.forgotPasswordText.alpha = if (isConnected) 1.0f else 0.5f
 
                     if (isConnected) {
                         checkFields()

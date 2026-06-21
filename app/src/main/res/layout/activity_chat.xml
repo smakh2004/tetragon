@@ -57,8 +57,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/voiceWaveView"
+        android:overScrollMode="never"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/animationBarRow"
         app:layout_constraintTop_toBottomOf="@id/topBar" />
 
     <View
@@ -73,27 +76,56 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/fade_bottom"
-        app:layout_constraintBottom_toTopOf="@id/voiceWaveView" />
+        app:layout_constraintBottom_toTopOf="@+id/animationBarRow" />
 
-    <!--
-        Animated bar visualizer. Hidden by default; shown when voice mode is active.
-        Sits directly above the input bar so it feels anchored to the conversation.
-    -->
-    <com.tetragon.app.aiChatBot.VoiceWaveView
-        android:id="@+id/voiceWaveView"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/animationBarRow"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginBottom="4dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/inputContainer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="95dp"
+        app:layout_constraintBottom_toTopOf="@id/inputContainer">
+
+        <FrameLayout
+            android:id="@+id/botAvatarContainer"
+            android:layout_width="125dp"
+            android:layout_height="105dp"
+            android:layout_marginBottom="-1dp"
+            android:layout_marginStart="31dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/main_mr_square_rive"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom|start"
+                app:riveAutoPlay="true"
+                app:riveResource="@raw/mr_square_chat"
+                app:riveStateMachine="State Machine 1" />
+        </FrameLayout>
+
+        <com.tetragon.app.aiChatBot.VoiceWaveView
+            android:id="@+id/voiceWaveView"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="150dp"
+            android:layout_marginEnd="48dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout

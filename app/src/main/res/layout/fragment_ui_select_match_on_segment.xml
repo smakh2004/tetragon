@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".questions.questionMathFifthGrade.firstTopic.medium.UiSelectMatchOnSegmentFragment">
+
+    <TextView
+        android:id="@+id/questionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Select the correct match: x ≥ 5"
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/x_greater_less_animation"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/questionText"
+        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintWidth_max="500dp"
+        app:riveAlignment="CENTER"
+        app:riveFit="FIT_WIDTH"
+        app:riveResource="@raw/x_greater_less"
+        app:riveStateMachine="State Machine 1" />
+
+    <View
+        android:id="@+id/animationTouchBlocker"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/x_greater_less_animation"
+        app:layout_constraintEnd_toEndOf="@id/x_greater_less_animation"
+        app:layout_constraintStart_toStartOf="@id/x_greater_less_animation"
+        app:layout_constraintTop_toTopOf="@id/x_greater_less_animation" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

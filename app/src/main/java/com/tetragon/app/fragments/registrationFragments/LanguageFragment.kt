@@ -33,14 +33,24 @@ class LanguageFragment : Fragment() {
     }
 
     private fun onLanguageSelected(lang: String) {
-        // 1. Save the selection
+        val registerActivity = activity as? RegisterActivity ?: return
+
+        // 1. Persist the selection to SharedPreferences via LocaleHelper
         LocaleHelper.setLocale(requireContext(), lang)
 
-        // 2. Show the visual selection in the UI
+        // 2. Store the chosen language code on the shared UserData model
+        registerActivity.userData.language = lang
+
+        // 3. Apply the locale immediately to the live activity Resources so that
+        //    all subsequent getString() calls (header titles, button labels, etc.)
+        //    reflect the new language right away — no activity recreation needed.
+        registerActivity.applyLocaleInPlace(lang)
+
+        // 4. Show the visual selection highlight in the UI
         highlightSelectedLanguage(lang)
 
-        // 3. ONLY now enable the continue button in the RegisterActivity
-        (activity as? RegisterActivity)?.setContinueButtonEnabled(true)
+        // 5. Enable the continue button now that a valid selection has been made
+        registerActivity.setContinueButtonEnabled(true)
     }
 
     private fun highlightSelectedLanguage(lang: String) {

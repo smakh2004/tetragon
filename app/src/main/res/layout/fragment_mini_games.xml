@@ -73,7 +73,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_semibold"
-                android:text="5 "
+                android:text="5"
+                android:layout_marginEnd="4dp"
                 android:textColor="@color/text_color"
                 android:textSize="23sp" />
 
@@ -195,7 +196,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp"
+            android:clipToPadding="false">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/math_storm_card_container"
@@ -322,7 +325,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
-                android:id="@+id/storm_divider"
+                android:id="@+id/cash_storm_divider"
                 android:layout_width="0dp"
                 android:layout_height="2dp"
                 android:layout_marginTop="16dp"
@@ -331,6 +334,137 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/math_storm_card_container" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cash_storm_card_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cash_storm_divider">
+
+                <LinearLayout
+                    android:id="@+id/cash_storm_info_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/cash_storm_icon"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/cash_storm" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/cash_storm_balance_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_semibold"
+                            android:text="@string/loading"
+                            android:textColor="@color/text_color"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:id="@+id/cash_storm_title_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_semibold"
+                            android:text="@string/cash_storm"
+                            android:textColor="@color/gray_1"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/start_cash_storm_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingBottom="5dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cash_storm_info_layout">
+
+                    <FrameLayout
+                        android:id="@+id/cash_storm_enabled_btn_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/custom_button"
+                            android:backgroundTint="@color/red_2"
+                            android:translationY="5dp" />
+
+                        <Button
+                            android:id="@+id/start_cash_storm_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/custom_button"
+                            android:fontFamily="@font/inter_semibold"
+                            android:stateListAnimator="@drawable/button_animator"
+                            android:text="@string/start_10xp"
+                            android:textColor="@color/white"
+                            android:textSize="17sp"
+                            app:backgroundTint="@color/red_1" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/cash_storm_disabled_btn_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/custom_button"
+                            android:backgroundTint="@color/gray_2"
+                            android:translationY="5dp" />
+
+                        <TextView
+                            android:id="@+id/start_cash_storm_disabled_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:fontFamily="@font/inter_semibold"
+                            android:gravity="center"
+                            android:text="@string/start_10xp"
+                            android:textColor="@color/gray_1"
+                            android:textSize="17sp"
+                            android:translationY="5dp" />
+                    </FrameLayout>
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/storm_divider"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/gray_2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cash_storm_card_container" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/online_game_card_container"
@@ -540,137 +674,6 @@
                             android:translationY="5dp" />
                     </FrameLayout>
                 </FrameLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <View
-                android:id="@+id/cash_storm_divider"
-                android:layout_width="0dp"
-                android:layout_height="2dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@color/gray_2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/online_game_card_container" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cash_storm_card_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:paddingBottom="24dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cash_storm_divider">
-
-                <LinearLayout
-                    android:id="@+id/cash_storm_info_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <ImageView
-                        android:id="@+id/cash_storm_icon"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginEnd="16dp"
-                        android:src="@drawable/cash_storm" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/cash_storm_balance_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_semibold"
-                            android:text="@string/loading"
-                            android:textColor="@color/text_color"
-                            android:textSize="22sp" />
-
-                        <TextView
-                            android:id="@+id/cash_storm_title_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_semibold"
-                            android:text="@string/cash_storm"
-                            android:textColor="@color/gray_1"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <FrameLayout
-                    android:id="@+id/start_cash_storm_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/cash_storm_info_layout">
-
-                    <FrameLayout
-                        android:id="@+id/cash_storm_enabled_btn_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="visible">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/custom_button"
-                            android:backgroundTint="@color/red_2"
-                            android:translationY="5dp" />
-
-                        <Button
-                            android:id="@+id/start_cash_storm_btn"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/custom_button"
-                            android:fontFamily="@font/inter_semibold"
-                            android:stateListAnimator="@drawable/button_animator"
-                            android:text="@string/start_10xp"
-                            android:textColor="@color/white"
-                            android:textSize="17sp"
-                            app:backgroundTint="@color/red_1" />
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:id="@+id/cash_storm_disabled_btn_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="invisible">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/custom_button"
-                            android:backgroundTint="@color/gray_2"
-                            android:translationY="5dp" />
-
-                        <TextView
-                            android:id="@+id/start_cash_storm_disabled_btn"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:fontFamily="@font/inter_semibold"
-                            android:gravity="center"
-                            android:text="@string/start_10xp"
-                            android:textColor="@color/gray_1"
-                            android:textSize="17sp"
-                            android:translationY="5dp" />
-                    </FrameLayout>
-                </FrameLayout>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

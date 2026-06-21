@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".questions.questionMathThirdGrade.fourthTopic.UiShowRadiusFragment">
+
+    <TextView
+        android:id="@+id/radiusQuestionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Show a circle with a radius of:"
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/radiusTargetValueText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="5"
+        android:textColor="@color/text_color"
+        android:textSize="38sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radiusQuestionText" />
+
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/radiusRiveView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radiusTargetValueText"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintWidth_max="500dp"
+        app:riveAlignment="CENTER"
+        app:riveFit="FIT_WIDTH"
+        app:riveResource="@raw/circle_radius"
+        app:riveStateMachine="State Machine 1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

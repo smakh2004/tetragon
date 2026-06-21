@@ -2,7 +2,6 @@ package com.tetragon.app.questions.questionMathSecondGrade
 
 import android.animation.ObjectAnimator
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -10,35 +9,25 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import app.rive.runtime.kotlin.core.Rive
 import com.tetragon.app.R
 import com.tetragon.app.connectivityCheck.AndroidConnectivityObserver
 import com.tetragon.app.connectivityCheck.ConnectivityViewModel
-import com.tetragon.app.databinding.ActivityQuestionQctivityBinding
+import com.tetragon.app.databinding.ActivityMath2GradeQuestionBinding
 import com.tetragon.app.questions.FiveCorrectAnswerFragment
 import com.tetragon.app.questions.SubjectConstants
 import com.tetragon.app.questions.XpGainedActivity
-import com.tetragon.app.questions.questionMathSecondGrade.firstTopic.UiAdditionInteractiveFragment
-import com.tetragon.app.questions.questionMathSecondGrade.firstTopic.UiArithmeticsBasicsFragment
-import com.tetragon.app.questions.questionMathSecondGrade.secondTopic.UiColumnAdditionPairsFragment
-import com.tetragon.app.questions.questionMathSecondGrade.secondTopic.UiColumnMethodFragment
-import com.tetragon.app.questions.questionMathSecondGrade.eighthTopic.UiDivisionFragment
-import com.tetragon.app.questions.questionMathSecondGrade.eighthTopic.UiDivisionInteractiveFragment
-import com.tetragon.app.questions.questionMathSecondGrade.fifthTopic.UiMeasurementArithmeticsFragment
-import com.tetragon.app.questions.questionMathSecondGrade.fifthTopic.UiMeterToCmFragment
-import com.tetragon.app.questions.questionMathSecondGrade.fourthTopic.UiComparisonThreeDigitNumbersFragment
-import com.tetragon.app.questions.questionMathSecondGrade.fourthTopic.UiComparisonThreeGigitNumbersArithmeticsFragment
-import com.tetragon.app.questions.questionMathSecondGrade.seventhTopic.UiMultiplicationFragment
-import com.tetragon.app.questions.questionMathSecondGrade.seventhTopic.UiMultiplicationInteractiveFragment
-import com.tetragon.app.questions.questionMathSecondGrade.sixthTopic.UiSetTimeFragment
-import com.tetragon.app.questions.questionMathSecondGrade.sixthTopic.UiTimeArithmeticsFragment
-import com.tetragon.app.questions.questionMathSecondGrade.thirdTopic.UiColumnAdditionThreeDigitNumbersFragment
-import com.tetragon.app.questions.questionMathSecondGrade.thirdTopic.UiColumnSubtractionThreeDigitNumbersFragment
+import com.tetragon.app.questions.questionMathSecondGrade.eighthTopic.*
+import com.tetragon.app.questions.questionMathSecondGrade.fifthTopic.*
+import com.tetragon.app.questions.questionMathSecondGrade.firstTopic.*
+import com.tetragon.app.questions.questionMathSecondGrade.fourthTopic.*
+import com.tetragon.app.questions.questionMathSecondGrade.secondTopic.*
+import com.tetragon.app.questions.questionMathSecondGrade.seventhTopic.*
+import com.tetragon.app.questions.questionMathSecondGrade.sixthTopic.*
+import com.tetragon.app.questions.questionMathSecondGrade.thirdTopic.*
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.tetragon.app.databinding.ActivityMath2GradeQuestionBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -46,7 +35,6 @@ class Math2GradeQuestionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMath2GradeQuestionBinding
     private lateinit var selectedTopic: MathGrade2Topic
-
     private var lastQuestionType: MathGrade2Type? = null
 
     var totalXp: Int = 0
@@ -67,12 +55,6 @@ class Math2GradeQuestionActivity : BaseActivity() {
         Rive.init(this)
         binding = ActivityMath2GradeQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // UI Styling
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        }
 
         binding.exitBtn.setOnClickListener { showQuitBottomSheet() }
         onBackPressedDispatcher.addCallback(this) { showQuitBottomSheet() }
@@ -139,45 +121,14 @@ class Math2GradeQuestionActivity : BaseActivity() {
 
     private fun getTypesForTopic(topic: MathGrade2Topic): List<MathGrade2Type> {
         return when (topic) {
-            MathGrade2Topic.ADDITION_SUBTRACTION_BASICS -> listOf(
-                MathGrade2Type.ARITHMETICS_BASICS,
-                MathGrade2Type.ADDITION_INTERACTIVE
-            )
-
-            MathGrade2Topic.COLUMN_METHOD -> listOf(
-                MathGrade2Type.COLUMN_METHOD_ADDITION,
-                MathGrade2Type.COLUMN_METHOD_ADDITION_MATCH
-            )
-
-            MathGrade2Topic.THREE_DIGIT_NUMBERS -> listOf(
-                MathGrade2Type.COLUMN_METHOD_ADDITION_THREE_DIGITS,
-                MathGrade2Type.COLUMN_METHOD_SUBTRACTION_THREE_DIGITS,
-            )
-
-            MathGrade2Topic.COMPARISON_THREE_DIGIT_NUMBERS -> listOf(
-                MathGrade2Type.COMPARISON_THREE_DIGITS,
-                MathGrade2Type.COMPARISON_THREE_DIGITS_ARITHMETICS,
-            )
-
-            MathGrade2Topic.LENGTH_MEASUREMENT -> listOf(
-                MathGrade2Type.METER_TO_CM,
-                MathGrade2Type.MEASUREMENT_ARITHMETICS,
-            )
-
-            MathGrade2Topic.TIME -> listOf(
-                MathGrade2Type.SET_TIME,
-                MathGrade2Type.TIME_ARITHMETICS
-            )
-
-            MathGrade2Topic.MULTIPLICATION -> listOf(
-                MathGrade2Type.MULTIPLICATION_TABLE,
-                MathGrade2Type.MULTIPLICATION_INTERACTIVE
-            )
-
-            MathGrade2Topic.DIVISION -> listOf(
-                MathGrade2Type.DIVISION_SIMPLE,
-                MathGrade2Type.DIVISION_INTERACTIVE,
-            )
+            MathGrade2Topic.ADDITION_SUBTRACTION_BASICS -> listOf(MathGrade2Type.ARITHMETICS_BASICS, MathGrade2Type.ADDITION_INTERACTIVE)
+            MathGrade2Topic.COLUMN_METHOD -> listOf(MathGrade2Type.COLUMN_METHOD_ADDITION, MathGrade2Type.COLUMN_METHOD_ADDITION_MATCH)
+            MathGrade2Topic.THREE_DIGIT_NUMBERS -> listOf(MathGrade2Type.COLUMN_METHOD_ADDITION_THREE_DIGITS, MathGrade2Type.COLUMN_METHOD_SUBTRACTION_THREE_DIGITS)
+            MathGrade2Topic.COMPARISON_THREE_DIGIT_NUMBERS -> listOf(MathGrade2Type.COMPARISON_THREE_DIGITS, MathGrade2Type.COMPARISON_THREE_DIGITS_ARITHMETICS)
+            MathGrade2Topic.LENGTH_MEASUREMENT -> listOf(MathGrade2Type.METER_TO_CM, MathGrade2Type.MEASUREMENT_ARITHMETICS)
+            MathGrade2Topic.TIME -> listOf(MathGrade2Type.SET_TIME, MathGrade2Type.TIME_ARITHMETICS)
+            MathGrade2Topic.MULTIPLICATION -> listOf(MathGrade2Type.MULTIPLICATION_TABLE, MathGrade2Type.MULTIPLICATION_INTERACTIVE)
+            MathGrade2Topic.DIVISION -> listOf(MathGrade2Type.DIVISION_SIMPLE, MathGrade2Type.DIVISION_INTERACTIVE)
         }
     }
 
@@ -186,46 +137,27 @@ class Math2GradeQuestionActivity : BaseActivity() {
         hideSuccessAnimation()
         binding.correctMrSquare.visibility = View.INVISIBLE
 
-        // 1. Get all possible types for this topic
         val allTypes = getTypesForTopic(selectedTopic)
-
-        // 2. Filter out the last question type to prevent back-to-back repeats
         val filteredTypes = allTypes.filter { it != lastQuestionType }
+        val nextType = if (filteredTypes.isNotEmpty()) filteredTypes.random() else allTypes.random()
 
-        // 3. Pick from the filtered list.
-        // If for some reason the filtered list is empty (only 1 type exists total),
-        // fallback to the full list.
-        val nextType = if (filteredTypes.isNotEmpty()) {
-            filteredTypes.random()
-        } else {
-            allTypes.random()
-        }
-
-        // 4. Update the tracker
         lastQuestionType = nextType
 
         val fragment = when (nextType) {
             MathGrade2Type.ARITHMETICS_BASICS -> UiArithmeticsBasicsFragment()
             MathGrade2Type.ADDITION_INTERACTIVE -> UiAdditionInteractiveFragment()
-
             MathGrade2Type.COLUMN_METHOD_ADDITION -> UiColumnMethodFragment()
             MathGrade2Type.COLUMN_METHOD_ADDITION_MATCH -> UiColumnAdditionPairsFragment()
-
             MathGrade2Type.COLUMN_METHOD_ADDITION_THREE_DIGITS -> UiColumnAdditionThreeDigitNumbersFragment()
             MathGrade2Type.COLUMN_METHOD_SUBTRACTION_THREE_DIGITS -> UiColumnSubtractionThreeDigitNumbersFragment()
-
             MathGrade2Type.COMPARISON_THREE_DIGITS -> UiComparisonThreeDigitNumbersFragment()
             MathGrade2Type.COMPARISON_THREE_DIGITS_ARITHMETICS -> UiComparisonThreeGigitNumbersArithmeticsFragment()
-
             MathGrade2Type.METER_TO_CM -> UiMeterToCmFragment()
             MathGrade2Type.MEASUREMENT_ARITHMETICS -> UiMeasurementArithmeticsFragment()
-
             MathGrade2Type.SET_TIME -> UiSetTimeFragment()
             MathGrade2Type.TIME_ARITHMETICS -> UiTimeArithmeticsFragment()
-
             MathGrade2Type.MULTIPLICATION_TABLE -> UiMultiplicationFragment()
             MathGrade2Type.MULTIPLICATION_INTERACTIVE -> UiMultiplicationInteractiveFragment()
-
             MathGrade2Type.DIVISION_SIMPLE -> UiDivisionFragment()
             MathGrade2Type.DIVISION_INTERACTIVE -> UiDivisionInteractiveFragment()
         }
@@ -241,7 +173,7 @@ class Math2GradeQuestionActivity : BaseActivity() {
         val increment = progressBar.max / 10
         val newProgress = (progressBar.progress + increment).coerceAtMost(progressBar.max)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             progressBar.setProgress(newProgress, true)
         } else {
             ObjectAnimator.ofInt(progressBar, "progress", progressBar.progress, newProgress).apply {
@@ -257,7 +189,7 @@ class Math2GradeQuestionActivity : BaseActivity() {
         val intent = Intent(this, XpGainedActivity::class.java).apply {
             putExtra(SubjectConstants.EXTRA_XP, totalXp)
             putExtra(SubjectConstants.EXTRA_TOPIC, selectedTopic.name)
-            putExtra(SubjectConstants.EXTRA_GRADE, 2) // Grade 2
+            putExtra(SubjectConstants.EXTRA_GRADE, 2)
             putExtra(SubjectConstants.EXTRA_SUBJECT, SubjectConstants.SUBJECT_MATH)
         }
         startActivity(intent)
@@ -270,23 +202,15 @@ class Math2GradeQuestionActivity : BaseActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_quit, null)
         dialog.setContentView(view)
 
-        // Localized Title and Message
         view.findViewById<TextView>(R.id.titleText).text = getString(R.string.quit_title)
         view.findViewById<TextView>(R.id.messageText).text = getString(R.string.quit_message)
-
-        // Localized "CONTINUE" button
         view.findViewById<Button>(R.id.noButton).apply {
             text = getString(R.string.continue_text)
             setOnClickListener { dialog.dismiss() }
         }
-
-        // Localized "EXIT" button
         view.findViewById<Button>(R.id.finishButton).apply {
             text = getString(R.string.exit_btn)
-            setOnClickListener {
-                finish()
-                dialog.dismiss()
-            }
+            setOnClickListener { finish(); dialog.dismiss() }
         }
         dialog.show()
     }
@@ -295,24 +219,18 @@ class Math2GradeQuestionActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isConnected.collect { isConnected ->
-                    if (isConnected) {
-                        binding.internetConnection.visibility = View.GONE
-                        binding.offlineContainer.visibility = View.GONE
-                        binding.topBarContainer.visibility = View.VISIBLE
-                        binding.questionFragmentContainer.visibility = View.VISIBLE
-                        binding.btnBackground.visibility = View.VISIBLE
-                        if (isResultCurrentlyVisible) {
-                            binding.stateContainer.visibility = View.VISIBLE
-                            binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
-                        }
+                    val isVisible = isConnected
+                    binding.internetConnection.visibility = if (isVisible) View.GONE else View.VISIBLE
+                    binding.offlineContainer.visibility = if (isVisible) View.GONE else View.VISIBLE
+                    binding.topBarContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+                    binding.questionFragmentContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+                    binding.btnBackground.visibility = if (isVisible) View.VISIBLE else View.GONE
+
+                    if (isVisible && isResultCurrentlyVisible) {
+                        binding.stateContainer.visibility = View.VISIBLE
+                        binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
                     } else {
-                        binding.internetConnection.visibility = View.VISIBLE
-                        binding.offlineContainer.visibility = View.VISIBLE
-                        binding.topBarContainer.visibility = View.GONE
-                        binding.questionFragmentContainer.visibility = View.GONE
-                        binding.btnBackground.visibility = View.GONE
                         binding.stateContainer.visibility = View.GONE
-                        binding.correctMrSquare.visibility = View.GONE
                     }
                 }
             }

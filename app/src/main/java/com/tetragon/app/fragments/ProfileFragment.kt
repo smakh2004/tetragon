@@ -7,8 +7,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tetragon.app.R
 import com.tetragon.app.streakCalendar.StreakCalendarActivity
 import com.tetragon.app.ui.uiSettings.SettingsActivity
@@ -42,6 +44,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private lateinit var loadingOverlayContainer: FrameLayout
     private lateinit var weeklyProgressGraph: WeeklyProgressGraphView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private var completedQueries = 0
     private val totalQueriesExpected = 6
@@ -57,10 +60,19 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val profileLineDivider = view.findViewById<View>(R.id.profileLineDivider)
         loadingOverlayContainer = view.findViewById(R.id.loadingOverlayContainer)
         weeklyProgressGraph = view.findViewById(R.id.weeklyProgressGraph)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
-        completedQueries = 0
-        loadingOverlayContainer.alpha = 1f
-        loadingOverlayContainer.visibility = View.VISIBLE
+        // Configuration to remove default circle backgrounds and shadows
+        context?.let { ctx ->
+            swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(ctx, R.color.blue_2))
+        }
+        swipeRefreshLayout.setSlingshotDistance(0)
+        swipeRefreshLayout.setProgressViewEndTarget(false, 140)
+
+        // Setup refresh listener for manual pulling gestures
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshPageData(isManualSwipe = true)
+        }
 
         fullNameText = view.findViewById(R.id.fullNameText)
         joinedText = view.findViewById(R.id.joinedText)
@@ -79,7 +91,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         cashStormText = view.findViewById(R.id.cashStormCount)
         leaderboardText = view.findViewById(R.id.leaderboardPosition)
 
-        // Modified: The line divider visibility logic triggers when the NestedScrollView is scrolled
         profileScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
             profileLineDivider.visibility = if (scrollY > 0) View.VISIBLE else View.INVISIBLE
         })
@@ -87,6 +98,18 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         streakContainer.setOnClickListener { startActivity(Intent(requireContext(), StreakCalendarActivity::class.java)) }
         settingsIcon.setOnClickListener { context?.let { startActivity(Intent(it, SettingsActivity::class.java)); requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left) } }
         view.findViewById<FrameLayout>(R.id.avatarContainer).setOnClickListener { startActivity(Intent(requireContext(), AvatarSelectionActivity::class.java)); requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left) }
+
+        // First initial page load execution
+        refreshPageData(isManualSwipe = false)
+    }
+
+    private fun refreshPageData(isManualSwipe: Boolean) {
+        completedQueries = 0
+
+        if (!isManualSwipe) {
+            loadingOverlayContainer.alpha = 1f
+            loadingOverlayContainer.visibility = View.VISIBLE
+        }
 
         loadUserData()
         loadStreak()
@@ -137,7 +160,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         completedQueries++
         if (completedQueries >= totalQueriesExpected) {
             if (!isAdded || context == null) return
-            loadingOverlayContainer.animate().alpha(0f).setDuration(250).withEndAction { if (isAdded && context != null) loadingOverlayContainer.visibility = View.GONE }
+
+            // Turn off pull-to-refresh spinner safely
+            swipeRefreshLayout.isRefreshing = false
+
+            // Dismiss full-screen overlay if it's currently showing
+            if (loadingOverlayContainer.visibility == View.VISIBLE) {
+                loadingOverlayContainer.animate().alpha(0f).setDuration(250).withEndAction {
+                    if (isAdded && context != null) loadingOverlayContainer.visibility = View.GONE
+                }
+            }
         }
     }
 

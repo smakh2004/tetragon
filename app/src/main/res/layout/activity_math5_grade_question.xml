@@ -118,14 +118,42 @@
             tools:progress="3" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <LinearLayout
+        android:id="@+id/complexityContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBarContainer">
+
+        <ImageView
+            android:id="@+id/complexityIcon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/easy" />
+
+        <TextView
+            android:id="@+id/complexityText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="@string/complexity_easy"
+            android:textColor="@color/green_1"
+            android:layout_marginStart="6dp"
+            android:textSize="16dp" />
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/questionFragmentContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@+id/btnBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topBarContainer" />
+        app:layout_constraintTop_toBottomOf="@+id/complexityContainer" />
 
     <FrameLayout
         android:id="@+id/stateContainer"

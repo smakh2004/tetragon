@@ -11,175 +11,168 @@
     android:clipToPadding="false"
     tools:context=".reward.MonthlyRewardActivity">
 
+    <!-- 1. MAIN TEXT CONTENT AREA (STABLE POSITIONING) -->
+    <!-- Fixed: Corrected layout_end_toEndOf to app:layout_constraintEnd_toEndOf -->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/center_content_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="90dp"
+        android:paddingTop="32dp"
         android:clipChildren="false"
         android:clipToPadding="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/center_content_wrapper"
+        <TextView
+            android:id="@+id/tv_winner_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
+            android:fontFamily="@font/inter_bold"
+            android:rotation="-10"
+            android:text="@string/winner"
+            android:textAllCaps="true"
+            android:textColor="#667484"
+            android:textSize="42sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.419">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/iv_mr_square"
-                android:layout_width="400dp"
-                android:layout_height="400dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/mr_square_winner"
-                android:translationX="-40dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_winner_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-100dp"
-                android:fontFamily="@font/inter_bold"
-                android:rotation="-10"
-                android:text="@string/winner"
-                android:textAllCaps="true"
-                android:textColor="#667484"
-                android:textSize="48sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/iv_mr_square" />
-
-            <TextView
-                android:id="@+id/tv_winner_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-10dp"
-                android:fontFamily="@font/inter_bold"
-                android:rotation="-10"
-                android:text="@string/of_the_month"
-                android:textAllCaps="true"
-                android:textColor="#667484"
-                android:textSize="22sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_winner_title" />
-
-            <FrameLayout
-                android:id="@+id/reward_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="10dp"
-                android:rotation="-10"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_winner_subtitle">
-
-                <LinearLayout
-                    android:id="@+id/reward_badge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/custom_background"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingStart="24dp"
-                    android:paddingTop="12dp"
-                    android:paddingEnd="32dp"
-                    android:paddingBottom="12dp">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/coin" />
-
-                    <TextView
-                        android:id="@+id/tv_coin_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:fontFamily="@font/inter_bold"
-                        android:text="500"
-                        android:textColor="#667484"
-                        android:textSize="28sp" />
-                </LinearLayout>
-            </FrameLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_winner_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
+            android:fontFamily="@font/inter_bold"
+            android:rotation="-10"
+            android:text="@string/of_the_month"
+            android:textAllCaps="true"
+            android:textColor="#667484"
+            android:textSize="22sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_winner_title" />
 
         <FrameLayout
-            android:id="@+id/continue_btn_container"
-            android:layout_width="0dp"
+            android:id="@+id/reward_container"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:paddingBottom="5dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="28dp"
+            android:rotation="-10"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_winner_subtitle">
 
-            <FrameLayout
-                android:id="@+id/continue_enabled_btn_container"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/reward_badge"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="visible">
+                android:layout_gravity="center"
+                android:background="@drawable/custom_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="24dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="32dp"
+                android:paddingBottom="12dp">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/custom_button"
-                    android:backgroundTint="#333333"
-                    android:translationY="5dp" />
-
-                <Button
-                    android:id="@+id/continue_enabled_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/custom_button"
-                    android:fontFamily="@font/inter_semibold"
-                    android:text="@string/claim_reward"
-                    android:textColor="@color/white"
-                    android:textSize="17sp"
-                    app:backgroundTint="#4E4E4E" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/disabledContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/custom_button"
-                    android:backgroundTint="@color/gray_2"
-                    android:translationY="5dp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/coin" />
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:fontFamily="@font/inter_semibold"
-                    android:gravity="center"
-                    android:text="@string/loading"
-                    android:textColor="@color/gray_1"
-                    android:textSize="17sp"
-                    android:translationY="5dp" />
-            </FrameLayout>
+                    android:id="@+id/tv_coin_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/inter_bold"
+                    android:text="500"
+                    android:textColor="#667484"
+                    android:textSize="28sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 2. RIVE ANIMATION (FLUSH ON TOP OF TEXT) -->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/rive_mr_square"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:riveResource="@raw/mr_square_monthly"
+        app:riveAutoPlay="true"
+        app:layout_constraintDimensionRatio="1:0.8"
+        app:layout_constraintBottom_toTopOf="@+id/center_content_wrapper"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <!-- 3. BUTTON CONTAINER -->
+    <FrameLayout
+        android:id="@+id/continue_btn_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <FrameLayout
+            android:id="@+id/continue_enabled_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="#333333"
+                android:translationY="5dp" />
+
+            <Button
+                android:id="@+id/continue_enabled_btn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/claim_reward"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                app:backgroundTint="#4E4E4E" />
         </FrameLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <FrameLayout
+            android:id="@+id/disabledContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_background"
+                android:backgroundTint="@color/gray_2"
+                android:translationY="5dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="@string/loading"
+                android:textColor="@color/gray_1"
+                android:textSize="17sp"
+                android:translationY="5dp" />
+        </FrameLayout>
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

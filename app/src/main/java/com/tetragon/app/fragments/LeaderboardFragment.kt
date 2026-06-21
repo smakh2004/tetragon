@@ -1,6 +1,7 @@
 package com.tetragon.app.fragments
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -14,6 +15,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout // IMPORT THIS
 import com.tetragon.app.R
 import com.tetragon.app.utils.leaderboardUtils.LeaderboardAdapter
 import com.tetragon.app.utils.leaderboardUtils.LeaderboardUser
@@ -30,6 +32,7 @@ import com.tetragon.app.otherProfile.OtherUserProfileActivity
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class LeaderboardFragment : Fragment() {
 
@@ -42,15 +45,16 @@ class LeaderboardFragment : Fragment() {
     private lateinit var leaderboardImage: ImageView
     private lateinit var leaderboardCard: MaterialCardView
     private lateinit var loadingLayout: LinearLayout
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout // Add reference
 
     private val db = FirebaseFirestore.getInstance()
     private val rtdb = FirebaseDatabase.getInstance().getReference("status")
 
     private val usersList = mutableListOf<LeaderboardUser>()
-    // Kept as a reference so we don't clear scroll states by constantly re-instantiating it
     private var leaderboardAdapter: LeaderboardAdapter? = null
-
     private var leaderboardListener: ListenerRegistration? = null
+
+    private var activeCountdownTimer: CountDownTimer? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,22 +71,30 @@ class LeaderboardFragment : Fragment() {
         leaderboardImage = view.findViewById(R.id.leaderboardImage)
         leaderboardCard = view.findViewById(R.id.leaderboardCard)
         loadingLayout = view.findViewById(R.id.loadingLayout)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout) // Initialize layout
 
         recycler.layoutManager = LinearLayoutManager(requireContext())
 
-        // FIXED: Initialize the adapter explicitly exactly ONCE right here
         val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
         leaderboardAdapter = LeaderboardAdapter(usersList, currentUserEmail) { selectedUser ->
             val intent = android.content.Intent(requireContext(), OtherUserProfileActivity::class.java)
-
-            // Safe fallback evaluation for rank layout processing
             val explicitRank = usersList.indexOf(selectedUser) + 1
-
             intent.putExtra("USER_DATA", selectedUser)
             intent.putExtra("USER_RANK", explicitRank)
             startActivity(intent)
         }
         recycler.adapter = leaderboardAdapter
+
+        // Set up custom indicator color matching your theme (optional)
+        context?.let { ctx ->
+            swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(ctx, R.color.blue_2))
+        }
+
+        // Set up the listener triggered when pulling down the page
+        swipeRefreshLayout.setOnRefreshListener {
+            updateMonthUI()
+            loadLeaderboard()
+        }
 
         updateMonthUI()
         loadLeaderboard()
@@ -92,30 +104,66 @@ class LeaderboardFragment : Fragment() {
 
     private fun updateMonthUI() {
         val calendar = Calendar.getInstance()
-
         val monthFormat = SimpleDateFormat("MMMM", Locale.getDefault())
         val monthName = monthFormat.format(calendar.time).uppercase()
         monthText.text = monthName
 
-        val today = calendar.get(Calendar.DAY_OF_MONTH)
-        val maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val daysLeft = maxDays - today
+        activeCountdownTimer?.cancel()
 
-        daysText.text = if (daysLeft == 1) {
-            getString(R.string.days_left_singular)
+        val targetCalendar = Calendar.getInstance().apply {
+            add(Calendar.MONTH, 1)
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val msLeft = targetCalendar.timeInMillis - calendar.timeInMillis
+        val twentyFourHoursInMs = TimeUnit.HOURS.toMillis(24)
+
+        if (msLeft <= twentyFourHoursInMs && msLeft > 0) {
+            activeCountdownTimer = object : CountDownTimer(msLeft, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    if (!isAdded) return
+                    val hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished)
+                    val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60
+                    val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
+                    daysText.text = getString(R.string.countdown_format, hours, minutes, seconds)
+                }
+
+                override fun onFinish() {
+                    if (!isAdded) return
+                    daysText.text = getString(R.string.countdown_format, 0, 0, 0)
+                }
+            }.start()
         } else {
-            getString(R.string.days_left_plural, daysLeft)
+            val today = calendar.get(Calendar.DAY_OF_MONTH)
+            val maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+            val daysLeft = maxDays - today
+
+            daysText.text = if (daysLeft == 1) {
+                getString(R.string.days_left_singular)
+            } else {
+                getString(R.string.days_left_plural, daysLeft)
+            }
         }
     }
 
     private fun loadLeaderboard() {
         val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
 
-        loadingLayout.visibility = View.VISIBLE
-        headerTextContainer.visibility = View.INVISIBLE
-        leaderboardImage.visibility = View.INVISIBLE
-        positionText.visibility = View.INVISIBLE
-        leaderboardCard.visibility = View.INVISIBLE
+        // Only show full screen loading if SwipeRefreshLayout isn't running
+        if (!swipeRefreshLayout.isRefreshing) {
+            loadingLayout.visibility = View.VISIBLE
+            headerTextContainer.visibility = View.INVISIBLE
+            leaderboardImage.visibility = View.INVISIBLE
+            positionText.visibility = View.INVISIBLE
+            leaderboardCard.visibility = View.INVISIBLE
+        }
+
+        // Remove old listener instance if reloading manually via pull down
+        leaderboardListener?.remove()
 
         leaderboardListener = db.collection("users")
             .orderBy("monthlyXP", Query.Direction.DESCENDING)
@@ -132,7 +180,6 @@ class LeaderboardFragment : Fragment() {
                 for ((index, document) in result.withIndex()) {
                     val lbUser = document.toObject(LeaderboardUser::class.java)
                     lbUser.uid = document.id
-
                     tempUsers.add(lbUser)
 
                     if (lbUser.email == currentUserEmail) {
@@ -149,13 +196,10 @@ class LeaderboardFragment : Fragment() {
                             lbUser.isOnline = (state == "online")
                         }
 
-                        // FIXED: Mutate underlying dataset fields directly instead of wiping view states
                         usersList.clear()
                         usersList.addAll(tempUsers)
 
                         updateHeaderUI(myRank)
-
-                        // FIXED: Notify existing UI setup cleanly rather than overriding it
                         leaderboardAdapter?.notifyDataSetChanged()
 
                         showMainContent()
@@ -169,7 +213,11 @@ class LeaderboardFragment : Fragment() {
     }
 
     private fun showMainContent() {
+        // HIDE loading systems
         loadingLayout.visibility = View.GONE
+        swipeRefreshLayout.isRefreshing = false // Stop the thumb pull loading circle icon
+
+        // SHOW Main view structures
         headerTextContainer.visibility = View.VISIBLE
         leaderboardImage.visibility = View.VISIBLE
         positionText.visibility = View.VISIBLE
@@ -182,7 +230,6 @@ class LeaderboardFragment : Fragment() {
                 val rankString = getString(R.string.rank_status_format, myRank)
                 val spannable = SpannableString(rankString)
                 val blueColor = ContextCompat.getColor(ctx, R.color.blue_2)
-
                 val startOfRank = rankString.indexOf(myRank.toString())
 
                 if (startOfRank != -1) {
@@ -203,5 +250,6 @@ class LeaderboardFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         leaderboardListener?.remove()
+        activeCountdownTimer?.cancel()
     }
 }

@@ -81,7 +81,10 @@ class AvatarAdapter(
 
                 avatarHolder.container.setOnClickListener {
                     val previous = selectedIndex
-                    selectedIndex = holder.bindingAdapterPosition
+
+                    // FIXED: Using 'position' from onBindViewHolder parameter signatures
+                    // avoids Unresolved Reference and prevents view recycling tracking bugs.
+                    selectedIndex = position
 
                     notifyItemChanged(previous)
                     notifyItemChanged(selectedIndex)

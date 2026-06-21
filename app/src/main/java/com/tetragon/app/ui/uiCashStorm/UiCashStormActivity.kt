@@ -64,11 +64,6 @@ class UiCashStormActivity : BaseActivity() {
                 binding.totalBalanceText.text = "$${problem.baseAmount}"
 
                 // --- DYNAMIC CASH IMAGE LOGIC ---
-                // Get the ImageView between the balance text and the options
-                // Based on your XML, this is the ImageView in the game_content_area
-                val mainCashIcon = (binding.gameContentArea.getChildAt(2) as ImageView)
-
-                // Inside onProblemChanged:
                 when {
                     problem.baseAmount < 100 -> binding.mainCashIcon.setImageResource(R.drawable.one_cash)
                     problem.baseAmount < 500 -> binding.mainCashIcon.setImageResource(R.drawable.two_cash)

@@ -11,8 +11,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import java.util.Calendar
-import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class XpGainedActivity : BaseActivity() {
 
@@ -24,7 +24,7 @@ class XpGainedActivity : BaseActivity() {
     private lateinit var subject: String
     private var grade: Int = 1
     private var xpGained: Int = 0
-    private val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,12 +48,7 @@ class XpGainedActivity : BaseActivity() {
         }
     }
 
-    /**
-     * 🔹 Generates dynamic Firestore key based on Grade and Subject.
-     * Example: Grade 7 + "Physics" -> "class7PhysicsProgress"
-     */
     private fun getFirestoreProgressKey(): String {
-        // Ensures subject starts with uppercase (e.g., "physics" -> "Physics")
         val formattedSubject = subject.lowercase().replaceFirstChar { it.uppercase() }
         return "class${grade}${formattedSubject}Progress"
     }
@@ -72,12 +67,10 @@ class XpGainedActivity : BaseActivity() {
 
             if (currentTopicProgress >= 100) {
                 binding.textView3.text = "0"
-                // Use translation for "Topic Mastered"
                 binding.description.text = getString(R.string.xp_topic_mastered)
                 binding.xpAnimation.setNumberState("State Machine 1", "XP", 0f)
             } else {
                 binding.textView3.text = xpGained.toString()
-                // Use translation for "Experience points collected"
                 binding.description.text = getString(R.string.xp_collected_desc)
                 binding.xpAnimation.setNumberState("State Machine 1", "XP", xpGained.toFloat())
 
@@ -94,8 +87,6 @@ class XpGainedActivity : BaseActivity() {
         val user = auth.currentUser ?: return
         val userDocRef = db.collection("users").document(user.uid)
         val progressKey = getFirestoreProgressKey()
-
-        // Create the key for today (e.g., "2026-05-22")
         val todayKey = dateFormat.format(java.util.Date())
 
         userDocRef.get().addOnSuccessListener { snapshot ->
@@ -104,16 +95,13 @@ class XpGainedActivity : BaseActivity() {
 
             if (currentTopicProgress >= 100) return@addOnSuccessListener
 
-            // 1. Update Main Stats
             userDocRef.update(
                 mapOf(
                     "xp" to FieldValue.increment(xp.toLong()),
                     "monthlyXP" to FieldValue.increment(xp.toLong()),
-                    // 2. Increment Daily XP Gain specifically for the graph
                     "dailyXPGains.$todayKey" to FieldValue.increment(xp.toLong())
                 )
             ).addOnSuccessListener {
-                // Level calculation logic
                 val currentTotalXp = snapshot.getLong("xp") ?: 0L
                 val newLevel = calculateLevel(currentTotalXp + xp)
                 userDocRef.update("level", newLevel)
@@ -127,7 +115,6 @@ class XpGainedActivity : BaseActivity() {
         val userDocRef = db.collection("users").document(userId)
         val progressKey = getFirestoreProgressKey()
         val topicPath = "$progressKey.$topicKey"
-
         val totalProgressToAdd = (10 + (xp / 10)).toLong()
 
         userDocRef.update(topicPath, FieldValue.increment(totalProgressToAdd))
@@ -141,7 +128,7 @@ class XpGainedActivity : BaseActivity() {
     }
 
     // =====================================================
-    // 🔹 STREAK & NAVIGATION (STAYS THE SAME)
+    // 🔹 STREAK & NAVIGATION
     // =====================================================
 
     private fun checkAndNavigateStreak() {
@@ -150,20 +137,20 @@ class XpGainedActivity : BaseActivity() {
 
         userDocRef.get().addOnSuccessListener { snapshot ->
             val lastStreakTimestamp = snapshot.getTimestamp("lastStreakDate")
-            val todayDate = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
+            val todayDate = java.util.Calendar.getInstance().apply {
+                set(java.util.Calendar.HOUR_OF_DAY, 0)
+                set(java.util.Calendar.MINUTE, 0)
+                set(java.util.Calendar.SECOND, 0)
+                set(java.util.Calendar.MILLISECOND, 0)
             }.time
 
-            val lastStreakDate: Date? = lastStreakTimestamp?.toDate()?.let {
-                Calendar.getInstance().apply {
+            val lastStreakDate: java.util.Date? = lastStreakTimestamp?.toDate()?.let {
+                java.util.Calendar.getInstance().apply {
                     time = it
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
+                    set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    set(java.util.Calendar.MINUTE, 0)
+                    set(java.util.Calendar.SECOND, 0)
+                    set(java.util.Calendar.MILLISECOND, 0)
                 }.time
             }
 
@@ -175,6 +162,7 @@ class XpGainedActivity : BaseActivity() {
         }.addOnFailureListener { finish() }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         checkAndNavigateStreak()
     }

@@ -50,12 +50,6 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
         binding = ActivityOnlineWaitingRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) { // API 27+
-            window.decorView.systemUiVisibility =
-                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.white) // optional: set nav bar color
-        }
-
         observeConnectivity()
 
         binding.cancelButton.setOnClickListener {
@@ -122,7 +116,6 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
     }
 
     private fun decreaseAttemptOnline() {
-
         val uid = OnlineGameData.myID
 
         val docRef = FirebaseFirestore.getInstance()
@@ -132,10 +125,8 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
             .document("Attempts")
 
         FirebaseFirestore.getInstance().runTransaction { transaction ->
-
             val snapshot = transaction.get(docRef)
-            val current =
-                snapshot.getLong("remainingAttempts") ?: 5L
+            val current = snapshot.getLong("remainingAttempts") ?: 5L
 
             if (current > 0) {
                 transaction.update(docRef, "remainingAttempts", current - 1)
@@ -167,6 +158,7 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
         cleanupRoomIfOwner()
         finish()
     }
+
     // ✅ Delete room if user presses back
     override fun onBackPressed() {
         cleanupRoomIfOwner()
@@ -183,13 +175,11 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isConnected.collect { isConnected ->
-
                     if (isConnected) {
                         // Hide banner
                         binding.internetConnection.visibility = View.GONE
                         binding.offlineContainer.visibility = View.GONE
                         binding.mainContent.visibility = View.VISIBLE
-
                     } else {
                         // Show banner
                         binding.internetConnection.visibility = View.VISIBLE
@@ -204,7 +194,6 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
         }
     }
 
-    // Add this helper method to your class
     private fun loadAvatar(imageView: android.widget.ImageView, avatarName: String?) {
         val resId = if (!avatarName.isNullOrEmpty()) {
             resources.getIdentifier(avatarName, "drawable", packageName)

@@ -7,31 +7,17 @@
     android:background="@color/white"
     tools:context=".fragments.registrationFragments.FullNameFragment">
 
-    <!-- Text centered horizontally and vertically -->
-    <TextView
-        android:id="@+id/textViewTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/inter_semibold"
-        android:gravity="center"
-        android:text="@string/what_s_your_full_name"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/text_color"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <!-- NAME INPUT CONTAINER -->
     <LinearLayout
         android:id="@+id/firstNameInputContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/input_container"
-        android:layout_marginTop="16dp"
         android:orientation="vertical"
         android:padding="2dp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTitle">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <EditText
             android:id="@+id/firstNameEditText"
@@ -53,10 +39,12 @@
         android:id="@+id/lastNameInputContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:background="@drawable/input_container"
         android:orientation="vertical"
-        android:layout_marginTop="16dp"
         android:padding="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/firstNameInputContainer">
 
         <EditText

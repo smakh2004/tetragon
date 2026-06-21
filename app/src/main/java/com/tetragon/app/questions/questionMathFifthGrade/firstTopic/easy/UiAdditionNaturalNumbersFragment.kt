@@ -1,11 +1,14 @@
-package com.tetragon.app.questions.questionMathFifthGrade.firstTopic
+package com.tetragon.app.questions.questionMathFifthGrade.firstTopic.easy
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.tetragon.app.R
@@ -48,7 +51,7 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
     private lateinit var cursorHundSecond: View
     private lateinit var cursorOnesSecond: View
 
-    // Global UI components from Activity
+    // Shared Activity Views
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
     private lateinit var btnBack: View
@@ -56,12 +59,16 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
     private lateinit var seeEnabledButton: Button
     private lateinit var stateAnswer: TextView
     private lateinit var answer: TextView
+    private lateinit var stateContainer: FrameLayout
+    private lateinit var circleState: ImageView
 
+    // Focus Tracking State
     private var activeInput: TextView? = null
     private var activeBox: ImageView? = null
     private var activeCursor: View? = null
     private var cursorAnimator: ObjectAnimator? = null
 
+    // Question Calculation State
     private var fullNum1 = 0
     private var fullNum2 = 0
     private var targetSum = 0
@@ -80,9 +87,15 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val activity = requireActivity() as Math5GradeQuestionActivity
+        initViews(view)
+        setupFocusLogic()
+        setupKeyboard(view)
+        setupInitialButtonState()
+        generateProblem()
+    }
 
-        // Initialize Display Views
+    private fun initViews(view: View) {
+        // Initialize Fragment Grid Number Grid Displays
         tvTopHundred = view.findViewById(R.id.tvTopHundred)
         tvTopOnes = view.findViewById(R.id.tvTopOnes)
         tvBottomThousand = view.findViewById(R.id.tvBottomThousand)
@@ -92,7 +105,7 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         tvResTens = view.findViewById(R.id.tvResTens)
         tvResOnes = view.findViewById(R.id.tvResOnes)
 
-        // Initialize Inputs
+        // Initialize Specialized Digits Frame Entry Fields
         tvInputThousandsFirstText = view.findViewById(R.id.tvInputThousandsFirstText)
         tvInputTensFirstText = view.findViewById(R.id.tvInputTensFirstText)
         tvInputHundredsSecondText = view.findViewById(R.id.tvInputHundredsSecondText)
@@ -103,7 +116,7 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         frameInputHundredsSecond = view.findViewById(R.id.frameInputHundredsSecond)
         frameOnesSecond = view.findViewById(R.id.frameOnesSecond)
 
-        // Initialize Visuals
+        // Initialize Background Framing States and Injected Blinking Carets
         boxThousFirst = view.findViewById(R.id.boxThousFirst)
         boxTensFirst = view.findViewById(R.id.boxTensFirst)
         boxHundSecond = view.findViewById(R.id.boxHundSecond)
@@ -114,7 +127,8 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         cursorHundSecond = view.findViewById(R.id.cursorHundSecond)
         cursorOnesSecond = view.findViewById(R.id.cursorOnesSecond)
 
-        // Activity UI from Math5GradeQuestionActivity
+        // Shared Parent Activity Layout View Binds
+        val activity = requireActivity() as Math5GradeQuestionActivity
         checkBtn = activity.findViewById(R.id.check_enabled_btn)
         checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
         btnBack = activity.findViewById(R.id.btnBackground)
@@ -122,11 +136,26 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
         stateAnswer = activity.findViewById(R.id.stateAnswer)
         answer = activity.findViewById(R.id.answer)
+        stateContainer = activity.findViewById(R.id.stateContainer)
+        circleState = activity.findViewById(R.id.circleState)
 
-        setupFocusLogic()
-        setupKeyboard(view)
-        generateProblem()
-        setupCheckButton()
+        checkBtn.setOnClickListener {
+            if (!isAnswerChecked) {
+                checkAnswer()
+            } else if (isIncorrectAttempt) {
+                resetForTryAgain()
+            } else {
+                if (checkBtn.text == getString(R.string.btn_finish)) {
+                    activity.navigateToXpGained()
+                } else {
+                    val isMilestoneActive = activity.checkAndTriggerMilestone()
+                    if (!isMilestoneActive) {
+                        resetUIForNext()
+                        activity.showRandomQuestion()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupFocusLogic() {
@@ -140,9 +169,13 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
     private fun setFocus(targetTextView: TextView, targetBox: ImageView, targetCursor: View) {
         if (isAnswerChecked) return
 
-        listOf(boxThousFirst, boxTensFirst, boxHundSecond, boxOnesSecond).forEach { it.setImageResource(R.drawable.answer_default_box) }
+        listOf(boxThousFirst, boxTensFirst, boxHundSecond, boxOnesSecond).forEach {
+            it.setImageResource(R.drawable.answer_default_box)
+        }
         cursorAnimator?.cancel()
-        listOf(cursorThousFirst, cursorTensFirst, cursorHundSecond, cursorOnesSecond).forEach { it.visibility = View.GONE }
+        listOf(cursorThousFirst, cursorTensFirst, cursorHundSecond, cursorOnesSecond).forEach {
+            it.visibility = View.GONE
+        }
 
         activeInput = targetTextView
         activeBox = targetBox
@@ -168,7 +201,10 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
     }
 
     private fun setupKeyboard(view: View) {
-        val buttonIds = listOf(R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9)
+        val buttonIds = listOf(
+            R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4,
+            R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9
+        )
         buttonIds.forEach { id ->
             view.findViewById<Button>(id).setOnClickListener {
                 if (isAnswerChecked) return@setOnClickListener
@@ -197,9 +233,6 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
     }
 
     private fun generateProblem() {
-        val activity = requireActivity() as Math5GradeQuestionActivity
-        activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
-
         targetSum = Random.nextInt(2000, 9999)
         fullNum1 = Random.nextInt(1000, targetSum - 1000)
         fullNum2 = targetSum - fullNum1
@@ -219,37 +252,22 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         tvResTens.text = ((targetSum / 10) % 10).toString()
         tvResOnes.text = (targetSum % 10).toString()
 
-        tvInputThousandsFirstText.text = ""
-        tvInputTensFirstText.text = ""
-        tvInputHundredsSecondText.text = ""
-        tvBottomOnesInputText.text = ""
-
-        isAnswerChecked = false
-        isIncorrectAttempt = false
-        isFirstAttempt = true
-        isSolutionShown = false
-        seeBtn.visibility = View.GONE
-
-        setFocus(tvInputThousandsFirstText, boxThousFirst, cursorThousFirst)
-        checkBtn.text = getString(R.string.btn_check)
-        disableCheckButton()
-        setupInitialButtonState()
+        resetFragmentState()
     }
 
-    private fun checkAnswer(stateContainer: FrameLayout, circleState: ImageView) {
+    private fun checkAnswer() {
         cursorAnimator?.cancel()
         activeCursor?.visibility = View.GONE
         isAnswerChecked = true
 
         val activity = requireActivity() as Math5GradeQuestionActivity
         activity.isResultCurrentlyVisible = true
+        stateContainer.visibility = View.VISIBLE
 
         val u1 = tvInputThousandsFirstText.text.toString().toIntOrNull() ?: -1
         val u2 = tvInputTensFirstText.text.toString().toIntOrNull() ?: -1
         val u3 = tvInputHundredsSecondText.text.toString().toIntOrNull() ?: -1
         val u4 = tvBottomOnesInputText.text.toString().toIntOrNull() ?: -1
-
-        stateContainer.visibility = View.VISIBLE
 
         if (u1 == correctThousandsFirst && u2 == correctTensFirst && u3 == correctHundredsSecond && u4 == correctOnesSecond) {
             playSound(R.raw.correct)
@@ -265,52 +283,42 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
             activity.handleCorrectAnswer()
             isIncorrectAttempt = false
             checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
-            showCorrectState(stateContainer, circleState)
+            showCorrectState()
         } else {
             playSound(R.raw.wrong)
             setAllBoxes(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
+            activity.handleIncorrectAnswer() // FIX: Correctly dropped handleIncorrectAnswer back in to stop random up-scaling leaks
             checkBtn.text = getString(R.string.btn_try_again)
-            showIncorrectState(stateContainer, circleState)
-            setupSeeSolution(stateContainer, circleState)
+            showIncorrectState()
+            setupSeeSolution()
         }
         isFirstAttempt = false
     }
 
-    private fun setAllBoxes(resId: Int) {
-        boxThousFirst.setImageResource(resId)
-        boxTensFirst.setImageResource(resId)
-        boxHundSecond.setImageResource(resId)
-        boxOnesSecond.setImageResource(resId)
+    private fun showCorrectState() {
+        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
+        circleState.setImageResource(R.drawable.correct_tick_icon)
+        stateAnswer.text = getString(R.string.state_correct)
+        val fullEquation = "$fullNum1 + $fullNum2 = $targetSum"
+        answer.text = getString(R.string.label_answer, fullEquation)
+        answer.visibility = View.VISIBLE
+        applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
+        enableCheckButton()
     }
 
-    private fun setupCheckButton() {
-        checkBtn.setOnClickListener {
-            val activity = requireActivity() as Math5GradeQuestionActivity
-            val stateContainer = activity.findViewById<FrameLayout>(R.id.stateContainer)
-            val circleState = activity.findViewById<ImageView>(R.id.circleState)
-
-            if (!isAnswerChecked) {
-                checkAnswer(stateContainer, circleState)
-            } else {
-                if (isIncorrectAttempt) {
-                    resetForTryAgain()
-                } else {
-                    if (checkBtn.text == getString(R.string.btn_finish)) {
-                        activity.navigateToXpGained()
-                    } else {
-                        val isMilestoneActive = activity.checkAndTriggerMilestone()
-                        if (!isMilestoneActive) {
-                            resetUIForNext()
-                            activity.showRandomQuestion()
-                        }
-                    }
-                }
-            }
-        }
+    private fun showIncorrectState() {
+        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
+        circleState.setImageResource(R.drawable.wrong_circle)
+        stateAnswer.text = getString(R.string.state_incorrect)
+        seeEnabledButton.text = getString(R.string.btn_see_solution)
+        answer.visibility = View.GONE
+        seeBtn.visibility = View.VISIBLE
+        applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
+        enableCheckButton()
     }
 
-    private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
+    private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
             isSolutionShown = true
             seeBtn.visibility = View.GONE
@@ -329,15 +337,43 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
 
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isIncorrectAttempt = false
-            applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
+
+            checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_3)
+            checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_2)
+            btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
         }
+    }
+
+    private fun resetFragmentState() {
+        val activity = requireActivity() as Math5GradeQuestionActivity
+        activity.isCorrectAnswerShowing = false // FIX: Flush out visibility tracking frames so animations drop correctly on loop turns
+
+        tvInputThousandsFirstText.text = ""
+        tvInputTensFirstText.text = ""
+        tvInputHundredsSecondText.text = ""
+        tvBottomOnesInputText.text = ""
+
+        isAnswerChecked = false
+        isIncorrectAttempt = false
+        isFirstAttempt = true
+        isSolutionShown = false
+
+        setAllBoxes(R.drawable.answer_default_box)
+        stateContainer.visibility = View.INVISIBLE
+        seeBtn.visibility = View.GONE
+        stateAnswer.text = ""
+        answer.text = ""
+        answer.visibility = View.VISIBLE
+
+        setupInitialButtonState()
+        disableCheckButton()
+        setFocus(tvInputThousandsFirstText, boxThousFirst, cursorThousFirst)
     }
 
     private fun resetForTryAgain() {
         val activity = requireActivity() as Math5GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
 
         isAnswerChecked = false
         isIncorrectAttempt = false
@@ -348,42 +384,27 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
 
         setAllBoxes(R.drawable.answer_default_box)
         seeBtn.visibility = View.GONE
-        setFocus(tvInputThousandsFirstText, boxThousFirst, cursorThousFirst)
         checkBtn.text = getString(R.string.btn_check)
-        disableCheckButton()
         setupInitialButtonState()
-    }
-
-    private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
-        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
-        circleState.setImageResource(R.drawable.correct_tick_icon)
-        stateAnswer.text = getString(R.string.state_correct)
-        val fullEquation = "$fullNum1 + $fullNum2 = $targetSum"
-        answer.text = getString(R.string.label_answer, fullEquation)
+        disableCheckButton()
+        stateContainer.visibility = View.INVISIBLE
         answer.visibility = View.VISIBLE
-        applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
-        enableCheckButton()
-    }
-
-    private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
-        stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
-        circleState.setImageResource(R.drawable.wrong_circle)
-        stateAnswer.text = getString(R.string.state_incorrect)
-        seeEnabledButton.text = getString(R.string.btn_see_solution)
-        answer.visibility = View.GONE
-        seeBtn.visibility = View.VISIBLE
-        applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
-        enableCheckButton()
+        setFocus(tvInputThousandsFirstText, boxThousFirst, cursorThousFirst)
     }
 
     private fun resetUIForNext() {
         val activity = requireActivity() as Math5GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
-        activity.findViewById<FrameLayout>(R.id.stateContainer).visibility = View.GONE
+
+        stateContainer.visibility = View.INVISIBLE
+        stateAnswer.text = ""
+        answer.text = ""
+        answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        setupInitialButtonState()
+
         checkBtn.text = getString(R.string.btn_check)
+        setupInitialButtonState()
         disableCheckButton()
     }
 
@@ -397,16 +418,14 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         checkBtn.isEnabled = true
         val activity = requireActivity() as Math5GradeQuestionActivity
         activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
-        checkBtnBack.visibility = View.VISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
     }
 
     private fun disableCheckButton() {
         checkBtn.isEnabled = false
         val activity = requireActivity() as Math5GradeQuestionActivity
-        activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        checkBtnBack.visibility = View.INVISIBLE
         activity.findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+        activity.findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
     }
 
     private fun applyButtonColors(buttonColor: Int, backColor: Int, backgroundColor: Int) {
@@ -415,16 +434,28 @@ class UiAdditionNaturalNumbersFragment : Fragment(R.layout.fragment_ui_addition_
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), backgroundColor))
     }
 
-    private fun playSound(soundResId: Int) {
-        mediaPlayer?.release()
-        mediaPlayer = MediaPlayer.create(requireContext(), soundResId)
-        mediaPlayer?.start()
+    private fun setAllBoxes(resId: Int) {
+        boxThousFirst.setImageResource(resId)
+        boxTensFirst.setImageResource(resId)
+        boxHundSecond.setImageResource(resId)
+        boxOnesSecond.setImageResource(resId)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun playSound(soundResId: Int) {
+        try {
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer.create(requireContext(), soundResId)
+            mediaPlayer?.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onDestroyView() {
         cursorAnimator?.cancel()
+        cursorAnimator = null
         mediaPlayer?.release()
         mediaPlayer = null
+        super.onDestroyView()
     }
 }

@@ -75,10 +75,18 @@ class Math3GradeFragment : Fragment() {
     private val grade4TopicNames by lazy {
         listOf(
             getString(R.string.complex_arithmetics),
-            getString(R.string.column_multiplication)
+            getString(R.string.column_multiplication),
+            getString(R.string.column_division),
+            getString(R.string.fraction_arithmetics),
+            getString(R.string.mixed_numbers),
+            getString(R.string.graphs)
         )
     }
-    private val grade4TopicKeys = listOf("COMPLEX_ARITHMETICS", "COLUMN_MULTIPLICATION")
+    private val grade4TopicKeys = listOf(
+        "COMPLEX_ARITHMETICS", "COLUMN_MULTIPLICATION",
+        "COLUMN_DIVISION", "FRACTION_ARITHMETICS", "MIXED_NUMBERS",
+        "GRAPHS"
+    )
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }

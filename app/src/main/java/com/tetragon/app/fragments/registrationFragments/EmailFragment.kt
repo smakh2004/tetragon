@@ -9,14 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.LinearLayout
 import com.tetragon.app.R
 import com.tetragon.app.ui.RegisterActivity
 
 class EmailFragment : Fragment() {
 
     private lateinit var emailEditText: EditText
-    private lateinit var googleSignUpButton: LinearLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,18 +27,13 @@ class EmailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         emailEditText = view.findViewById(R.id.emailEditText)
-        googleSignUpButton = view.findViewById(R.id.googleSignUpButton)
 
         val activity = activity as? RegisterActivity
         val savedEmail = activity?.userData?.email ?: ""
         if (savedEmail.isNotEmpty()) {
             emailEditText.setText(savedEmail)
             emailEditText.setSelection(savedEmail.length)
-        }
-
-        googleSignUpButton.setOnClickListener {
-            val registerActivity = activity as? RegisterActivity ?: return@setOnClickListener
-            registerActivity.triggerGoogleRegistration()
+            validateEmail(savedEmail)
         }
 
         emailEditText.addTextChangedListener(object : TextWatcher {
@@ -54,24 +47,8 @@ class EmailFragment : Fragment() {
         })
     }
 
-    /**
-     * Toggles the interactivity and visual state of the fragment inputs
-     * during active background authentication requests.
-     */
     fun setControlsEnabled(enabled: Boolean) {
         emailEditText.isEnabled = enabled
-        googleSignUpButton.isEnabled = enabled
-        googleSignUpButton.alpha = if (enabled) 1.0f else 0.5f
-    }
-
-    // Maintained public exposure to hook into RegisterActivity recovery pipelines safely
-    fun restoreGoogleButtonState() {
-        setControlsEnabled(true)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        restoreGoogleButtonState()
     }
 
     private fun validateEmail(email: String) {

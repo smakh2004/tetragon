@@ -1,9 +1,9 @@
 package com.tetragon.app.subscriptionModel
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import app.rive.runtime.kotlin.core.Rive
 import com.android.billingclient.api.Purchase
 import com.tetragon.app.R
@@ -20,7 +20,6 @@ class SubscriptionModelActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Rive.init(this)
-        enableEdgeToEdge()
         binding = ActivitySubscriptionModelBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -109,11 +108,6 @@ class SubscriptionModelActivity : BaseActivity() {
 
     private fun handleSuccessfulPremium(purchase: Purchase) {
         Toast.makeText(this, "Премиум успешно активирован!", Toast.LENGTH_SHORT).show()
-
-        // TODO: Синхронизация с сервером / Firebase FirebaseFirestore или FirebaseAuth
-        // Например:
-        // val userId = FirebaseAuth.getInstance().currentUser?.uid
-        // FirebaseFirestore.getInstance().collection("users").document(userId).update("isPremium", true)
 
         // Закрываем экран оплаты после успешной транзакции
         finish()

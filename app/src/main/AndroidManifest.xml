@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <queries>
         <intent>
@@ -13,6 +14,7 @@
     </queries>
     <queries>
         <package android:name="com.google.android.gms" />
+
         <intent>
             <action android:name="com.google.android.gms.actions.SEARCH_ACTION" />
         </intent>
@@ -30,299 +32,287 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Tetragon">
-
         <activity
-            android:name=".accountPicking.StartOrLoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".accountPicking.ControlAccountsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".accountPicking.AccountPickerActivity"
-            android:exported="false" />
-        <activity
-            android:name=".reward.PodiumActivity"
-            android:exported="false" />
+            android:name=".ui.ForgotPasswordActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".starsBuy.StarsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".otherProfile.OtherUserProfileActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".avatarSelection.AvatarSelectionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".reward.MonthlyRewardActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".questions.questionMathElevenGrade.Math11GradeQuestionActivity"
+            android:name=".questions.questionMathEleventhGrade.Math11GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathTenthGrade.Math10GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathNinthGrade.Math9GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathEighthGrade.Math8GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathSeventhGrade.Math7GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathSixthGrade.Math6GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathFifthGrade.Math5GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionPhysicsEleventhGrade.Physics11GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionPhysicsTenthGrade.Physics10GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionPhysicsNinthGrade.Physics9GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionPhysicsEighthGrade.Physics8GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".subscriptionModel.SubscriptionModelActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".subscriptionModel.IntroSubscriptionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".streakCalendar.StreakCalendarActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".aiChatBot.ChatActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathFourthGrade.Math4GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathThirdGrade.Math3GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiCashStorm.ResultCashStormActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <service
             android:name=".fragments.registrationFragments.RegistrationCleanupService"
-            android:screenOrientation="portrait"
-            android:stopWithTask="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:stopWithTask="false" />
 
         <activity
             android:name=".ui.uiCashStorm.UiCashStormActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathSecondGrade.Math2GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionPhysicsSevenGrade.Physics7GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.NaturalSciencesActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".reward.BagTapActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.StreakGainedActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.XpGainedActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".questions.questionMathFirstGrade.Math1GradeQuestionActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.DeleteAccountActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.LanguageChooseActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.EmailShowActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.PasswordChangeActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.AgeShowActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.NameChangeActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.PreimumNavigationActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.AccountActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiSettings.SettingsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStormPrivate.PrivateResultBattleMathStorm"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStormPrivate.PrivateBattleMathStormActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStormPrivate.PrivateWaitingRoomMathStorm"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStormPrivate.RoomActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStormOnline.OnlineResultBattleMathStormActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStormOnline.OnlineBattleMathStormActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStormOnline.OnlineWaitingRoomMathStormActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStorm.ResultMathStormActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.uiMathStorm.MathStormActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.RegisterActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.LoginActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.SplashScreenActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.Tetragon.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.WelcomeActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:theme="@style/Theme.Tetragon"
-            android:screenOrientation="portrait" />
-
+            android:theme="@style/Theme.Tetragon" />
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:theme="@style/Theme.Tetragon"
-            android:screenOrientation="portrait" />
+            android:theme="@style/Theme.Tetragon" />
 
         <meta-data
             android:name="preloaded_fonts"

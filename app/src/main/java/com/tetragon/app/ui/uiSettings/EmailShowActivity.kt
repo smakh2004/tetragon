@@ -24,7 +24,5 @@ class EmailShowActivity : BaseActivity() {
         // Show currently authenticated user's email
         val user = auth.currentUser
         binding.email.text = user?.email ?: "No email"
-
     }
-
 }

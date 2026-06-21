@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "150411864468-m5g2ir8sbr2k4ssi5u16p6tnq74t597d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tetragon",
+            "certificate_hash": "5fc80a3eff620c84a9d2324aab9abeecb4bb443c"
+          }
+        },
+        {
           "client_id": "150411864468-60ban1a6ecubotujub26i0lc4f95nrhi.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -43,6 +51,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "150411864468-9qcknlasntlt8a4i4gaaveqe4lg31rcc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tetragon.app",
+            "certificate_hash": "99fa58bebe93cd3d328439ebee7a684399b7535e"
+          }
+        },
         {
           "client_id": "150411864468-q7mk4cerbpk7h8ige85munr0ql0lhjc7.apps.googleusercontent.com",
           "client_type": 1,

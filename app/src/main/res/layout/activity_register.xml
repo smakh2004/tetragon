@@ -6,9 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ui.RegisterActivity">
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:context=".ui.RegisterActivity"
+    android:fitsSystemWindows="true">
 
-    <!-- OFFLINE BANNER -->
     <LinearLayout
         android:id="@+id/internetConnection"
         android:layout_width="0dp"
@@ -37,12 +39,13 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- MAIN CONTENT -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="16dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +54,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true">
+            android:fitsSystemWindows="true"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout"
@@ -61,28 +66,25 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <!-- Exit Button -->
                 <ImageView
-                    android:id="@+id/exit_btn"
+                    android:id="@+id/exitBtn"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:padding="14dp"
-                    android:src="@drawable/exit_btn"
+                    android:padding="12dp"
+                    android:src="@drawable/back_btn"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- STEP PROGRESS CONTAINER -->
-                <!-- STEP PROGRESS CONTAINER -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/stepProgressContainer"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_marginStart="12dp"
-                    app:layout_constraintBottom_toBottomOf="@id/exit_btn"
+                    app:layout_constraintBottom_toBottomOf="@id/exitBtn"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/exit_btn"
-                    app:layout_constraintTop_toTopOf="@id/exit_btn">
+                    app:layout_constraintStart_toEndOf="@id/exitBtn"
+                    app:layout_constraintTop_toTopOf="@id/exitBtn">
 
                     <View
                         android:id="@+id/progressBackground"
@@ -102,7 +104,7 @@
                         app:layout_constraintBottom_toBottomOf="@id/progressBackground"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@id/progressBackground"
-                        app:layout_constraintWidth_percent="0.0" /> <!-- Width managed by Kotlin -->
+                        app:layout_constraintWidth_percent="0.0" />
 
                     <View
                         android:id="@+id/step1"
@@ -169,14 +171,47 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- FRAGMENT CONTAINER -->
+            <LinearLayout
+                android:id="@+id/questionHeaderContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/mr_square_welcome_anim"
+                    android:layout_width="160dp"
+                    android:layout_height="170dp"
+                    android:layout_marginTop="-10dp"
+                    app:riveAutoPlay="false"
+                    app:riveResource="@raw/mr_square_welcome" />
+
+                <TextView
+                    android:id="@+id/globalQuestionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:textColor="@color/text_color"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    tools:text="@string/what_s_your_age" />
+
+            </LinearLayout>
+
             <FrameLayout
                 android:id="@+id/questionFragmentContainer"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/questionHeaderContainer" />
 
             <LinearLayout
                 android:id="@+id/offlineContainer"
@@ -188,7 +223,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+                app:layout_constraintTop_toBottomOf="@+id/questionHeaderContainer">
 
                 <app.rive.runtime.kotlin.RiveAnimationView
                     android:id="@+id/internet_mr_square"
@@ -222,7 +257,6 @@
 
             </LinearLayout>
 
-            <!-- CONTINUE BUTTON -->
             <FrameLayout
                 android:id="@+id/continue_btn_container"
                 android:layout_width="0dp"
@@ -234,7 +268,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
-                <!-- ENABLED CONTINUE BUTTON -->
                 <FrameLayout
                     android:id="@+id/continue_enabled_btn_container"
                     android:layout_width="match_parent"
@@ -261,14 +294,12 @@
                         app:backgroundTint="@color/black_3" />
                 </FrameLayout>
 
-                <!-- DISABLED CONTINUE BUTTON -->
                 <FrameLayout
                     android:id="@+id/continue_disabled_btn_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="visible">
 
-                    <!-- shadow -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
@@ -276,7 +307,6 @@
                         android:backgroundTint="@color/gray_2"
                         android:translationY="5dp" />
 
-                    <!-- text over shadow -->
                     <TextView
                         android:id="@+id/continue_disabled_btn"
                         android:layout_width="match_parent"
