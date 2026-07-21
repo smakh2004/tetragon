@@ -14,8 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.startup.AppInitializer
-import app.rive.runtime.kotlin.RiveInitializer
 import app.rive.runtime.kotlin.core.Rive
 import com.tetragon.app.databinding.ActivityMainBinding
 import com.tetragon.app.fragments.*
@@ -30,6 +28,7 @@ import com.tetragon.app.utils.registrationUtils.DeviceUtils
 import com.tetragon.app.gameModel.GradeManager
 import com.tetragon.app.reward.MonthlyRewardActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -56,26 +55,20 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 1. Android 15 Edge-to-Edge Compatibility Fix
         enableEdgeToEdge()
-
         super.onCreate(savedInstanceState)
 
-        // 2. Fixed Rive double-initialization crash hazard.
-        // Using explicit init. Ensure Jetpack startup provider isn't clashing.
         try {
             Rive.init(this)
         } catch (e: Exception) {
-            // Already initialized or fallback
+            // Context already running
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 3. Handle status bar and navigation bar system paddings natively so UI looks correct
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // Apply padding to prevent your structural layout from hiding under the system status/navigation bars
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
@@ -107,7 +100,6 @@ class MainActivity : BaseActivity() {
 
         val currentUser = auth.currentUser
 
-        // 4. Fixed Broken Functionality / Loop Crash Trigger
         if (currentUser == null || !currentUser.isEmailVerified) {
             auth.signOut()
             val intent = Intent(this, WelcomeActivity::class.java).apply {
@@ -115,10 +107,9 @@ class MainActivity : BaseActivity() {
             }
             startActivity(intent)
             finish()
-            return // Stop execution immediately safely
+            return
         }
 
-        // Only run operational database updates if the authorization pass is 100% sound
         checkMonthlyReset(currentUser.email)
         StreakManager.checkAndResetIfMissed()
         UserPresenceHelper.startTracking()
@@ -127,7 +118,7 @@ class MainActivity : BaseActivity() {
         setMiniGamesVisible(true)
     }
 
-    // --- MONTHLY RESET LOGIC ---
+    // --- SECURE TOTAL DB OVERWRITE LOGIC ---
     private fun checkMonthlyReset(currentUserEmail: String?) {
         if (currentUserEmail == null) return
 
@@ -143,40 +134,79 @@ class MainActivity : BaseActivity() {
             val lastMonth = metaDoc.getString("lastMonth") ?: ""
             val savedWinners = metaDoc.get("winnerEmails") as? List<String> ?: emptyList()
 
+            // CASE 1: The month flipped. This device forces a total data sweep across all users
             if (lastMonth != monthKey) {
                 db.collection("users")
                     .orderBy("monthlyXP", Query.Direction.DESCENDING)
-                    .limit(1).get().addOnSuccessListener { topSnapshot ->
-                        val maxXP = topSnapshot.documents.firstOrNull()?.getLong("monthlyXP") ?: 0L
+                    .limit(10).get().addOnSuccessListener { topSnapshot ->
 
-                        if (maxXP > 0) {
-                            db.collection("users").whereEqualTo("monthlyXP", maxXP).get()
-                                .addOnSuccessListener { winnersSnapshot ->
-                                    val winnerEmails = winnersSnapshot.documents.mapNotNull { it.getString("email") }
+                        val docs = topSnapshot.documents
+                        val maxXP = docs.firstOrNull()?.getLong("monthlyXP") ?: 0L
 
-                                    db.collection("users").get().addOnSuccessListener { allUsers ->
-                                        val batch = db.batch()
-                                        for (doc in allUsers.documents) {
-                                            batch.update(doc.reference, "monthlyXP", 0)
-                                        }
-
-                                        batch.update(metaRef, "lastMonth", monthKey)
-                                        batch.update(metaRef, "winnerEmails", winnerEmails)
-
-                                        batch.commit().addOnSuccessListener {
-                                            if (winnerEmails.contains(currentUserEmail)) {
-                                                claimReward(metaRef, currentUserEmail, winnerEmails)
-                                            }
-                                        }
-                                    }
-                                }
+                        val winnerEmails = if (maxXP > 0) {
+                            docs.filter { it.getLong("monthlyXP") == maxXP }.mapNotNull { it.getString("email") }
                         } else {
-                            metaRef.update("lastMonth", monthKey)
+                            emptyList()
+                        }
+
+                        // Wipe entire database system in paginated blocks before saving the confirmation metadata
+                        wipeAllUsersXpStepByStep(null, monthKey) {
+                            val globalUpdate = mapOf(
+                                "lastMonth" to monthKey,
+                                "winnerEmails" to winnerEmails
+                            )
+
+                            metaRef.set(globalUpdate).addOnSuccessListener {
+                                if (winnerEmails.contains(currentUserEmail)) {
+                                    claimReward(metaRef, currentUserEmail, winnerEmails)
+                                }
+                            }
                         }
                     }
-            } else if (savedWinners.contains(currentUserEmail)) {
+            }
+            // CASE 2: The global configurations are set, evaluate destination logic directly
+            else if (savedWinners.contains(currentUserEmail)) {
                 claimReward(metaRef, currentUserEmail, savedWinners)
             }
+        }
+    }
+
+    // Paginated client processor sweeps database elements step-by-step
+    private fun wipeAllUsersXpStepByStep(
+        lastProcessedDoc: DocumentSnapshot?,
+        currentMonthKey: String,
+        onComplete: () -> Unit
+    ) {
+        var baseQuery = db.collection("users").limit(200)
+        if (lastProcessedDoc != null) {
+            baseQuery = baseQuery.startAfter(lastProcessedDoc)
+        }
+
+        baseQuery.get().addOnSuccessListener { snapshot ->
+            if (snapshot.isEmpty) {
+                onComplete()
+                return@addOnSuccessListener
+            }
+
+            val batch = db.batch()
+            for (doc in snapshot.documents) {
+                // Wipe every single profile structure fields down to 0
+                batch.update(doc.reference, mapOf(
+                    "monthlyXP" to 0,
+                    "lastResetMonth" to currentMonthKey
+                ))
+            }
+
+            batch.commit().addOnSuccessListener {
+                val lastDoc = snapshot.documents.last()
+                // Recurse to handle next 200 documents
+                wipeAllUsersXpStepByStep(lastDoc, currentMonthKey, onComplete)
+            }.addOnFailureListener {
+                // Fallback escape safety structure
+                onComplete()
+            }
+        }.addOnFailureListener {
+            onComplete()
         }
     }
 
@@ -255,7 +285,6 @@ class MainActivity : BaseActivity() {
     }
 
     private fun startSessionListener() {
-        // Double check authentication context before parsing snapshot queries
         val uid = auth.currentUser?.uid ?: return
         val currentDeviceId = DeviceUtils.getDeviceId(this)
 

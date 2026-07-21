@@ -32,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:paddingTop="20dp">
+                android:paddingTop="20dp"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/next_grade_label"

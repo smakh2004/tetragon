@@ -31,7 +31,6 @@ class MonthlyRewardActivity : BaseActivity() {
     private lateinit var rewardContainer: FrameLayout
     private lateinit var continueBtnContainer: FrameLayout
 
-    // SoundPool architecture for latency-free instant audio playback
     private var soundPool: SoundPool? = null
     private var rewardSoundId: Int = 0
 
@@ -45,12 +44,12 @@ class MonthlyRewardActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize Rive runtime before inflating layout
-        Rive.init(this)
+        try {
+            Rive.init(this)
+        } catch (e: Exception) {}
 
         setContentView(R.layout.activity_monthly_reward)
 
-        // 1. Initialize SoundPool instantly before layout calculations
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_GAME)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -61,7 +60,6 @@ class MonthlyRewardActivity : BaseActivity() {
             .setAudioAttributes(audioAttributes)
             .build()
 
-        // Pre-load the audio track straight into RAM memory cache
         rewardSoundId = soundPool?.load(this, R.raw.monthly_reward, 1) ?: 0
 
         tvCoinCount = findViewById(R.id.tv_coin_count)
@@ -74,7 +72,6 @@ class MonthlyRewardActivity : BaseActivity() {
         rewardContainer = findViewById(R.id.reward_container)
         continueBtnContainer = findViewById(R.id.continue_btn_container)
 
-        // RESTORE LOGIC
         if (savedInstanceState != null) {
             selectedReward = savedInstanceState.getInt("SAVED_REWARD", 0)
             isAnimationStarted = savedInstanceState.getBoolean("ANIMATION_DONE", false)
@@ -89,25 +86,17 @@ class MonthlyRewardActivity : BaseActivity() {
                 continueBtnContainer.visibility = View.VISIBLE
                 continueBtnContainer.alpha = 1f
 
-                // CHANGED: Shifted up from 60f to 20f to keep it high on configuration restore
                 riveAnimationView.translationY = 20f * resources.displayMetrics.density
+                riveAnimationView.play()
             }
         }
 
         if (selectedReward == 0) {
             selectedReward = rewardOptions.random()
 
-            // PRE-ANIMATION CONFIGURATION (Hide elements & center the Rive View)
             centerContentWrapper.visibility = View.INVISIBLE
             rewardContainer.visibility = View.INVISIBLE
             continueBtnContainer.visibility = View.INVISIBLE
-
-            // Play sound the absolute moment the sample finishes loading into memory buffer
-            soundPool?.setOnLoadCompleteListener { _, sampleId, status ->
-                if (status == 0 && sampleId == rewardSoundId && !isDestroyed && !isFinishing) {
-                    soundPool?.play(rewardSoundId, 1f, 1f, 1, 0, 1f)
-                }
-            }
 
             riveAnimationView.post {
                 if (!isDestroyed && !isFinishing) {
@@ -117,7 +106,6 @@ class MonthlyRewardActivity : BaseActivity() {
 
                     riveAnimationView.translationY = targetCenterTranslation
 
-                    // TIMED SEQUENCE TRIGGER
                     riveAnimationView.postDelayed({
                         if (!isDestroyed && !isFinishing) {
                             runEntranceAndRevealSequence()
@@ -139,16 +127,17 @@ class MonthlyRewardActivity : BaseActivity() {
     }
 
     private fun runEntranceAndRevealSequence() {
-        // CHANGED: Lowered resting position translation value from 60f to 20f.
-        // This pulls the animation up on the screen when it finishes its drop entrance.
-        val restingTranslationYPx = 20f * resources.displayMetrics.density
+        if (!isDestroyed && !isFinishing) {
+            soundPool?.play(rewardSoundId, 1f, 1f, 1, 0, 1f)
+        }
 
+        riveAnimationView.play()
+        startCoinAnimation(selectedReward)
+
+        val restingTranslationYPx = 20f * resources.displayMetrics.density
         riveAnimationView.animate()
             .translationY(restingTranslationYPx)
             .setDuration(300)
-            .withEndAction {
-                startCoinAnimation(selectedReward)
-            }
             .start()
 
         centerContentWrapper.alpha = 0f
@@ -162,20 +151,20 @@ class MonthlyRewardActivity : BaseActivity() {
 
         centerContentWrapper.animate()
             .alpha(1f)
-            .setStartDelay(200)
-            .setDuration(500)
+            .setStartDelay(1000)
+            .setDuration(400)
             .start()
 
         rewardContainer.animate()
             .alpha(1f)
-            .setStartDelay(400)
-            .setDuration(500)
+            .setStartDelay(1000)
+            .setDuration(400)
             .start()
 
         continueBtnContainer.animate()
             .alpha(1f)
-            .setStartDelay(500)
-            .setDuration(500)
+            .setStartDelay(1000)
+            .setDuration(400)
             .start()
     }
 
@@ -212,7 +201,6 @@ class MonthlyRewardActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Unload sound and release the SoundPool hardware pipeline from RAM
         soundPool?.release()
         soundPool = null
     }

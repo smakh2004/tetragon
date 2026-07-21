@@ -1,5 +1,6 @@
-package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers
+package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy
 
+import android.graphics.Typeface
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.Spannable
@@ -7,7 +8,11 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -174,7 +179,7 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
         val start = baseText.indexOf(countStr)
         if (start != -1) {
             spannable.setSpan(
-                StyleSpan(android.graphics.Typeface.BOLD),
+                StyleSpan(Typeface.BOLD),
                 start, start + countStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             spannable.setSpan(

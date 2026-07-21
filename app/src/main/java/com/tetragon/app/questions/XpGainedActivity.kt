@@ -66,15 +66,44 @@ class XpGainedActivity : BaseActivity() {
             val currentTopicProgress = progressMap?.get(topicKey) ?: 0L
 
             if (currentTopicProgress >= 100) {
-                binding.textView3.text = "0"
+                val reviewXp = 10
+                binding.textView3.text = reviewXp.toString()
                 binding.description.text = getString(R.string.xp_topic_mastered)
-                binding.xpAnimation.setNumberState("State Machine 1", "XP", 0f)
+                binding.xpAnimation.setNumberState("State Machine 1", "XP", reviewXp.toFloat())
+
+                saveReviewXpToFirestore(reviewXp)
             } else {
                 binding.textView3.text = xpGained.toString()
                 binding.description.text = getString(R.string.xp_collected_desc)
                 binding.xpAnimation.setNumberState("State Machine 1", "XP", xpGained.toFloat())
 
                 saveXpAndLevelToFirestore(xpGained)
+            }
+        }
+    }
+
+    // =====================================================
+    // 🔹 SAVE REVIEW XP (topic already mastered — flat reward, no topic-progress write)
+    // =====================================================
+
+    private fun saveReviewXpToFirestore(xp: Int) {
+        val user = auth.currentUser ?: return
+        val userDocRef = db.collection("users").document(user.uid)
+        val todayKey = dateFormat.format(java.util.Date())
+
+        userDocRef.get().addOnSuccessListener { snapshot ->
+            userDocRef.update(
+                mapOf(
+                    "xp" to FieldValue.increment(xp.toLong()),
+                    "monthlyXP" to FieldValue.increment(xp.toLong()),
+                    "dailyXPGains.$todayKey" to FieldValue.increment(xp.toLong())
+                )
+            ).addOnSuccessListener {
+                val currentTotalXp = snapshot.getLong("xp") ?: 0L
+                val newLevel = calculateLevel(currentTotalXp + xp)
+                userDocRef.update("level", newLevel)
+                // Note: no updateTopicProgress() call here — topic is already at/above
+                // 100, so we deliberately don't touch progress on a review pass.
             }
         }
     }

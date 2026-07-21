@@ -23,12 +23,15 @@ class PhysicsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Setup listeners for all physics grade buttons
+        // Setup listeners for visible physics grade buttons
         setupGradeButton(view.findViewById(R.id.class_btn_7), 7)
+
+        /* UNCOMMENT THIS BLOCK TO RESTORE GRADES 8-11
         setupGradeButton(view.findViewById(R.id.class_btn_8), 8)
         setupGradeButton(view.findViewById(R.id.class_btn_9), 9)
         setupGradeButton(view.findViewById(R.id.class_btn_10), 10)
         setupGradeButton(view.findViewById(R.id.class_btn_11), 11)
+        */
     }
 
     /**

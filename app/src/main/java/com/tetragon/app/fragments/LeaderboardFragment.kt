@@ -15,7 +15,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout // IMPORT THIS
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tetragon.app.R
 import com.tetragon.app.utils.leaderboardUtils.LeaderboardAdapter
 import com.tetragon.app.utils.leaderboardUtils.LeaderboardUser
@@ -31,6 +31,7 @@ import com.google.firebase.firestore.Query
 import com.tetragon.app.otherProfile.OtherUserProfileActivity
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -45,7 +46,7 @@ class LeaderboardFragment : Fragment() {
     private lateinit var leaderboardImage: ImageView
     private lateinit var leaderboardCard: MaterialCardView
     private lateinit var loadingLayout: LinearLayout
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout // Add reference
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val db = FirebaseFirestore.getInstance()
     private val rtdb = FirebaseDatabase.getInstance().getReference("status")
@@ -71,7 +72,7 @@ class LeaderboardFragment : Fragment() {
         leaderboardImage = view.findViewById(R.id.leaderboardImage)
         leaderboardCard = view.findViewById(R.id.leaderboardCard)
         loadingLayout = view.findViewById(R.id.loadingLayout)
-        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout) // Initialize layout
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
         recycler.layoutManager = LinearLayoutManager(requireContext())
 
@@ -85,12 +86,10 @@ class LeaderboardFragment : Fragment() {
         }
         recycler.adapter = leaderboardAdapter
 
-        // Set up custom indicator color matching your theme (optional)
         context?.let { ctx ->
             swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(ctx, R.color.blue_2))
         }
 
-        // Set up the listener triggered when pulling down the page
         swipeRefreshLayout.setOnRefreshListener {
             updateMonthUI()
             loadLeaderboard()
@@ -151,9 +150,6 @@ class LeaderboardFragment : Fragment() {
     }
 
     private fun loadLeaderboard() {
-        val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
-
-        // Only show full screen loading if SwipeRefreshLayout isn't running
         if (!swipeRefreshLayout.isRefreshing) {
             loadingLayout.visibility = View.VISIBLE
             headerTextContainer.visibility = View.INVISIBLE
@@ -162,7 +158,22 @@ class LeaderboardFragment : Fragment() {
             leaderboardCard.visibility = View.INVISIBLE
         }
 
-        // Remove old listener instance if reloading manually via pull down
+        // Fetch master system configuration month context first
+        db.collection("system").document("leaderboard").get()
+            .addOnSuccessListener { task ->
+                if (!isAdded) return@addOnSuccessListener
+                val globalMonthKey = task.getString("lastMonth") ?: ""
+                executeLeaderboardQuery(globalMonthKey)
+            }
+            .addOnFailureListener {
+                if (isAdded) showMainContent()
+            }
+    }
+
+    private fun executeLeaderboardQuery(globalMonthKey: String) {
+        val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
+        val localMonthKey = SimpleDateFormat("yyyy-MM", Locale.ENGLISH).format(Date())
+
         leaderboardListener?.remove()
 
         leaderboardListener = db.collection("users")
@@ -175,15 +186,29 @@ class LeaderboardFragment : Fragment() {
                 }
 
                 val tempUsers = mutableListOf<LeaderboardUser>()
-                var myRank = 0
 
-                for ((index, document) in result.withIndex()) {
+                for (document in result) {
                     val lbUser = document.toObject(LeaderboardUser::class.java)
                     lbUser.uid = document.id
-                    tempUsers.add(lbUser)
 
+                    // Check if user record profile has synced with current system month
+                    val userLastResetMonth = document.getString("lastResetMonth") ?: ""
+
+                    // If month flipped or this specific document's last reset timestamp is outdated, visual wipe to 0 XP
+                    if (globalMonthKey != localMonthKey || (userLastResetMonth.isNotEmpty() && userLastResetMonth != globalMonthKey)) {
+                        lbUser.monthlyXP = 0L
+                    }
+                    tempUsers.add(lbUser)
+                }
+
+                // Re-sort locally because visual elements may have shifted to 0 XP
+                tempUsers.sortByDescending { it.monthlyXP }
+
+                var myRank = 0
+                for ((index, lbUser) in tempUsers.withIndex()) {
                     if (lbUser.email == currentUserEmail) {
                         myRank = index + 1
+                        break
                     }
                 }
 
@@ -213,11 +238,9 @@ class LeaderboardFragment : Fragment() {
     }
 
     private fun showMainContent() {
-        // HIDE loading systems
         loadingLayout.visibility = View.GONE
-        swipeRefreshLayout.isRefreshing = false // Stop the thumb pull loading circle icon
+        swipeRefreshLayout.isRefreshing = false
 
-        // SHOW Main view structures
         headerTextContainer.visibility = View.VISIBLE
         leaderboardImage.visibility = View.VISIBLE
         positionText.visibility = View.VISIBLE

@@ -13,8 +13,8 @@ android {
         applicationId = "com.tetragon.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 25
-        versionName = "2.5"
+        versionCode = 38
+        versionName = "3.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

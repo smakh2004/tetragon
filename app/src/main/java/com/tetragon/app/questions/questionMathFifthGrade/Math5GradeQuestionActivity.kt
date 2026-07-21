@@ -1,8 +1,14 @@
 package com.tetragon.app.questions.questionMathFifthGrade
 
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
@@ -42,6 +48,8 @@ class Math5GradeQuestionActivity : BaseActivity() {
     private var previousComplexity: MathComplexity? = null
     private var consecutiveCorrectAtLevel = 0
     private var isOnSecondChance = false
+
+    private var milestoneMediaPlayer: MediaPlayer? = null
 
     // Queue tracking system for the Round-Robin logic
     private var remainingTypesInRound: MutableList<MathGrade5Type> = mutableListOf()
@@ -84,11 +92,40 @@ class Math5GradeQuestionActivity : BaseActivity() {
         isOnSecondChance = false
 
         if (consecutiveCorrectAtLevel >= 3) {
+            val oldComplexity = currentComplexity
+
             currentComplexity = when (currentComplexity) {
                 MathComplexity.EASY -> MathComplexity.MEDIUM
                 MathComplexity.MEDIUM -> MathComplexity.HARD
                 MathComplexity.HARD -> MathComplexity.HARD
             }
+
+            if ((oldComplexity == MathComplexity.EASY && currentComplexity == MathComplexity.MEDIUM) ||
+                (oldComplexity == MathComplexity.MEDIUM && currentComplexity == MathComplexity.HARD)) {
+
+                // 1. Immediately animate complexity container drop with clean scale out/in
+                binding.complexityContainer.animate()
+                    .alpha(0f)
+                    .scaleX(0.8f)
+                    .scaleY(0.8f)
+                    .setDuration(150)
+                    .withEndAction {
+                        updateComplexityUi(currentComplexity)
+                        previousComplexity = currentComplexity // Prevent duplicate showRandomQuestion alpha jump
+
+                        binding.complexityContainer.animate()
+                            .alpha(1f)
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(250)
+                            .setInterpolator(DecelerateInterpolator())
+                            .start()
+                    }.start()
+
+                // 2. Play level up milestone sequence
+                playLevelUpAnimation()
+            }
+
             consecutiveCorrectAtLevel = 0
         }
     }
@@ -157,6 +194,61 @@ class Math5GradeQuestionActivity : BaseActivity() {
         }
     }
 
+    private fun playLevelUpAnimation() {
+        triggerHapticFeedback()
+
+        try {
+            milestoneMediaPlayer?.stop()
+            milestoneMediaPlayer?.release()
+
+            milestoneMediaPlayer = MediaPlayer.create(this, R.raw.energy).apply {
+                setOnCompletionListener {
+                    it.release()
+                    if (milestoneMediaPlayer == it) {
+                        milestoneMediaPlayer = null
+                    }
+                }
+                start()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        binding.levelUpAnimation.visibility = View.VISIBLE
+        binding.levelUpAnimationRiveView.fireState("State Machine 1", "play")
+
+        lifecycleScope.launch {
+            delay(3000)
+            hideLevelUpAnimation()
+        }
+    }
+
+    fun hideLevelUpAnimation() {
+        binding.levelUpAnimationRiveView.stop()
+        binding.levelUpAnimation.visibility = View.INVISIBLE
+    }
+
+    private fun triggerHapticFeedback() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                val vibrator = vibratorManager.defaultVibrator
+                vibrator.vibrate(VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(300)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     private fun getTypesForTopic(topic: MathGrade5Topic): List<MathGrade5Type> {
         return when (topic) {
             MathGrade5Topic.NATURAL_NUMBERS -> listOf(
@@ -181,7 +273,6 @@ class Math5GradeQuestionActivity : BaseActivity() {
         hideSuccessAnimation()
         binding.correctMrSquare.visibility = View.INVISIBLE
 
-        // 1. Manage Complexity Navigation Header Transition
         if (currentComplexity != previousComplexity) {
             updateComplexityUi(currentComplexity)
             binding.complexityContainer.apply {
@@ -195,34 +286,25 @@ class Math5GradeQuestionActivity : BaseActivity() {
             binding.complexityContainer.alpha = 1f
         }
 
-        // 2. Fetch all configuration types defined for this active topic
         val allTypes = getTypesForTopic(selectedTopic)
-
-        // 3. Filter layout pool based strictly on the current complexity architecture
         val targetedLevelPool = allTypes.filter { it.complexity == currentComplexity }
-
-        // Fallback protection if no custom complexities are initialized in structural enums
         val finalWorkingPool = if (targetedLevelPool.isNotEmpty()) targetedLevelPool else allTypes
 
-        // 4. Queue Restoration & Validation Engine
         if (currentComplexity != lastTrackedComplexity || remainingTypesInRound.isEmpty()) {
             lastTrackedComplexity = currentComplexity
 
             remainingTypesInRound = finalWorkingPool.toMutableList()
-            remainingTypesInRound.shuffle() // Keeps elements shuffled WITHIN the round context
+            remainingTypesInRound.shuffle()
 
-            // Prevention check: Avoid showing the same fragment twice back-to-back during a round reset
             if (remainingTypesInRound.size > 1 && remainingTypesInRound.first() == lastQuestionType) {
                 val duplicateElement = remainingTypesInRound.removeAt(0)
-                remainingTypesInRound.add(duplicateElement) // Push matching type safely to end of queue
+                remainingTypesInRound.add(duplicateElement)
             }
         }
 
-        // 5. Pop sequence item at index 0 (Guarantees every type shows exactly once per round)
         val nextType = remainingTypesInRound.removeAt(0)
         lastQuestionType = nextType
 
-        // 6. Fragment router assignment
         val fragment = when (nextType) {
             MathGrade5Type.ADDITION_NATURAL_NUMBERS -> UiAdditionNaturalNumbersFragment()
             MathGrade5Type.WRITE_WITH_DIGITS -> UiWriteWithDigitsFragment()
@@ -239,12 +321,7 @@ class Math5GradeQuestionActivity : BaseActivity() {
         }
 
         supportFragmentManager.beginTransaction()
-            .setCustomAnimations(
-                R.anim.slide_in_right,
-                R.anim.slide_out_left,
-                R.anim.slide_in_left,
-                R.anim.slide_out_right
-            )
+            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
             .replace(R.id.questionFragmentContainer, fragment)
             .commit()
     }
@@ -301,20 +378,16 @@ class Math5GradeQuestionActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isConnected.collect { isConnected ->
                     val isVisible = isConnected
-                    binding.internetConnection.visibility =
-                        if (isVisible) View.GONE else View.VISIBLE
+                    binding.internetConnection.visibility = if (isVisible) View.GONE else View.VISIBLE
                     binding.offlineContainer.visibility = if (isVisible) View.GONE else View.VISIBLE
                     binding.topBarContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
-                    binding.questionFragmentContainer.visibility =
-                        if (isVisible) View.VISIBLE else View.GONE
+                    binding.questionFragmentContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
                     binding.btnBackground.visibility = if (isVisible) View.VISIBLE else View.GONE
-                    binding.complexityContainer.visibility =
-                        if (isVisible) View.VISIBLE else View.GONE
+                    binding.complexityContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
 
                     if (isVisible && isResultCurrentlyVisible) {
                         binding.stateContainer.visibility = View.VISIBLE
-                        binding.correctMrSquare.visibility =
-                            if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
+                        binding.correctMrSquare.visibility = if (isCorrectAnswerShowing) View.VISIBLE else View.INVISIBLE
                     } else {
                         binding.stateContainer.visibility = View.INVISIBLE
                         binding.correctMrSquare.visibility = View.INVISIBLE
@@ -326,22 +399,18 @@ class Math5GradeQuestionActivity : BaseActivity() {
 
     private fun updateComplexityUi(complexity: MathComplexity) {
         val (iconRes, textRes, colorRes) = when (complexity) {
-            MathComplexity.EASY -> Triple(
-                R.drawable.easy,
-                R.string.complexity_easy,
-                R.color.green_1
-            )
-
-            MathComplexity.MEDIUM -> Triple(
-                R.drawable.medium,
-                R.string.complexity_medium,
-                R.color.orange_1
-            )
-
+            MathComplexity.EASY -> Triple(R.drawable.easy, R.string.complexity_easy, R.color.green_1)
+            MathComplexity.MEDIUM -> Triple(R.drawable.medium, R.string.complexity_medium, R.color.orange_1)
             MathComplexity.HARD -> Triple(R.drawable.hard, R.string.complexity_hard, R.color.red_1)
         }
         binding.complexityIcon.setImageResource(iconRes)
         binding.complexityText.setText(textRes)
         binding.complexityText.setTextColor(ContextCompat.getColor(this, colorRes))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        milestoneMediaPlayer?.release()
+        milestoneMediaPlayer = null
     }
 }

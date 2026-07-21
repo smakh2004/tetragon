@@ -7,32 +7,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    android:fitsSystemWindows="true"
     tools:context=".ui.SplashScreenActivity">
 
-    <LinearLayout
-        android:id="@+id/logoContainer"
+    <!-- Full width + height Rive animation.
+         riveFit="LAYOUT" + riveAlignment="CENTER" fills and aligns
+         correctly on tablets / large screens too. -->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/riveAnimationView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:scaleX="1.2"
-        android:scaleY="1.2"
-        app:layout_constraintWidth_percent="0.60"
-        app:layout_constraintWidth_max="290dp"
+        android:layout_height="0dp"
+        app:riveResource="@raw/splash_screen"
+        app:riveFit="LAYOUT"
+        app:riveAlignment="CENTER"
+        app:riveAutoPlay="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Logo PNG + brand text pinned to bottom, in white -->
+    <LinearLayout
+        android:id="@+id/logoContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/logoImageView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginEnd="8dp"
             android:src="@drawable/logo_blue"
-            android:contentDescription="App Logo" />
+            android:contentDescription="App Logo"
+            app:tint="#FFFFFF" />
 
         <TextView
             android:id="@+id/brandTextView"
@@ -40,58 +52,9 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_bold"
             android:text="@string/tetragon"
-            android:textColor="#00BFFF"
+            android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/mascotImageView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:src="@drawable/loading_mr_square"
-        android:contentDescription="Mascot Character"
-        android:adjustViewBounds="true"
-        android:visibility="invisible"
-        android:alpha="0"
-        app:layout_constraintWidth_percent="0.60"
-        app:layout_constraintWidth_max="290dp"
-        app:layout_constraintTop_toBottomOf="@id/logoContainer"
-        app:layout_constraintBottom_toTopOf="@id/progressTextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextView
-        android:id="@+id/progressTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:fontFamily="@font/inter_bold"
-        android:text="0%"
-        android:textColor="#00BFFF"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:visibility="invisible"
-        android:alpha="0"
-        app:layout_constraintBottom_toTopOf="@id/progressBar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:progress="0"
-        android:max="100"
-        android:visibility="invisible"
-        android:alpha="0"
-        android:progressDrawable="@drawable/custom_progress_bar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

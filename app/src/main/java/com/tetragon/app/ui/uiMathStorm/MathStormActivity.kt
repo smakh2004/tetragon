@@ -35,6 +35,9 @@ class MathStormActivity : BaseActivity() {
     private var isNavigatingToResult = false
     private var sessionHighestScore = 0
 
+    // Counts every answer the user submits (one per answer-button tap).
+    private var questionsAnswered = 0
+
     private val viewModel: ConnectivityViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -171,7 +174,10 @@ class MathStormActivity : BaseActivity() {
                 if (value == "DEL") controller.deleteInput() else controller.addInput(value)
             }
         }
-        enabledButton.setOnClickListener { controller.checkAnswer() }
+        enabledButton.setOnClickListener {
+            questionsAnswered++          // count this submitted answer
+            controller.checkAnswer()
+        }
     }
 
     private fun showQuitBottomSheet() {
@@ -211,7 +217,10 @@ class MathStormActivity : BaseActivity() {
         controller.cancelQuizTimer()
         controller.cancelCountdown()
 
-        val intent = Intent(this, ResultMathStormActivity::class.java).apply { putExtra("score", score) }
+        val intent = Intent(this, ResultMathStormActivity::class.java).apply {
+            putExtra("score", score)
+            putExtra("questionsAnswered", questionsAnswered)
+        }
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         finish()

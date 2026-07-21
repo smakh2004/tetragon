@@ -1,4 +1,4 @@
-package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers
+package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -16,10 +16,15 @@ import com.tetragon.app.questions.questionMathFirstGrade.Math1GradeQuestionActiv
 import com.tetragon.app.questions.questionMathFirstGrade.MathGrade1Type
 import kotlin.random.Random
 
-class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
+class UiCountWithHandsFragment : Fragment(R.layout.fragment_ui_count_with_hands) {
 
-    private lateinit var apples: List<ImageView>
-    private lateinit var options: List<LinearLayout>
+    private lateinit var questionText: TextView
+    private lateinit var handCountImage: ImageView
+    private lateinit var tvCounterValue: TextView
+
+    private lateinit var addBtn: LinearLayout
+    private lateinit var minusBtn: LinearLayout
+
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
     private lateinit var btnBack: ConstraintLayout
@@ -28,36 +33,57 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
     private lateinit var stateAnswer: TextView
     private lateinit var answer: TextView
 
-    private var correctAnswer = 0
-    private var selectedOptionIndex: Int? = null
+    private lateinit var addEnabledContainer: FrameLayout
+    private lateinit var addDisabledContainer: FrameLayout
+    private lateinit var minusEnabledContainer: FrameLayout
+    private lateinit var minusDisabledContainer: FrameLayout
+
+    // Changed default values to 0 instead of 1
+    private var currentCountValue = 0
+    private var targetHandCount = 1
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
+    private var isInitialized = false
     private var mediaPlayer: MediaPlayer? = null
+
+    private val handDrawables = intArrayOf(
+        R.drawable.hand_one,
+        R.drawable.hand_two,
+        R.drawable.hand_three,
+        R.drawable.hand_four,
+        R.drawable.hand_five,
+        R.drawable.hand_six,
+        R.drawable.hand_seven,
+        R.drawable.hand_eight,
+        R.drawable.hand_nine,
+        R.drawable.hand_ten
+    )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
         setupInitialButtonState()
-        generateProblem()
-        setupOptionClicks()
+
+        if (!isInitialized) {
+            generateProblem()
+            isInitialized = true
+        }
         setupCheckButton()
     }
 
     private fun initViews(view: View) {
-        apples = listOf(
-            view.findViewById(R.id.apple1), view.findViewById(R.id.apple2),
-            view.findViewById(R.id.apple3), view.findViewById(R.id.apple4),
-            view.findViewById(R.id.apple5), view.findViewById(R.id.apple6),
-            view.findViewById(R.id.apple7), view.findViewById(R.id.apple8),
-            view.findViewById(R.id.apple9), view.findViewById(R.id.apple10)
-        )
+        addEnabledContainer = view.findViewById(R.id.add_enabled_container)
+        addDisabledContainer = view.findViewById(R.id.add_disabled_container)
+        minusEnabledContainer = view.findViewById(R.id.minus_enabled_container)
+        minusDisabledContainer = view.findViewById(R.id.minus_disabled_container)
 
-        options = listOf(
-            view.findViewById(R.id.option1),
-            view.findViewById(R.id.option2),
-            view.findViewById(R.id.option3)
-        )
+        questionText = view.findViewById(R.id.questionText)
+        handCountImage = view.findViewById(R.id.handCountImage)
+        tvCounterValue = view.findViewById(R.id.tv_counter_value)
+
+        addBtn = view.findViewById(R.id.add_btn)
+        minusBtn = view.findViewById(R.id.minus_btn)
 
         checkBtn = requireActivity().findViewById(R.id.check_enabled_btn)
         checkBtnBack = requireActivity().findViewById(R.id.check_enabled_button_background)
@@ -66,6 +92,9 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         seeEnabledButton = requireActivity().findViewById(R.id.see_enabled_btn)
         stateAnswer = requireActivity().findViewById(R.id.stateAnswer)
         answer = requireActivity().findViewById(R.id.answer)
+
+        addBtn.setOnClickListener { changeCounterValue(+1) }
+        minusBtn.setOnClickListener { changeCounterValue(-1) }
     }
 
     private fun playSound(soundResId: Int) {
@@ -85,21 +114,18 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
     }
 
     private fun generateProblem() {
-        correctAnswer = Random.Default.nextInt(1, 11)
-        apples.forEachIndexed { index, image ->
-            image.visibility = if (index < correctAnswer) View.VISIBLE else View.GONE
-        }
+        targetHandCount = Random.Default.nextInt(1, 11)
+        handCountImage.setImageResource(handDrawables[targetHandCount - 1])
 
-        val optionSet = mutableSetOf(correctAnswer)
-        while (optionSet.size < 3) optionSet.add(Random.Default.nextInt(1, 11))
-        val shuffledOptions = optionSet.shuffled()
+        selectedOptionIndexReset()
+        updateVisualButtonStates()
+    }
 
-        options.forEachIndexed { index, layout ->
-            (layout.getChildAt(0) as TextView).text = shuffledOptions[index].toString()
-            layout.setBackgroundResource(R.drawable.custom_background)
-        }
+    private fun selectedOptionIndexReset() {
+        // Explicitly set default layout value representations back to 0
+        currentCountValue = 0
+        tvCounterValue.text = "0"
 
-        selectedOptionIndex = null
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
@@ -113,24 +139,43 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         setupInitialButtonState()
     }
 
-    private fun setupOptionClicks() {
-        options.forEachIndexed { index, layout ->
-            layout.setOnClickListener {
-                if (isAnswerChecked) return@setOnClickListener
-                selectedOptionIndex = index
-                highlightSelectedOption(index)
-                enableCheckButton()
-            }
-        }
+    private fun changeCounterValue(delta: Int) {
+        if (isAnswerChecked) return
+
+        // Allowed selectable range maps strictly between 1 and 10
+        val newValue = (currentCountValue + delta).coerceIn(1, 10)
+        if (newValue == currentCountValue) return
+
+        currentCountValue = newValue
+        tvCounterValue.text = currentCountValue.toString()
+
+        enableCheckButton()
+        updateVisualButtonStates()
     }
 
-    private fun highlightSelectedOption(selectedIndex: Int) {
-        options.forEachIndexed { i, layout ->
-            layout.setBackgroundResource(if (i == selectedIndex) R.drawable.option_selected else R.drawable.custom_background)
+    private fun updateVisualButtonStates() {
+        if (isAnswerChecked) {
+            addEnabledContainer.visibility = View.GONE
+            addDisabledContainer.visibility = View.VISIBLE
+            minusEnabledContainer.visibility = View.GONE
+            minusDisabledContainer.visibility = View.VISIBLE
+            return
         }
+
+        val canAdd = currentCountValue < 10
+        addEnabledContainer.visibility = if (canAdd) View.VISIBLE else View.GONE
+        addDisabledContainer.visibility = if (canAdd) View.GONE else View.VISIBLE
+
+        // If it's 0 (initial unselected state) or 1, disable minus button interaction layers
+        val canMinus = currentCountValue > 1
+        minusEnabledContainer.visibility = if (canMinus) View.VISIBLE else View.GONE
+        minusDisabledContainer.visibility = if (canMinus) View.GONE else View.VISIBLE
     }
 
     private fun enableCheckButton() {
+        // Prevent check triggering logic explicitly if a user maintains or hacks back to 0
+        if (currentCountValue == 0) return
+
         checkBtn.isEnabled = true
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
@@ -142,7 +187,7 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
             val circleState = requireActivity().findViewById<ImageView>(R.id.circleState)
 
             if (!isAnswerChecked) {
-                selectedOptionIndex?.let { checkAnswer(it, stateContainer, circleState) }
+                checkAnswer(stateContainer, circleState)
             } else if (isIncorrectAttempt) {
                 resetForTryAgain()
             } else {
@@ -150,10 +195,9 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
                 if (checkBtn.text == getString(R.string.btn_finish)) {
                     activity.navigateToXpGained()
                 } else {
+                    resetUIForNext() // always reset first
                     val isMilestoneActive = activity.checkAndTriggerMilestone()
-
                     if (!isMilestoneActive) {
-                        resetUIForNext()
                         activity.showRandomQuestion()
                     }
                 }
@@ -161,53 +205,53 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         }
     }
 
-    private fun checkAnswer(index: Int, stateContainer: FrameLayout, circleState: ImageView) {
+    private fun checkAnswer(stateContainer: FrameLayout, circleState: ImageView) {
+        if (currentCountValue == 0) return // Fallback protection guard
+
         isAnswerChecked = true
-        val chosenNumber = (options[index].getChildAt(0) as TextView).text.toString().toInt()
         val activity = requireActivity() as Math1GradeQuestionActivity
 
         activity.isResultCurrentlyVisible = true
         stateContainer.visibility = View.VISIBLE
 
-        if (chosenNumber == correctAnswer) {
+        if (currentCountValue == targetHandCount) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
 
             val isFinished = activity.incrementProgress()
             if (isFirstAttempt) {
-                activity.totalXp += MathGrade1Type.APPLE.xp
+                activity.totalXp += MathGrade1Type.HAND_COUNT.xp
             }
 
             activity.handleCorrectAnswer()
 
             isIncorrectAttempt = false
             checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
-            showCorrectState(stateContainer, circleState, index)
+            showCorrectState(stateContainer, circleState)
         } else {
             playSound(R.raw.wrong)
             isIncorrectAttempt = true
             activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
-            showIncorrectState(stateContainer, circleState, index)
+            showIncorrectState(stateContainer, circleState)
             setupSeeSolution(stateContainer, circleState)
         }
+        updateVisualButtonStates()
         isFirstAttempt = false
     }
 
-    private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
+    private fun showCorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_3))
         circleState.setImageResource(R.drawable.correct_tick_icon)
-        options[index].setBackgroundResource(R.drawable.option_correct)
         stateAnswer.text = getString(R.string.state_correct)
-        answer.text = getString(R.string.label_answer, correctAnswer.toString())
+        answer.text = getString(R.string.label_answer, targetHandCount.toString())
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
-    private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView, index: Int) {
+    private fun showIncorrectState(stateContainer: FrameLayout, circleState: ImageView) {
         stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_4))
         circleState.setImageResource(R.drawable.wrong_circle)
-        options[index].setBackgroundResource(R.drawable.option_incorrect)
         seeEnabledButton.text = getString(R.string.btn_see_solution)
         answer.visibility = View.GONE
         stateAnswer.text = getString(R.string.state_incorrect)
@@ -219,23 +263,22 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
             stateAnswer.text = getString(R.string.state_solution)
-            answer.text = getString(R.string.label_answer, correctAnswer.toString())
+            answer.text = getString(R.string.label_answer, targetHandCount.toString())
             answer.visibility = View.VISIBLE
             checkBtn.text = getString(R.string.btn_continue)
             isAnswerChecked = true
             isIncorrectAttempt = false
+
             checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_3)
             checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_2)
             btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
-            options.forEach { layout ->
-                val tv = layout.getChildAt(0) as TextView
-                layout.setBackgroundResource(
-                    if (tv.text.toString().toInt() == correctAnswer) R.drawable.option_showed
-                    else R.drawable.custom_background
-                )
-            }
+
+            currentCountValue = targetHandCount
+            tvCounterValue.text = currentCountValue.toString()
+            updateVisualButtonStates()
         }
     }
 
@@ -251,17 +294,18 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
 
         isAnswerChecked = false
         isIncorrectAttempt = false
-        selectedOptionIndex = null
-        options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
+
         checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+
         setupInitialButtonState()
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
         answer.visibility = View.VISIBLE
+        updateVisualButtonStates()
     }
 
     private fun resetUIForNext() {
@@ -281,14 +325,11 @@ class UiAppleQuestionFragment : Fragment(R.layout.fragment_ui_apple_question) {
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
 
         setupInitialButtonState()
-        options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
         mediaPlayer?.release()
         mediaPlayer = null
+        super.onDestroyView()
     }
-
 }

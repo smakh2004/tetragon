@@ -7,7 +7,7 @@
     android:background="@color/white"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
-    tools:context=".questions.questionMathFirstGrade.firstTopicCountingNumbers.UiCountByNumberFragment">
+    tools:context=".questions.questionMathFirstGrade.firstTopicCountingNumbers.hard.UiCountByNumberFragment">
 
     <TextView
         android:id="@+id/instructionText"

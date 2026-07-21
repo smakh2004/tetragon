@@ -177,9 +177,9 @@ class UiWhatIsEvenOrOddNumberUpToFragment : Fragment(R.layout.fragment_ui_even_o
                     if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
+                        resetUIForNext() // always reset first
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
-                            resetUIForNext()
                             activity.showRandomQuestion()
                         }
                     }

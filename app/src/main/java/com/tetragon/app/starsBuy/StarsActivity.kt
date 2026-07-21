@@ -34,11 +34,9 @@ class StarsActivity : BaseActivity() {
     private lateinit var starPriceContainer: LinearLayout
     private lateinit var starStatusText: TextView
 
-    // Scroll Layer Layout Components
     private lateinit var shopScrollView: NestedScrollView
     private lateinit var scrollDivider: View
 
-    // Persistent Bottom Button References
     private lateinit var bottomActionContainer: FrameLayout
     private lateinit var confirmCoinAmount: TextView
     private lateinit var startEnabledBtnContainer: FrameLayout
@@ -46,7 +44,6 @@ class StarsActivity : BaseActivity() {
     private lateinit var subscribeDisabledBtnContainer: FrameLayout
     private lateinit var continueEnabledBtn: LinearLayout
 
-    // Initial Fetching State Layer Overlay
     private lateinit var loadingOverlayContainer: FrameLayout
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
@@ -54,7 +51,7 @@ class StarsActivity : BaseActivity() {
     private var userDataListener: ListenerRegistration? = null
     private var countDownTimer: CountDownTimer? = null
 
-    private val REGEN_TIME_MILLIS = 1800000L // 30 minutes
+    private val REGEN_TIME_MILLIS = 1800000L
     private val MAX_STARS = 15
     private val INFINITY_COST = 1000L
     private val REFILL_COST = 50L
@@ -63,9 +60,9 @@ class StarsActivity : BaseActivity() {
     private var currentStars: Int = 0
     private var isInfinityPlan: Boolean = false
 
-    // Control initial selection state
     private var isAnyOptionSelected: Boolean = false
     private var isInfinitySelected: Boolean = false
+    private var isSubscribedState: Boolean = false
 
     private var isFirstLoad: Boolean = true
 
@@ -73,7 +70,6 @@ class StarsActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stars)
 
-        // Initialize Base Views
         backBtn = findViewById(R.id.back_btn)
         coinCountText = findViewById(R.id.coinCountText)
         centerStarGraphic = findViewById(R.id.center_star_graphic)
@@ -87,11 +83,9 @@ class StarsActivity : BaseActivity() {
         starPriceContainer = findViewById(R.id.star_price_container)
         starStatusText = findViewById(R.id.star_status_text)
 
-        // Initialize Scroll Layers
         shopScrollView = findViewById(R.id.shopScrollView)
         scrollDivider = findViewById(R.id.scrollDivider)
 
-        // Initialize Persistent Bottom Action Button UI elements
         bottomActionContainer = findViewById(R.id.bottom_action_container)
         confirmCoinAmount = findViewById(R.id.confirm_coin_amount)
         startEnabledBtnContainer = findViewById(R.id.start_enabled_btn_container)
@@ -112,9 +106,13 @@ class StarsActivity : BaseActivity() {
             scrollDivider.visibility = if (scrollY > 0) View.VISIBLE else View.INVISIBLE
         })
 
-        itemInfinity.setOnClickListener { selectOption(selectInfinity = true) }
+        itemInfinity.setOnClickListener {
+            if (isSubscribedState) return@setOnClickListener
+            selectOption(selectInfinity = true)
+        }
 
         itemStar.setOnClickListener {
+            if (isSubscribedState) return@setOnClickListener
             if (currentStars >= MAX_STARS) {
                 Toast.makeText(this, getString(R.string.stars_full_toast), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -123,13 +121,15 @@ class StarsActivity : BaseActivity() {
         }
 
         continueEnabledBtn.setOnClickListener {
-            if (isAnyOptionSelected) {
+            if (isAnyOptionSelected && !isSubscribedState) {
                 executePlanTransaction(isInfinitySelected)
             }
         }
     }
 
     private fun selectOption(selectInfinity: Boolean) {
+        if (isSubscribedState) return
+
         isAnyOptionSelected = true
         isInfinitySelected = selectInfinity
 
@@ -164,25 +164,32 @@ class StarsActivity : BaseActivity() {
                 val starsLong = snapshot.getLong("stars") ?: 15L
                 currentStars = starsLong.toInt()
                 isInfinityPlan = snapshot.getBoolean("subscription") ?: false
+                isSubscribedState = isInfinityPlan
+
                 val lastStarUsed = snapshot.getTimestamp("lastStarUsedTime")
 
                 coinCountText.text = currentCoins.toString()
                 countDownTimer?.cancel()
 
-                if (isInfinityPlan) {
+                if (isSubscribedState) {
                     centerStarGraphic.setImageResource(R.drawable.star_infinity)
                     attemptsLabel.text = getString(R.string.infinity)
                     attemptsLabel.setTextColor(ContextCompat.getColor(this, R.color.text_color))
+
                     infinityPriceContainer.visibility = View.GONE
                     infinityStatusText.visibility = View.VISIBLE
                     itemInfinity.isClickable = false
                     itemInfinity.setBackgroundResource(R.drawable.custom_background)
+
                     starPriceContainer.visibility = View.GONE
                     starStatusText.visibility = View.VISIBLE
                     starStatusText.text = getString(R.string.full_stars)
                     itemStar.isClickable = false
                     itemStar.setBackgroundResource(R.drawable.custom_background)
+
                     bottomActionContainer.visibility = View.GONE
+                    isAnyOptionSelected = false
+                    isInfinitySelected = false
                 } else {
                     bottomActionContainer.visibility = View.VISIBLE
                     centerStarGraphic.setImageResource(if (currentStars <= 0) R.drawable.star_null else R.drawable.star)
@@ -194,12 +201,14 @@ class StarsActivity : BaseActivity() {
                         starStatusText.text = getString(R.string.full_stars)
                         itemStar.isClickable = false
                         itemStar.setBackgroundResource(R.drawable.custom_background)
+
                         if (isAnyOptionSelected && !isInfinitySelected) selectOption(true)
                         else if (!isAnyOptionSelected) resetToInactiveState()
                     } else {
                         starStatusText.visibility = View.GONE
                         starPriceContainer.visibility = View.VISIBLE
                         itemStar.isClickable = true
+
                         if (isAnyOptionSelected) selectOption(isInfinitySelected)
                         else resetToInactiveState()
 
@@ -226,7 +235,7 @@ class StarsActivity : BaseActivity() {
         itemStar.setBackgroundResource(R.drawable.custom_background)
         startEnabledBtnContainer.visibility = View.GONE
         startDisabledBtnContainer.visibility = View.GONE
-        subscribeDisabledBtnContainer.visibility = View.VISIBLE
+        subscribeDisabledBtnContainer.visibility = if (isSubscribedState) View.GONE else View.VISIBLE
     }
 
     private fun clearSelectionState() {
@@ -248,7 +257,7 @@ class StarsActivity : BaseActivity() {
 
         countDownTimer = object : CountDownTimer(REGEN_TIME_MILLIS - elapsedTime, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                if (isInfinityPlan) return
+                if (isSubscribedState) return
                 val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
                 val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
                 val staticLabel = getString(R.string.next_star_in)
@@ -271,7 +280,12 @@ class StarsActivity : BaseActivity() {
         db.collection("users").document(user.uid).update(updates)
     }
 
+    // 🟢 ИСПРАВЛЕНО: раньше INFINITY и STAR кейсы отправляли по 3-4 отдельных
+    // transaction.update(ref, "field", value) вызова. Теперь каждый кейс — ОДНО
+    // объединённое обновление (map), одна атомарная запись.
     private fun executePlanTransaction(isInfinityPurchase: Boolean) {
+        if (isSubscribedState) return
+
         val cost = if (isInfinityPurchase) INFINITY_COST else REFILL_COST
         if (currentCoins < cost) {
             Toast.makeText(this, getString(R.string.not_enough_coins), Toast.LENGTH_SHORT).show()
@@ -280,23 +294,33 @@ class StarsActivity : BaseActivity() {
         }
         val user = auth.currentUser ?: return
         val userDocRef = db.collection("users").document(user.uid)
+
         startEnabledBtnContainer.visibility = View.GONE
         subscribeDisabledBtnContainer.visibility = View.GONE
         startDisabledBtnContainer.visibility = View.VISIBLE
+
         db.runTransaction { transaction ->
             val snapshot = transaction.get(userDocRef)
             val freshCoins = snapshot.getLong("coins") ?: 0L
             val freshStars = (snapshot.getLong("stars") ?: 15L).toInt()
+
             if (isInfinityPurchase) {
                 if (freshCoins >= INFINITY_COST) {
-                    transaction.update(userDocRef, "coins", freshCoins - INFINITY_COST)
-                    transaction.update(userDocRef, "subscription", true)
-                } else throw Exception(getString(R.string.not_enough_coins))
+                    val calendar = java.util.Calendar.getInstance().apply { add(java.util.Calendar.MONTH, 1) }
+                    transaction.update(userDocRef, mapOf(
+                        "coins" to freshCoins - INFINITY_COST,
+                        "subscription" to true,
+                        "subscriptionUntil" to com.google.firebase.Timestamp(calendar.time),
+                        "planType" to "monthly"
+                    ))
+                } else throw Exception(getString(R.string.transaction_failed))
             } else {
                 if (freshCoins >= REFILL_COST && freshStars < MAX_STARS) {
-                    transaction.update(userDocRef, "coins", freshCoins - REFILL_COST)
-                    transaction.update(userDocRef, "stars", MAX_STARS)
-                    transaction.update(userDocRef, "lastStarUsedTime", com.google.firebase.firestore.FieldValue.delete())
+                    transaction.update(userDocRef, mapOf(
+                        "coins" to freshCoins - REFILL_COST,
+                        "stars" to MAX_STARS,
+                        "lastStarUsedTime" to com.google.firebase.firestore.FieldValue.delete()
+                    ))
                 } else throw Exception(getString(R.string.transaction_failed))
             }
         }.addOnSuccessListener {

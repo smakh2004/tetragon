@@ -29,6 +29,10 @@ class ResultMathStormActivity : BaseActivity() {
     private lateinit var loadingOverlayContainer: FrameLayout
 
     private var currentScore: Int = 0
+    private var questionsAnswered: Int = 0
+
+    // Minimum questions the user must answer before XP is awarded.
+    private val minQuestionsForXp = 7
 
     // SoundPool variables
     private lateinit var soundPool: SoundPool
@@ -70,8 +74,9 @@ class ResultMathStormActivity : BaseActivity() {
             }
         }
 
-        // Get score from Intent
+        // Get score and questions answered from Intent
         currentScore = intent.getIntExtra("score", 0)
+        questionsAnswered = intent.getIntExtra("questionsAnswered", 0)
         resultText.text = currentScore.toString()
 
         // Enforce the full-screen loader layout immediately before task triggers execution
@@ -98,31 +103,39 @@ class ResultMathStormActivity : BaseActivity() {
         val userDocRef = firestore.collection("users").document(uid)
 
         firestore.runTransaction { transaction ->
+            // All reads must happen before any writes.
             val gameSnapshot = transaction.get(gameDocRef)
             val userSnapshot = transaction.get(userDocRef)
 
             val savedHighScore = gameSnapshot.getLong("highScore") ?: 0L
-            val currentTotalXp = userSnapshot.getLong("xp") ?: 0L
-            val currentMonthlyXp = userSnapshot.getLong("monthlyXP") ?: 0L
 
-            // Fetch current daily map or create a new one if it doesn't exist
-            val dailyXpMap = userSnapshot.get("dailyXPGains") as? MutableMap<String, Long> ?: mutableMapOf()
+            // Only award XP when the user answered more than 7 questions.
+            if (questionsAnswered > minQuestionsForXp) {
+                val currentTotalXp = userSnapshot.getLong("xp") ?: 0L
+                val currentMonthlyXp = userSnapshot.getLong("monthlyXP") ?: 0L
 
-            // Calculate gains (10 XP for finishing)
-            val xpGain = 10L
-            val currentTodayXp = dailyXpMap[todayKey] ?: 0L
+                // Fetch current daily map or create a new one if it doesn't exist
+                val dailyXpMap =
+                    userSnapshot.get("dailyXPGains") as? MutableMap<String, Long> ?: mutableMapOf()
 
-            // Update the Map with today's incremented XP
-            dailyXpMap[todayKey] = currentTodayXp + xpGain
+                // Calculate gains (10 XP for finishing)
+                val xpGain = 10L
+                val currentTodayXp = dailyXpMap[todayKey] ?: 0L
 
-            // Update User fields atomically
-            transaction.update(userDocRef, mapOf(
-                "xp" to (currentTotalXp + xpGain),
-                "monthlyXP" to (currentMonthlyXp + xpGain),
-                "dailyXPGains" to dailyXpMap
-            ))
+                // Update the Map with today's incremented XP
+                dailyXpMap[todayKey] = currentTodayXp + xpGain
 
-            // Check and update High Score
+                // Update User fields atomically
+                transaction.update(
+                    userDocRef, mapOf(
+                        "xp" to (currentTotalXp + xpGain),
+                        "monthlyXP" to (currentMonthlyXp + xpGain),
+                        "dailyXPGains" to dailyXpMap
+                    )
+                )
+            }
+
+            // Check and update High Score (always, regardless of XP gate)
             val isNewRecord = currentScore.toLong() > savedHighScore
             if (isNewRecord) {
                 transaction.set(gameDocRef, hashMapOf("highScore" to currentScore.toLong()))

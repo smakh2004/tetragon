@@ -94,6 +94,8 @@
                     </FrameLayout>
                 </FrameLayout>
 
+                <!-- REMOVE THE OPENING AND CLOSING COMMENT TAGS BELOW TO RESTORE GRADES 8-11 -->
+                <!--
                 <View
                     android:layout_width="2dp"
                     android:layout_height="20dp"
@@ -361,6 +363,7 @@
                         </LinearLayout>
                     </FrameLayout>
                 </FrameLayout>
+                -->
             </LinearLayout>
 
         </FrameLayout>

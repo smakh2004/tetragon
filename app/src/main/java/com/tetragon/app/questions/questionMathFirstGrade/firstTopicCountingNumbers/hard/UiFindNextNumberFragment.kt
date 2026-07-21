@@ -1,4 +1,4 @@
-package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers
+package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.hard
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -187,9 +187,9 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
                     if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
+                        resetUIForNext() // always reset first
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
-                            resetUIForNext()
                             activity.showRandomQuestion()
                         }
                     }

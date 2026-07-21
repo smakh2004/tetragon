@@ -18,10 +18,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.android.billingclient.api.*
 import com.tetragon.app.R
 import com.tetragon.app.subscriptionModel.IntroSubscriptionActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import java.util.Calendar
@@ -33,7 +35,15 @@ class ShopFragment : Fragment() {
     private val auth = FirebaseAuth.getInstance()
     private var userListener: ListenerRegistration? = null
 
-    // UI Components
+    private lateinit var billingClient: BillingClient
+    private var inAppProductDetailsList: List<ProductDetails> = emptyList()
+
+    companion object {
+        private const val COINS_100 = "coins_100"
+        private const val COINS_200 = "coins_200"
+        private const val COINS_500 = "coins_500"
+    }
+
     private lateinit var coinCountText: TextView
     private lateinit var itemStar: ConstraintLayout
     private lateinit var starPriceContainer: LinearLayout
@@ -42,7 +52,10 @@ class ShopFragment : Fragment() {
     private lateinit var infinityPriceContainer: LinearLayout
     private lateinit var infinityStatusText: TextView
 
-    // Claim Container UI Components
+    private lateinit var btnBuyCoins100: LinearLayout
+    private lateinit var btnBuyCoins200: LinearLayout
+    private lateinit var btnBuyCoins500: LinearLayout
+
     private lateinit var startContainer: FrameLayout
     private lateinit var startLessonLabel: TextView
     private lateinit var confirmBtn: LinearLayout
@@ -53,11 +66,9 @@ class ShopFragment : Fragment() {
     private lateinit var shopLineDivider: View
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
-    // --- HOISTED LOADING OVERLAY ---
     private lateinit var loadingOverlayContainer: FrameLayout
     private var isInitialDataLoaded = false
 
-    // State Variables
     private var currentCoins: Long = 0
     private var currentStars: Long = 0
     private var pendingPurchaseType: String? = null
@@ -72,6 +83,7 @@ class ShopFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
+        setupBillingClient()
         setupListeners(view)
     }
 
@@ -81,7 +93,6 @@ class ShopFragment : Fragment() {
         shopLineDivider = view.findViewById(R.id.shopLineDivider)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
-        // Purchase Item Views
         itemStar = view.findViewById(R.id.item_star)
         starPriceContainer = view.findViewById(R.id.star_price_container)
         starStatusText = view.findViewById(R.id.star_status_text)
@@ -90,45 +101,175 @@ class ShopFragment : Fragment() {
         infinityPriceContainer = view.findViewById(R.id.infinity_price_container)
         infinityStatusText = view.findViewById(R.id.infinity_status_text)
 
-        // Confirmation Drawer Views
+        btnBuyCoins100 = view.findViewById(R.id.btn_buy_coins_100)
+        btnBuyCoins200 = view.findViewById(R.id.btn_buy_coins_200)
+        btnBuyCoins500 = view.findViewById(R.id.btn_buy_coins_500)
+
         startContainer = view.findViewById(R.id.start_container)
         startLessonLabel = view.findViewById(R.id.start_lesson_label)
 
-        // References for the Button structure
         confirmBtn = view.findViewById(R.id.continue_enabled_btn)
         confirmCoinAmount = view.findViewById(R.id.confirm_coin_amount)
 
         confirmBtnContainer = view.findViewById(R.id.start_enabled_btn_container)
         processingBtnContainer = view.findViewById(R.id.start_disabled_btn_container)
 
-        // Find reference to full screen overlay layer target
         loadingOverlayContainer = view.findViewById(R.id.loadingOverlayContainer)
 
-        // Minimalist configuration to remove default shadow circles
         context?.let { ctx ->
             swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(ctx, R.color.blue_2))
         }
         swipeRefreshLayout.setSlingshotDistance(0)
         swipeRefreshLayout.setProgressViewEndTarget(false, 140)
 
-        // Initial UI State
         startContainer.visibility = View.GONE
         startContainer.alpha = 0f
+    }
+
+    private fun setupBillingClient() {
+        billingClient = BillingClient.newBuilder(requireContext())
+            .setListener { billingResult, purchases ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+                    for (purchase in purchases) {
+                        handleInAppPurchase(purchase, enforceOwnership = false)
+                    }
+                } else if (billingResult.responseCode != BillingClient.BillingResponseCode.USER_CANCELED) {
+                    Toast.makeText(context, billingResult.debugMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .enablePendingPurchases()
+            .build()
+
+        connectToGooglePlay()
+    }
+
+    private fun connectToGooglePlay() {
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    queryCoinPacks()
+
+                    val params = QueryPurchasesParams.newBuilder()
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build()
+
+                    billingClient.queryPurchasesAsync(params) { result, purchaseList ->
+                        if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                            for (purchase in purchaseList) {
+                                handleInAppPurchase(purchase, enforceOwnership = true)
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onBillingServiceDisconnected() {
+                connectToGooglePlay()
+            }
+        })
+    }
+
+    private fun queryCoinPacks() {
+        val productList = listOf(
+            QueryProductDetailsParams.Product.newBuilder().setProductId(COINS_100).setProductType(BillingClient.ProductType.INAPP).build(),
+            QueryProductDetailsParams.Product.newBuilder().setProductId(COINS_200).setProductType(BillingClient.ProductType.INAPP).build(),
+            QueryProductDetailsParams.Product.newBuilder().setProductId(COINS_500).setProductType(BillingClient.ProductType.INAPP).build()
+        )
+
+        val params = QueryProductDetailsParams.newBuilder().setProductList(productList).build()
+
+        billingClient.queryProductDetailsAsync(params) { _, detailsList ->
+            inAppProductDetailsList = detailsList
+        }
+    }
+
+    private fun launchCoinPurchaseFlow(productId: String) {
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            Toast.makeText(context, getString(R.string.error_auth_failed), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val productDetails = inAppProductDetailsList.find { it.productId == productId }
+        if (productDetails == null) {
+            Toast.makeText(context, getString(R.string.coin_pack_not_found), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val productDetailsParamsList = listOf(
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetails)
+                .build()
+        )
+
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(productDetailsParamsList)
+            .setObfuscatedAccountId(uid)
+            .build()
+
+        billingClient.launchBillingFlow(requireActivity(), billingFlowParams)
+    }
+
+    private fun handleInAppPurchase(purchase: Purchase, enforceOwnership: Boolean) {
+        if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED) {
+            return
+        }
+
+        if (enforceOwnership) {
+            val ownerUid = purchase.accountIdentifiers?.obfuscatedAccountId
+            val uid = auth.currentUser?.uid
+            if (ownerUid == null || ownerUid != uid) {
+                return
+            }
+        }
+
+        val consumeParams = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+
+        billingClient.consumeAsync(consumeParams) { billingResult, _ ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                activity?.runOnUiThread {
+                    val purchasedId = purchase.products.firstOrNull()
+                    val coinsToAward = when (purchasedId) {
+                        COINS_100 -> 100L
+                        COINS_200 -> 200L
+                        COINS_500 -> 500L
+                        else -> 0L
+                    }
+                    if (coinsToAward > 0) {
+                        awardCoinsToUser(coinsToAward)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun awardCoinsToUser(amount: Long) {
+        val uid = auth.currentUser?.uid ?: return
+        db.collection("users").document(uid)
+            .update("coins", FieldValue.increment(amount))
+            .addOnSuccessListener {
+                if (isAdded) {
+                    Toast.makeText(context, getString(R.string.coins_purchased_success, amount), Toast.LENGTH_LONG).show()
+                }
+            }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListeners(view: View) {
         val subscribeBtn = view.findViewById<View>(R.id.subscribe_enabled_btn)
 
-        // 1. Swipe Refresh Integration
+        btnBuyCoins100.setOnClickListener { launchCoinPurchaseFlow(COINS_100) }
+        btnBuyCoins200.setOnClickListener { launchCoinPurchaseFlow(COINS_200) }
+        btnBuyCoins500.setOnClickListener { launchCoinPurchaseFlow(COINS_500) }
+
         swipeRefreshLayout.setOnRefreshListener {
             refreshShopData(isManualSwipe = true)
         }
 
-        // 2. Scroll Behavior: Dismiss Drawer and Handle Divider Visibility dynamically
         shopScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (isAdded) {
-                // Toggles divider based on active scrolling offset state
                 shopLineDivider.visibility = if (scrollY > 0) View.VISIBLE else View.INVISIBLE
             }
 
@@ -137,7 +278,6 @@ class ShopFragment : Fragment() {
             }
         })
 
-        // 3. Background Touch: Dismiss Drawer
         shopScrollView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN && startContainer.visibility == View.VISIBLE) {
                 hidePurchaseDrawer()
@@ -145,7 +285,6 @@ class ShopFragment : Fragment() {
             false
         }
 
-        // 4. Purchase Triggers
         itemStar.setOnClickListener {
             val isSubscribed = starStatusText.visibility == View.VISIBLE && !itemStar.isClickable
             if (isSubscribed) {
@@ -155,7 +294,6 @@ class ShopFragment : Fragment() {
 
             if (currentStars < 15) {
                 pendingPurchaseType = "STAR"
-                // 🟢 CHANGED: Set the drawer text display price argument to "50"
                 showPurchaseDrawer(getString(R.string.refill_stars_label), "50")
             } else {
                 Toast.makeText(context, getString(R.string.stars_full_toast), Toast.LENGTH_SHORT).show()
@@ -167,12 +305,10 @@ class ShopFragment : Fragment() {
             showPurchaseDrawer(getString(R.string.monthly_infinity_label), "1000")
         }
 
-        // 5. Drawer Confirmation
         confirmBtn.setOnClickListener {
             handleConfirmPurchase()
         }
 
-        // 6. Subscription Button
         subscribeBtn.setOnClickListener {
             val intent = Intent(requireContext(), IntroSubscriptionActivity::class.java)
             startActivity(intent)
@@ -186,7 +322,6 @@ class ShopFragment : Fragment() {
             loadingOverlayContainer.visibility = View.VISIBLE
         }
 
-        // Cycle active Snapshot listeners to force real-time continuous remote updates
         userListener?.remove()
         observeUserStats()
     }
@@ -224,6 +359,10 @@ class ShopFragment : Fragment() {
         pendingPurchaseType = null
     }
 
+    // 🟢 ИСПРАВЛЕНО: раньше отправлялось несколько отдельных transaction.update(ref, "field", value)
+    // вызовов подряд. Теперь каждый кейс отправляет ОДНО объединённое обновление (map),
+    // чтобы весь набор полей менялся одним атомарным write — это и требуется для совместимости
+    // с правилами безопасности Firestore, и просто правильнее с точки зрения консистентности данных.
     private fun handleConfirmPurchase() {
         val type = pendingPurchaseType ?: return
         val uid = auth.currentUser?.uid ?: return
@@ -232,18 +371,18 @@ class ShopFragment : Fragment() {
         confirmBtnContainer.visibility = View.GONE
         processingBtnContainer.visibility = View.VISIBLE
 
-        // Use a Firestore Transaction to guarantee state isolation and prevent double-spending anomalies
         db.runTransaction { transaction ->
             val snapshot = transaction.get(userDocRef)
             val freshCoins = snapshot.getLong("coins") ?: 0L
-            val freshStars = snapshot.getLong("stars") ?: 0L
 
             when (type) {
                 "STAR" -> {
-                    // 🟢 CHANGED: Validate wallet has at least 50 coins, and deduct 50 coins instead of 15
                     if (freshCoins >= 50) {
-                        transaction.update(userDocRef, "coins", freshCoins - 50)
-                        transaction.update(userDocRef, "stars", 15L) // Keeps your max star count refill limit at 15
+                        transaction.update(userDocRef, mapOf(
+                            "coins" to freshCoins - 50,
+                            "stars" to 15L,
+                            "lastStarUsedTime" to FieldValue.delete()
+                        ))
                     } else {
                         throw Exception(getString(R.string.not_enough_coins))
                     }
@@ -251,10 +390,12 @@ class ShopFragment : Fragment() {
                 "INFINITY" -> {
                     if (freshCoins >= 1000) {
                         val calendar = Calendar.getInstance().apply { add(Calendar.MONTH, 1) }
-                        transaction.update(userDocRef, "coins", freshCoins - 1000)
-                        transaction.update(userDocRef, "subscriptionUntil", Timestamp(calendar.time))
-                        transaction.update(userDocRef, "planType", "monthly")
-                        transaction.update(userDocRef, "subscription", true)
+                        transaction.update(userDocRef, mapOf(
+                            "coins" to freshCoins - 1000,
+                            "subscriptionUntil" to Timestamp(calendar.time),
+                            "planType" to "monthly",
+                            "subscription" to true
+                        ))
                     } else {
                         throw Exception(getString(R.string.not_enough_coins))
                     }
@@ -299,13 +440,11 @@ class ShopFragment : Fragment() {
                     val isSubscriptionActive = snapshot.getBoolean("subscription") == true &&
                             expiry != null && expiry.toDate().after(Date())
 
-                    // Direct binding without modifying configuration attributes
                     coinCountText.text = currentCoins.toString()
 
                     updateItemUI(isSubscriptionActive, currentStars >= 15)
                 }
 
-                // Turn off pulling indicators across both sync configurations
                 swipeRefreshLayout.isRefreshing = false
 
                 if (!isInitialDataLoaded) {
@@ -318,7 +457,6 @@ class ShopFragment : Fragment() {
     private fun updateItemUI(isSubscribed: Boolean, isStarsFull: Boolean) {
         if (!isAdded) return
 
-        // Infinity Item
         if (isSubscribed) {
             infinityPriceContainer.visibility = View.GONE
             infinityStatusText.visibility = View.VISIBLE
@@ -329,7 +467,6 @@ class ShopFragment : Fragment() {
             itemInfinity.isClickable = true
         }
 
-        // Star Item
         if (isStarsFull || isSubscribed) {
             starPriceContainer.visibility = View.GONE
             starStatusText.visibility = View.VISIBLE
@@ -351,12 +488,17 @@ class ShopFragment : Fragment() {
         userListener?.remove()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::billingClient.isInitialized) {
+            billingClient.endConnection()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         if (view != null) {
             view?.findViewById<FrameLayout>(R.id.start_container)?.visibility = View.GONE
-            view?.findViewById<FrameLayout>(R.id.subscribe_enabled_btn_container)?.visibility = View.VISIBLE
-            view?.findViewById<FrameLayout>(R.id.subscribe_disabled_btn_container)?.visibility = View.INVISIBLE
         }
     }
 }

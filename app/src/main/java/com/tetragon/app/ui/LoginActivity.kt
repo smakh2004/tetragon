@@ -71,11 +71,24 @@ class LoginActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }
+        val currentUser = auth.currentUser ?: return
+
+        // Only auto-redirect a session that is actually complete: verified email AND an
+        // existing Firestore profile. Previously this redirected on *any* non-null user,
+        // which could drop an orphaned/unverified auth account into MainActivity with no
+        // profile document (empty state, session listener bound to a doc that doesn't
+        // exist). If the account isn't in a valid state we simply stay on the login
+        // screen and let the user sign in cleanly.
+        if (!currentUser.isEmailVerified) return
+
+        db.collection("users").document(currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
+                // else: no profile — abandoned/orphaned account. Stay on login.
+            }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

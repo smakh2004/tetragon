@@ -49,7 +49,8 @@
                     android:text="GRADE 5"
                     android:textAllCaps="true"
                     android:textColor="@color/gray_1"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/next_topic_name"
@@ -59,7 +60,8 @@
                     android:fontFamily="@font/inter_semibold"
                     android:text="Topic 1: Fractions &amp; Decimals"
                     android:textColor="@color/text_color"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:visibility="gone"/>
 
                 <FrameLayout
                     android:id="@+id/move_on_btn_container"
@@ -69,7 +71,8 @@
                     android:layout_marginBottom="5dp"
                     android:minWidth="220dp"
                     android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
+                    android:paddingRight="16dp"
+                    android:visibility="gone">
 
                     <View
                         android:layout_width="match_parent"
@@ -125,47 +128,276 @@
                     android:background="@color/gray_2" />
             </LinearLayout>
 
-            <app.rive.runtime.kotlin.RiveAnimationView
-                android:id="@+id/topic6"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="530dp"
-                app:riveResource="@raw/progress_path_even"
-                app:riveStateMachine="State Machine 1" />
+                android:layout_height="530dp">
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/topic6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:riveResource="@raw/progress_path_even"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/kacheli_in_path6"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintVertical_bias="0.64"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveResource="@raw/clock_in_path"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/buttons_in_path6"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.1"
+                    app:layout_constraintVertical_bias="0.32"
+                    app:riveResource="@raw/calculator_in_path"
+                    app:riveStateMachine="State Machine 1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <app.rive.runtime.kotlin.RiveAnimationView
-                android:id="@+id/topic5"
-                android:layout_width="match_parent"
-                android:layout_height="530dp"
-                app:riveResource="@raw/progress_path_odd"
+                android:id="@+id/mr_square_junction_5_6"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="-75dp"
+                android:layout_marginBottom="-105dp"
+                app:riveResource="@raw/tree_in_path"
                 app:riveStateMachine="State Machine 1" />
 
-            <app.rive.runtime.kotlin.RiveAnimationView
-                android:id="@+id/topic4"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="530dp"
-                app:riveResource="@raw/progress_path_even"
-                app:riveStateMachine="State Machine 1" />
+                android:layout_height="530dp">
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/topic5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:riveResource="@raw/progress_path_odd"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/clock_in_path5"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintVertical_bias="0.34"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveResource="@raw/clock_in_path"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/calculator_in_path5"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.1"
+                    app:layout_constraintVertical_bias="0.65"
+                    app:riveResource="@raw/calculator_in_path"
+                    app:riveStateMachine="State Machine 1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <app.rive.runtime.kotlin.RiveAnimationView
-                android:id="@+id/topic3"
-                android:layout_width="match_parent"
-                android:layout_height="530dp"
-                app:riveResource="@raw/progress_path_odd"
+                android:id="@+id/frog_junction_4_5"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="40dp"
+                android:layout_marginTop="-75dp"
+                android:layout_marginBottom="-105dp"
+                app:riveResource="@raw/frog_in_path"
                 app:riveStateMachine="State Machine 1" />
 
-            <app.rive.runtime.kotlin.RiveAnimationView
-                android:id="@+id/topic2"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="530dp"
-                app:riveResource="@raw/progress_path_even"
-                app:riveStateMachine="State Machine 1" />
+                android:layout_height="530dp">
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/topic4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:riveResource="@raw/progress_path_even"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/kacheli_in_path4"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintVertical_bias="0.64"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveResource="@raw/clock_in_path"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/buttons_in_path4"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.1"
+                    app:layout_constraintVertical_bias="0.32"
+                    app:riveResource="@raw/calculator_in_path"
+                    app:riveStateMachine="State Machine 1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <app.rive.runtime.kotlin.RiveAnimationView
-                android:id="@+id/topic1"
-                android:layout_width="match_parent"
-                android:layout_height="530dp"
-                app:riveResource="@raw/progress_path_odd"
+                android:id="@+id/mr_square_junction_3_4"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="-75dp"
+                android:layout_marginBottom="-105dp"
+                app:riveResource="@raw/tree_in_path"
                 app:riveStateMachine="State Machine 1" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="530dp">
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/topic3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:riveResource="@raw/progress_path_odd"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/clock_in_path3"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintVertical_bias="0.34"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveResource="@raw/clock_in_path"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/calculator_in_path3"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.1"
+                    app:layout_constraintVertical_bias="0.65"
+                    app:riveResource="@raw/calculator_in_path"
+                    app:riveStateMachine="State Machine 1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/frog_junction_2_3"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="40dp"
+                android:layout_marginTop="-75dp"
+                android:layout_marginBottom="-105dp"
+                app:riveResource="@raw/frog_in_path"
+                app:riveStateMachine="State Machine 1" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="530dp">
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/topic2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:riveResource="@raw/progress_path_even"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/kacheli_in_path2"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintVertical_bias="0.64"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveResource="@raw/clock_in_path"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/buttons_in_path2"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.1"
+                    app:layout_constraintVertical_bias="0.32"
+                    app:riveResource="@raw/calculator_in_path"
+                    app:riveStateMachine="State Machine 1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/mr_square_junction_1_2"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="-75dp"
+                android:layout_marginBottom="-105dp"
+                app:riveResource="@raw/tree_in_path"
+                app:riveStateMachine="State Machine 1" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="530dp">
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/topic1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:riveResource="@raw/progress_path_odd"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/clock_in_path1"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintVertical_bias="0.34"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveResource="@raw/clock_in_path"
+                    app:riveStateMachine="State Machine 1" />
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/calculator_in_path1"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.1"
+                    app:layout_constraintVertical_bias="0.65"
+                    app:riveResource="@raw/calculator_in_path"
+                    app:riveStateMachine="State Machine 1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
     </ScrollView>

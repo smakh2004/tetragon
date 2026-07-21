@@ -28,6 +28,8 @@ class MathFragment : Fragment() {
         setupGradeButton(view.findViewById(R.id.class_btn_2), 2)
         setupGradeButton(view.findViewById(R.id.class_btn_3), 3)
         setupGradeButton(view.findViewById(R.id.class_btn_4), 4)
+
+        /* UNCOMMENT THIS BLOCK TO RESTORE GRADES 5-11
         setupGradeButton(view.findViewById(R.id.class_btn_5), 5)
         setupGradeButton(view.findViewById(R.id.class_btn_6), 6)
         setupGradeButton(view.findViewById(R.id.class_btn_7), 7)
@@ -35,6 +37,7 @@ class MathFragment : Fragment() {
         setupGradeButton(view.findViewById(R.id.class_btn_9), 9)
         setupGradeButton(view.findViewById(R.id.class_btn_10), 10)
         setupGradeButton(view.findViewById(R.id.class_btn_11), 11)
+        */
     }
 
     /**

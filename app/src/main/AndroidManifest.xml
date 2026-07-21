@@ -297,6 +297,7 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true"
             android:theme="@style/Theme.Tetragon.Splash">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

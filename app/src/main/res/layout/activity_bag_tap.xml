@@ -18,78 +18,28 @@
         android:clipChildren="false"
         android:clipToPadding="false">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/currentBalanceContainer"
+        <TextView
+            android:id="@+id/rewardStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/custom_background"
-            android:padding="6dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingStart="10dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="5dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/coin" />
-
-                <TextView
-                    android:id="@+id/currentCoinCountText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:fontFamily="@font/inter_semibold"
-                    android:text="0"
-                    android:textColor="@color/text_color"
-                    android:textSize="16sp" />
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <LinearLayout
-            android:id="@+id/coinRewardContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginBottom="120dp"
+            android:fontFamily="@font/inter_semibold"
+            android:text="@string/tap_to_open_bag"
+            android:textColor="@color/text_color"
+            android:textSize="24sp"
             android:gravity="center"
-            android:visibility="gone"
-            android:translationY="10dp"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            app:layout_constraintEnd_toEndOf="@+id/currentBalanceContainer"
-            app:layout_constraintStart_toStartOf="@+id/currentBalanceContainer"
-            app:layout_constraintBottom_toTopOf="@+id/currentBalanceContainer">
-
-            <TextView
-                android:id="@+id/coinRewardText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+20"
-                android:textColor="#FFCC00"
-                android:textSize="18sp"
-                android:fontFamily="@font/inter_bold"
-                android:textStyle="bold" />
-        </LinearLayout>
+            android:elevation="2dp"
+            app:layout_constraintBottom_toBottomOf="@+id/bag"
+            app:layout_constraintEnd_toEndOf="@+id/bag"
+            app:layout_constraintStart_toStartOf="@+id/bag" />
 
         <app.rive.runtime.kotlin.RiveAnimationView
             android:id="@+id/bag"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:maxWidth="600dp"
-            app:layout_constraintWidth_max="600dp"
-            app:layout_constraintDimensionRatio="H, 1:1"
+            android:maxWidth="700dp"
+            app:layout_constraintWidth_max="700dp"
+            app:layout_constraintDimensionRatio="H, 1:1.8"
             app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

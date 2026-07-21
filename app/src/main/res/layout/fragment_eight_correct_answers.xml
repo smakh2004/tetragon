@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://tools.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".questions.EightCorrectAnswersFragment">
+
+    <!-- Text above animation -->
+    <TextView
+        android:id="@+id/eightCorrectText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/_8_correct"
+        android:textSize="26sp"
+        android:fontFamily="@font/inter_semibold"
+        android:textColor="@color/yellow_1"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="48dp"/>
+
+    <!-- Fixed capital 'P' in riveAutoPlay -->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/topic8Correct"
+        android:layout_width="500dp"
+        android:layout_height="700dp"
+        android:layout_gravity="bottom|center_horizontal"
+        app:riveResource="@raw/mr_square_eight_correct"
+        app:riveStateMachine="State Machine 1"
+        app:riveAutoPlay="false"/>
+
+</FrameLayout>

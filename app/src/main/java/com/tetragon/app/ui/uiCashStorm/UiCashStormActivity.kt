@@ -213,7 +213,10 @@ class UiCashStormActivity : BaseActivity() {
         if (isNavigatingToResult || isFinishing) return
         isNavigatingToResult = true
         controller.cancelQuizTimer()
-        val intent = Intent(this, ResultCashStormActivity::class.java).apply { putExtra("score", score) }
+        val intent = Intent(this, ResultCashStormActivity::class.java).apply {
+            putExtra("score", score)
+            putExtra("questionsAnswered", controller.getQuestionsAnswered())
+        }
         startActivity(intent)
         finish()
     }

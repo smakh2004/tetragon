@@ -7,14 +7,61 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@color/white"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     tools:context=".questions.StreakGainedActivity">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- RIVE STREAK ANIMATION VIEW -->
+        <!-- Capped with constraintWidth_max / constraintHeight_max so it doesn't -->
+        <!-- balloon on tablets/large screens; constrainedWidth lets the max win -->
+        <!-- over match_parent-derived width, and it stays centered via bias. -->
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/streak_rive_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="-60dp"
+            android:layout_marginTop="-100dp"
+            android:layout_marginEnd="-60dp"
+            app:layout_constrainedWidth="true"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintWidth_max="480dp"
+            app:layout_constraintHeight_max="480dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:riveAutoPlay="true"
+            app:riveResource="@raw/streak"
+            app:riveStateMachine="State Machine 1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 2. MR SQUARE ANIMATION (Rendered over the streak canvas) -->
+    <!-- Same cap applied here; layout_width is no longer match_parent so it -->
+    <!-- can't grow past the max and collide with the streak animation above. -->
     <app.rive.runtime.kotlin.RiveAnimationView
         android:id="@+id/streak_mr_square"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="-60dp"
         android:layout_marginEnd="-60dp"
+        android:alpha="0"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintWidth_max="560dp"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,304 +69,76 @@
         app:riveResource="@raw/streak_gained_mr_square"
         app:riveStateMachine="State Machine 1" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/topBarContainer"
+    <!-- 3. CONTINUE BUTTON CONTAINER (Rendered on top of everything) -->
+    <!-- Added layout translationZ elevation and padding bottom to stand out cleanly -->
+    <FrameLayout
+        android:id="@+id/continue_btn_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
+        android:alpha="0"
+        android:translationZ="10dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingBottom="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_semibold"
-            android:text="12"
-            android:textColor="@color/black_2"
-            android:textSize="80sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_semibold"
-            android:text="@string/days_of_mindful_problem_solving"
-            android:textColor="@color/text_color"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-        <!-- WEEKLY STREAK CONTAINER -->
-        <LinearLayout
-            android:id="@+id/week_streak_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4">
-
-            <!-- Monday -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/mo_tick"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:contentDescription="Monday tick"
-                    android:src="@drawable/circle_tick_blue" />
-
-                <TextView
-                    android:id="@+id/mo_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Mo"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/text_color"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Tuesday -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/tu_tick"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:contentDescription="Tuesday tick"
-                    android:src="@drawable/circle_tick_blue" />
-
-                <TextView
-                    android:id="@+id/tu_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Tu"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/text_color"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Wednesday -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/we_tick"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:contentDescription="Wednesday tick"
-                    android:src="@drawable/circle_tick_blue" />
-
-                <TextView
-                    android:id="@+id/we_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="We"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/text_color"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Thursday -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/th_tick"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:contentDescription="Thursday tick"
-                    android:src="@drawable/circle_tick_blue" />
-
-                <TextView
-                    android:id="@+id/th_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Th"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/text_color"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Friday (not done yet) -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/fr_tick"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:contentDescription="Friday tick"
-                    android:src="@drawable/circle_tick_gray" />
-
-                <TextView
-                    android:id="@+id/fr_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Fr"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/text_color"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Saturday (not done yet) -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/sa_tick"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:contentDescription="Saturday tick"
-                    android:src="@drawable/circle_tick_gray" />
-
-                <TextView
-                    android:id="@+id/sa_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Sa"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/text_color"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Sunday (not done yet) -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/su_tick"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:contentDescription="Sunday tick"
-                    android:src="@drawable/circle_tick_gray" />
-
-                <TextView
-                    android:id="@+id/su_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Su"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/text_color"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- CONTINUE BUTTON -->
+        <!-- ENABLED CONTINUE BUTTON -->
         <FrameLayout
-            android:id="@+id/continue_btn_container"
-            android:layout_width="0dp"
+            android:id="@+id/continue_enabled_btn_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:paddingBottom="5dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:visibility="visible">
 
-            <!-- ENABLED CONTINUE BUTTON -->
-            <FrameLayout
-                android:id="@+id/continue_enabled_btn_container"
+            <View
+                android:id="@+id/continue_enabled_button_background"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="visible">
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="@color/black_2"
+                android:translationY="5dp" />
 
-                <View
-                    android:id="@+id/continue_enabled_button_background"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/custom_button"
-                    android:backgroundTint="@color/black_2"
-                    android:translationY="5dp" />
-
-                <Button
-                    android:id="@+id/continue_enabled_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/custom_button"
-                    android:fontFamily="@font/inter_semibold"
-                    android:stateListAnimator="@drawable/button_animator"
-                    android:text="@string/continue_text"
-                    android:textColor="@color/white"
-                    android:textSize="17sp"
-                    app:backgroundTint="@color/black_3" />
-            </FrameLayout>
-
-            <!-- DISABLED CONTINUE BUTTON -->
-            <FrameLayout
-                android:id="@+id/continue_disabled_btn_container"
+            <Button
+                android:id="@+id/continue_enabled_btn"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="invisible">
-
-                <!-- shadow -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/custom_button"
-                    android:backgroundTint="@color/gray_2"
-                    android:translationY="5dp" />
-
-                <!-- text over shadow -->
-                <TextView
-                    android:id="@+id/check_disabled_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:fontFamily="@font/inter_semibold"
-                    android:gravity="center"
-                    android:text="@string/continue_text"
-                    android:textColor="@color/gray_1"
-                    android:textSize="17sp"
-                    android:translationY="5dp" />
-            </FrameLayout>
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:fontFamily="@font/inter_semibold"
+                android:stateListAnimator="@drawable/button_animator"
+                android:text="@string/continue_text"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                app:backgroundTint="@color/black_3" />
         </FrameLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- DISABLED CONTINUE BUTTON -->
+        <FrameLayout
+            android:id="@+id/continue_disabled_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="@color/gray_2"
+                android:translationY="5dp" />
+
+            <TextView
+                android:id="@+id/check_disabled_btn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:text="@string/continue_text"
+                android:textColor="@color/gray_1"
+                android:textSize="17sp"
+                android:translationY="5dp" />
+        </FrameLayout>
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

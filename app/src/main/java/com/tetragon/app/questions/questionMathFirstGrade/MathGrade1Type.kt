@@ -9,8 +9,12 @@ enum class MathGrade1Type(val xp: Int, val complexity: MathComplexity) {
     HAND_COUNT(1, MathComplexity.EASY),
     FIND_MISSED_NUMBER(2, MathComplexity.MEDIUM),
     ANGLES(2, MathComplexity.MEDIUM),
+    FIND_LARGEST_NUMBER(2, MathComplexity.MEDIUM),
+    FIND_SMALLEST_NUMBER(2, MathComplexity.MEDIUM),
     COUNT_BY(3, MathComplexity.HARD),
     FIND_NEXT_NUMBER(3, MathComplexity.HARD),
+    COUNT_BY_DRAG(3, MathComplexity.HARD),
+    NUMBER_CONNECTING(3, MathComplexity.HARD),
 
     ADDITION_NUMBERS(1, MathComplexity.EASY),
     ADDITION_MISSED_NUMBER(2, MathComplexity.MEDIUM),

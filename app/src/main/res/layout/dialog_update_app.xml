@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="24dp"
+        app:cardCornerRadius="32dp"
+        app:strokeWidth="0dp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="false">
+
+        <!-- Note: We apply the background color directly here to match your custom design -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/custom_background_less_circular"
+            android:padding="22dp"
+            android:gravity="center_horizontal">
+
+            <!-- Bold Dynamic Title -->
+            <TextView
+                android:id="@+id/tv_update_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/update_available_title"
+                android:textColor="@color/text_color"
+                android:textSize="22sp"
+                android:fontFamily="@font/inter_semibold"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Descriptive Message Body -->
+            <TextView
+                android:id="@+id/tv_update_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/update_available_message"
+                android:textColor="@color/text_color"
+                android:textSize="15sp"
+                android:fontFamily="@font/inter"
+                android:lineSpacingMultiplier="1.2"
+                android:gravity="center"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- CONTINUE BUTTON CONTAINER -->
+            <FrameLayout
+                android:id="@+id/continue_btn_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp">
+
+                <!-- ENABLED CONTINUE BUTTON -->
+                <FrameLayout
+                    android:id="@+id/continue_enabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
+
+                    <!-- 3D Shadow Layer -->
+                    <View
+                        android:id="@+id/continue_enabled_button_background"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/black_2"
+                        android:translationY="5dp" />
+
+                    <!-- Main Action Button Interacting Layer -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_update_action"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:fontFamily="@font/inter_semibold"
+                        android:stateListAnimator="@drawable/button_animator"
+                        android:text="@string/update_button_action"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        app:backgroundTint="@color/black_3" />
+                </FrameLayout>
+
+                <!-- DISABLED CONTINUE BUTTON -->
+                <FrameLayout
+                    android:id="@+id/continue_disabled_btn_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
+
+                    <!-- Disabled Shadow Layer -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/gray_2"
+                        android:translationY="5dp" />
+
+                    <!-- Disabled Top Text Layer -->
+                    <TextView
+                        android:id="@+id/check_disabled_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/gray_2"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:text="@string/update_button_action"
+                        android:textColor="@color/gray_1"
+                        android:textSize="17sp" />
+                </FrameLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>

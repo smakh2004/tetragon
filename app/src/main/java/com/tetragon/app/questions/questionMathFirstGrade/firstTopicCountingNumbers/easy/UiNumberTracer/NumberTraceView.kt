@@ -1,4 +1,4 @@
-package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.UiNumberTracer
+package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy.UiNumberTracer
 
 import android.content.Context
 import android.graphics.Canvas
@@ -70,6 +70,10 @@ class NumberTraceView @JvmOverloads constructor(
     private val fillPath = Path()
     private var pathPoints = listOf<PointF>()
 
+    // Indices in pathPoints where a new stroke (contour) begins.
+    // Used to support multi-stroke glyphs like "4" where the pen lifts.
+    private val contourStartIndices = mutableSetOf<Int>()
+
     private var trackWidth = 70f
     private var knobRadius = 65f
     private var currentProgressIndex = 0
@@ -139,11 +143,11 @@ class NumberTraceView @JvmOverloads constructor(
                 numberPath.cubicTo(w * 0.73f, h * 0.86f, w * 0.27f, h * 0.86f, w * 0.26f, h * 0.70f)
             }
             4 -> {
-                numberPath.moveTo(w * 0.31f, h * 0.22f)
-                numberPath.lineTo(w * 0.23f, h * 0.58f)
-                numberPath.lineTo(w * 0.68f, h * 0.58f)
-                numberPath.moveTo(w * 0.68f, h * 0.22f)
-                numberPath.lineTo(w * 0.68f, h * 0.84f)
+                numberPath.moveTo(w * 0.31f, h * 0.22f)   // top of diagonal
+                numberPath.lineTo(w * 0.23f, h * 0.58f)   // down-left
+                numberPath.lineTo(w * 0.68f, h * 0.58f)   // across to the crossing
+                numberPath.lineTo(w * 0.68f, h * 0.22f)   // UP the vertical to the top
+                numberPath.lineTo(w * 0.68f, h * 0.84f)   // DOWN to the bottom
             }
             5 -> {
                 numberPath.moveTo(w * 0.69f, h * 0.18f)
@@ -182,8 +186,12 @@ class NumberTraceView @JvmOverloads constructor(
         val pm = PathMeasure(numberPath, false)
         val tempPoints = mutableListOf<PointF>()
         val pos = FloatArray(2)
+        contourStartIndices.clear()
 
         do {
+            // Record where this stroke begins in the flattened point list.
+            contourStartIndices.add(tempPoints.size)
+
             val length = pm.length
             val step = 4f
             var distance = 0f
@@ -211,8 +219,14 @@ class NumberTraceView @JvmOverloads constructor(
         guidePath.moveTo(pathPoints.first().x, pathPoints.first().y)
 
         for (i in 1 until pathPoints.size) {
-            trackPath.lineTo(pathPoints[i].x, pathPoints[i].y)
-            guidePath.lineTo(pathPoints[i].x, pathPoints[i].y)
+            // Start of a new stroke: lift the pen instead of drawing a bridge line.
+            if (i in contourStartIndices) {
+                trackPath.moveTo(pathPoints[i].x, pathPoints[i].y)
+                guidePath.moveTo(pathPoints[i].x, pathPoints[i].y)
+            } else {
+                trackPath.lineTo(pathPoints[i].x, pathPoints[i].y)
+                guidePath.lineTo(pathPoints[i].x, pathPoints[i].y)
+            }
         }
     }
 
@@ -222,7 +236,12 @@ class NumberTraceView @JvmOverloads constructor(
 
         fillPath.moveTo(pathPoints.first().x, pathPoints.first().y)
         for (i in 1..currentProgressIndex) {
-            fillPath.lineTo(pathPoints[i].x, pathPoints[i].y)
+            // Don't fill across the gap between separate strokes.
+            if (i in contourStartIndices) {
+                fillPath.moveTo(pathPoints[i].x, pathPoints[i].y)
+            } else {
+                fillPath.lineTo(pathPoints[i].x, pathPoints[i].y)
+            }
         }
     }
 
@@ -278,15 +297,30 @@ class NumberTraceView @JvmOverloads constructor(
         // Sample points slightly ahead to get smooth direction orientation
         val targetLookahead = minOf(currentProgressIndex + 6, pathPoints.size - 1)
 
-        // If we are at the absolute end, look backward slightly to maintain final correct orientation angle
-        val angleDeg = if (targetLookahead == currentProgressIndex && currentProgressIndex > 0) {
-            val past = pathPoints[currentProgressIndex - 6.coerceAtLeast(0)]
+        // Avoid pointing across a stroke gap: if the look-ahead point belongs to a
+        // different stroke than the knob, clamp it to the end of the current stroke.
+        val safeLookahead = run {
+            var idx = targetLookahead
+            for (j in (currentProgressIndex + 1)..targetLookahead) {
+                if (j in contourStartIndices) {
+                    idx = j - 1
+                    break
+                }
+            }
+            idx.coerceAtLeast(currentProgressIndex)
+        }
+
+        // If we are at the absolute end (or clamped to it), look backward slightly
+        // to maintain final correct orientation angle.
+        val angleDeg = if (safeLookahead == currentProgressIndex && currentProgressIndex > 0) {
+            val pastIndex = (currentProgressIndex - 6).coerceAtLeast(0)
+            val past = pathPoints[pastIndex]
             val origin = pathPoints[currentProgressIndex]
             val angleRad = Math.atan2((origin.y - past.y).toDouble(), (origin.x - past.x).toDouble())
             Math.toDegrees(angleRad).toFloat()
         } else {
             val origin = pathPoints[currentProgressIndex]
-            val future = pathPoints[targetLookahead]
+            val future = pathPoints[safeLookahead]
             val angleRad = Math.atan2((future.y - origin.y).toDouble(), (future.x - origin.x).toDouble())
             Math.toDegrees(angleRad).toFloat()
         }
@@ -323,6 +357,9 @@ class NumberTraceView @JvmOverloads constructor(
                 val distanceToKnob = hypot(x - currentKnobPos.x, y - currentKnobPos.y)
                 if (distanceToKnob <= knobRadius * 1.6f) {
                     isDragging = true
+                } else if (tryStartNextContour(x, y)) {
+                    // User lifted the pen and re-grabbed the start of the next stroke.
+                    isDragging = true
                 }
             }
             MotionEvent.ACTION_MOVE -> {
@@ -337,12 +374,46 @@ class NumberTraceView @JvmOverloads constructor(
         return true
     }
 
+    /**
+     * When the knob sits at the end of one stroke and the next stroke starts
+     * somewhere else (e.g. the vertical bar of "4"), allow the user to grab the
+     * start of that next stroke and continue. Only fires once the current stroke
+     * is fully traced, so the completion percentage stays meaningful.
+     */
+    private fun tryStartNextContour(touchX: Float, touchY: Float): Boolean {
+        val nextIndex = currentProgressIndex + 1
+        if (nextIndex >= pathPoints.size || nextIndex !in contourStartIndices) return false
+
+        val nextStart = pathPoints[nextIndex]
+        if (hypot(touchX - nextStart.x, touchY - nextStart.y) <= knobRadius * 1.8f) {
+            currentProgressIndex = nextIndex
+            currentKnobPos.set(nextStart)
+            invalidate()
+
+            onTraceProgressListener?.invoke(currentFilledPercentage)
+
+            if (currentProgressIndex == pathPoints.size - 1) {
+                isCompleted = true
+                isDragging = false
+            }
+            return true
+        }
+        return false
+    }
+
     private fun processDragMovement(touchX: Float, touchY: Float) {
+        // Handle crossing a stroke gap first (multi-stroke glyphs like "4").
+        if (tryStartNextContour(touchX, touchY)) return
+
         val lookAheadLimit = minOf(currentProgressIndex + 15, pathPoints.size - 1)
         var closestIndex = currentProgressIndex
         var minDistance = Float.MAX_VALUE
 
         for (i in currentProgressIndex..lookAheadLimit) {
+            // Never let the closest-point search jump across a stroke boundary;
+            // that transition is handled explicitly by tryStartNextContour.
+            if (i > currentProgressIndex && i in contourStartIndices) break
+
             val pt = pathPoints[i]
             val dist = hypot(touchX - pt.x, touchY - pt.y)
             if (dist < minDistance) {

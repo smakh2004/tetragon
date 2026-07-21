@@ -1,6 +1,7 @@
 package com.tetragon.app.questions.questionMathThirdGrade
 
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Rect
@@ -56,7 +57,47 @@ class Math3GradeFragment : Fragment() {
     private lateinit var topic3: RiveAnimationView
     private lateinit var topic4: RiveAnimationView
 
+    // --- XML SUB-DECORATIONS & PATH JUNCTIONS ---
+    private var clockInPath1: RiveAnimationView? = null
+    private var calculatorInPath1: RiveAnimationView? = null
+    private var mrSquareJunction12: RiveAnimationView? = null
+
+    private var kacheliInPath2: RiveAnimationView? = null
+    private var buttonsInPath2: RiveAnimationView? = null
+    private var frogJunction23: RiveAnimationView? = null
+
+    private var clockInPath3: RiveAnimationView? = null
+    private var calculatorInPath3: RiveAnimationView? = null
+    private var mrSquareJunction34: RiveAnimationView? = null
+
+    private var kacheliInPath4: RiveAnimationView? = null
+    private var buttonsInPath4: RiveAnimationView? = null
+
     private val topicViews by lazy { listOf(topic1, topic2, topic3, topic4) }
+
+    // Matched positioning lists corresponding to indexing rules
+    private val calculatorViews by lazy { listOf(calculatorInPath1, null, calculatorInPath3, null) }
+    private val clockViews by lazy { listOf(clockInPath1, null, clockInPath3, null) }
+    private val junctionViews by lazy { listOf(mrSquareJunction12, null, mrSquareJunction34, null) }
+
+    private val kacheliViews by lazy { listOf(null, kacheliInPath2, null, kacheliInPath4) }
+    private val buttonsViews by lazy { listOf(null, buttonsInPath2, null, buttonsInPath4) }
+    private val frogJunctionViews by lazy { listOf(null, frogJunction23, null, null) }
+
+    // --- DECORATION TRACKING HASHMAPS ---
+    private val calculatorPlayedStates = HashMap<Int, Boolean>()
+    private val clockPlayedStates = HashMap<Int, Boolean>()
+    private val junctionPlayedStates = HashMap<Int, Boolean>()
+    private val kacheliPlayedStates = HashMap<Int, Boolean>()
+    private val buttonsPlayedStates = HashMap<Int, Boolean>()
+    private val frogJunctionPlayedStates = HashMap<Int, Boolean>()
+
+    // --- MEMORY AND VIEWPORT LAYER DEBOUNCING ---
+    private val riveVisibilityCandidates = mutableListOf<RiveAnimationView>()
+    private val rivePlayingStates = HashMap<RiveAnimationView, Boolean>()
+    private val animatorsMap = HashMap<String, ValueAnimator>()
+    private val reusableRect = Rect()
+    private var visibilityBuffer = 0
 
     // --- LOCALIZED TOPICS (Grade 3) ---
     private val topicNames by lazy {
@@ -92,9 +133,12 @@ class Math3GradeFragment : Fragment() {
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private var topicProgressListener: ListenerRegistration? = null
 
-    private var currentTopicProgress = mutableMapOf<String, Float>()
-    private var claimedRewards = mutableMapOf<String, Boolean>()
-    private var isUnlocked = mutableMapOf<String, Boolean>()
+    private val currentTopicProgress = HashMap<String, Float>()
+    private val claimedRewards = HashMap<String, Boolean>()
+    private val isUnlocked = HashMap<String, Boolean>()
+
+    private data class RiveButtonState(val finished: Boolean, val unlocked: Boolean, val claimed: Boolean)
+    private val lastPushedRiveState = HashMap<String, RiveButtonState>()
 
     private var userStars: Int = 15
     private var isInfinity: Boolean = false
@@ -105,6 +149,11 @@ class Math3GradeFragment : Fragment() {
     private var userHasScrolled = false
     private var lastReportedTopic = ""
     private var currentTargetIndex: Int = 0
+
+    private val scrollRunnable = Runnable {
+        determineVisibleTopic()
+        updateRiveActiveStates()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_math3_grade, container, false)
@@ -117,7 +166,8 @@ class Math3GradeFragment : Fragment() {
 
         scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             userHasScrolled = true
-            determineVisibleTopic()
+            scrollView.removeCallbacks(scrollRunnable)
+            scrollView.postDelayed(scrollRunnable, 60)
             if (startContainer.visibility == View.VISIBLE) {
                 startContainer.animate().cancel()
                 startContainer.visibility = View.GONE
@@ -133,7 +183,7 @@ class Math3GradeFragment : Fragment() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             startActivity(intent)
-            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            (requireActivity() as? Activity)?.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
         backToGrade2Btn.setOnClickListener {
@@ -143,7 +193,7 @@ class Math3GradeFragment : Fragment() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             startActivity(intent)
-            requireActivity().overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+            (requireActivity() as? Activity)?.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
         }
 
         scrollTargetContainer.setOnClickListener {
@@ -175,11 +225,70 @@ class Math3GradeFragment : Fragment() {
         topic3 = view.findViewById(R.id.topic3)
         topic4 = view.findViewById(R.id.topic4)
 
+        // --- LOOKUP VIEW REFERENCES BY THE EXACT XML IDS ---
+        clockInPath1 = view.findViewById(R.id.clock_in_path1)
+        calculatorInPath1 = view.findViewById(R.id.calculator_in_path1)
+        mrSquareJunction12 = view.findViewById(R.id.mr_square_junction_1_2)
+
+        kacheliInPath2 = view.findViewById(R.id.kacheli_in_path2)
+        buttonsInPath2 = view.findViewById(R.id.buttons_in_path2)
+        frogJunction23 = view.findViewById(R.id.frog_junction_2_3)
+
+        clockInPath3 = view.findViewById(R.id.clock_in_path3)
+        calculatorInPath3 = view.findViewById(R.id.calculator_in_path3)
+        mrSquareJunction34 = view.findViewById(R.id.mr_square_junction_3_4)
+
+        kacheliInPath4 = view.findViewById(R.id.kacheli_in_path4)
+        buttonsInPath4 = view.findViewById(R.id.buttons_in_path4)
+
+        // Register candidate views into visibility calculations
+        riveVisibilityCandidates.addAll(topicViews)
+        listOfNotNull(
+            clockInPath1, calculatorInPath1, mrSquareJunction12,
+            kacheliInPath2, buttonsInPath2, frogJunction23,
+            clockInPath3, calculatorInPath3, mrSquareJunction34,
+            kacheliInPath4, buttonsInPath4
+        ).forEach { riveVisibilityCandidates.add(it) }
+
+        // Clear played trigger map configurations
+        topicKeys.forEachIndexed { index, _ ->
+            calculatorPlayedStates[index] = false
+            clockPlayedStates[index] = false
+            junctionPlayedStates[index] = false
+            kacheliPlayedStates[index] = false
+            buttonsPlayedStates[index] = false
+            frogJunctionPlayedStates[index] = false
+        }
+
+        riveVisibilityCandidates.forEach { rivePlayingStates[it] = true }
+        visibilityBuffer = (resources.displayMetrics.heightPixels * 0.5f).toInt()
+
         startContainer.visibility = View.GONE
         scrollTargetContainer.visibility = View.GONE
-
-        // Localized 4th Grade Label
         nextGradeLabel.text = getString(R.string.fourth_grade)
+    }
+
+    private fun updateRiveActiveStates() {
+        if (!isAdded || !::scrollView.isInitialized) return
+        val scrollTop = scrollView.scrollY - visibilityBuffer
+        val scrollBottom = scrollView.scrollY + scrollView.height + visibilityBuffer
+
+        for (rive in riveVisibilityCandidates) {
+            if (rive.width == 0 && rive.height == 0) continue
+
+            reusableRect.set(0, 0, rive.width, rive.height)
+            scrollView.offsetDescendantRectToMyCoords(rive, reusableRect)
+            val isNearViewport = reusableRect.bottom >= scrollTop && reusableRect.top <= scrollBottom
+
+            val wasPlaying = rivePlayingStates[rive] ?: true
+            if (isNearViewport && !wasPlaying) {
+                rive.play()
+                rivePlayingStates[rive] = true
+            } else if (!isNearViewport && wasPlaying) {
+                rive.pause()
+                rivePlayingStates[rive] = false
+            }
+        }
     }
 
     private fun listenToTopicProgress() {
@@ -197,13 +306,51 @@ class Math3GradeFragment : Fragment() {
             topicKeys.forEachIndexed { index, key ->
                 val prog = (progressMap[key] as? Long ?: 0).toFloat()
                 val claimed = claimedMap[key] as? Boolean ?: false
-                topicViews.getOrNull(index)?.let { view ->
-                    animateRiveProgress(view, currentTopicProgress[key] ?: 0f, prog) { currentTopicProgress[key] = it }
-                    updateRiveButtonStates(view, prog >= 100f, if (index == 0) true else prevClaimed, claimed)
+
+                animateRiveProgress(key, topicViews[index], currentTopicProgress[key] ?: 0f, prog) {
+                    currentTopicProgress[key] = it
                 }
                 claimedRewards[key] = claimed
-                isUnlocked[key] = if (index == 0) true else prevClaimed
-                prevClaimed = prog >= 100f && claimed
+
+                val topicUnlocked = if (index == 0) true else prevClaimed
+                isUnlocked[key] = topicUnlocked
+
+                val finished = prog >= 100f
+                val newState = RiveButtonState(finished, topicUnlocked, claimed)
+                if (lastPushedRiveState[key] != newState) {
+                    updateRiveButtonStates(topicViews[index], finished, topicUnlocked, claimed)
+                    lastPushedRiveState[key] = newState
+                }
+                prevClaimed = finished && claimed
+
+                // --- PATH DECORATION MILESTONE PROGRESS TRIGGERS ---
+                if (index % 2 == 0) {
+                    if (prog >= 35f && calculatorPlayedStates[index] == false) {
+                        calculatorViews[index]?.fireState("State Machine 1", "play")
+                        calculatorPlayedStates[index] = true
+                    }
+                    if (prog >= 70f && clockPlayedStates[index] == false) {
+                        clockViews[index]?.fireState("State Machine 1", "play")
+                        clockPlayedStates[index] = true
+                    }
+                    if (prog >= 100f && junctionPlayedStates[index] == false) {
+                        junctionViews[index]?.fireState("State Machine 1", "play")
+                        junctionPlayedStates[index] = true
+                    }
+                } else {
+                    if (prog >= 35f && kacheliPlayedStates[index] == false) {
+                        kacheliViews[index]?.fireState("State Machine 1", "play")
+                        kacheliPlayedStates[index] = true
+                    }
+                    if (prog >= 70f && buttonsPlayedStates[index] == false) {
+                        buttonsViews[index]?.fireState("State Machine 1", "play")
+                        buttonsPlayedStates[index] = true
+                    }
+                    if (prog >= 100f && frogJunctionPlayedStates[index] == false) {
+                        frogJunctionViews[index]?.fireState("State Machine 1", "play")
+                        frogJunctionPlayedStates[index] = true
+                    }
+                }
             }
 
             currentTargetIndex = findTargetTopicIndex(progressMap, topicKeys, claimedMap)
@@ -220,6 +367,7 @@ class Math3GradeFragment : Fragment() {
                     if (isAdded && !userHasScrolled) {
                         scrollToSpecificTopic(currentTargetIndex, instant = true)
                         hasInitialScrolled = true
+                        updateRiveActiveStates()
                     }
                 }
             }
@@ -359,23 +507,24 @@ class Math3GradeFragment : Fragment() {
     private fun scrollToSpecificTopic(index: Int, instant: Boolean = false) {
         if (!isAdded || index < 0 || index >= topicViews.size) return
         val targetView = topicViews[index]
-        val rect = Rect()
-        targetView.getDrawingRect(rect)
-        scrollView.offsetDescendantRectToMyCoords(targetView, rect)
+        reusableRect.set(0, 0, targetView.width, targetView.height)
+        scrollView.offsetDescendantRectToMyCoords(targetView, reusableRect)
         val offset = scrollView.height / 16
-        val scrollY = (rect.top - offset).coerceAtLeast(0)
+        val scrollY = (reusableRect.top - offset).coerceAtLeast(0)
         if (instant) scrollView.scrollTo(0, scrollY) else scrollView.smoothScrollTo(0, scrollY)
         determineVisibleTopic()
+        updateRiveActiveStates()
     }
 
     private fun determineVisibleTopic() {
+        if (!isAdded) return
         var bestIndex = 0
         var minDistance = Int.MAX_VALUE
         val focusPoint = scrollView.height / 2
+
         topicViews.forEachIndexed { index, view ->
-            val rect = Rect()
-            if (view.getGlobalVisibleRect(rect)) {
-                val center = (rect.top + rect.bottom) / 2
+            if (view.getGlobalVisibleRect(reusableRect)) {
+                val center = (reusableRect.top + reusableRect.bottom) / 2
                 val distance = Math.abs(center - focusPoint)
                 if (distance < minDistance) {
                     minDistance = distance
@@ -417,7 +566,6 @@ class Math3GradeFragment : Fragment() {
                     controller.stateMachines.firstOrNull()?.viewModelInstance = vmi
                     vmi.getNumberProperty("level")?.value = level
 
-                    // Localized text injection for Rive
                     val isFinished = (currentTopicProgress[topicKey] ?: 0f) >= 100f
                     val startTxt = if (isFinished) getString(R.string.review_text) else getString(R.string.start_text)
                     try {
@@ -454,8 +602,12 @@ class Math3GradeFragment : Fragment() {
         view.setBooleanState("State Machine 1", "reward", claimed)
     }
 
-    private fun animateRiveProgress(view: RiveAnimationView, start: Float, end: Float, onUpdate: (Float) -> Unit) {
-        ValueAnimator.ofFloat(start, end).apply {
+    private fun animateRiveProgress(key: String, view: RiveAnimationView, start: Float, end: Float, onUpdate: (Float) -> Unit) {
+        if (start == end) return
+
+        animatorsMap[key]?.cancel()
+
+        val animator = ValueAnimator.ofFloat(start, end).apply {
             duration = 1000
             interpolator = DecelerateInterpolator()
             addUpdateListener {
@@ -463,11 +615,13 @@ class Math3GradeFragment : Fragment() {
                 view.setNumberState("State Machine 1", "progress", v)
                 onUpdate(v)
             }
-            start()
         }
+        animatorsMap[key] = animator
+        animator.start()
     }
 
     private fun View.fadeInAndSlideUp() {
+        animate().cancel()
         visibility = View.VISIBLE
         alpha = 0f
         translationY = 100f
@@ -475,6 +629,7 @@ class Math3GradeFragment : Fragment() {
     }
 
     private fun View.fadeOutAndSlideDown() {
+        animate().cancel()
         animate().alpha(0f).translationY(100f).setDuration(250).withEndAction { visibility = View.GONE }.start()
     }
 
@@ -484,9 +639,32 @@ class Math3GradeFragment : Fragment() {
             startContainer.animate().cancel()
             startContainer.visibility = View.GONE
         }
+        if (::scrollView.isInitialized) {
+            scrollView.post { updateRiveActiveStates() }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        riveVisibilityCandidates.forEach { rive ->
+            rive.pause()
+            rivePlayingStates[rive] = false
+        }
     }
 
     override fun onDestroyView() {
+        scrollView.removeCallbacks(scrollRunnable)
+        animatorsMap.values.forEach { it.cancel() }
+        animatorsMap.clear()
+        riveVisibilityCandidates.clear()
+        rivePlayingStates.clear()
+        calculatorPlayedStates.clear()
+        clockPlayedStates.clear()
+        junctionPlayedStates.clear()
+        kacheliPlayedStates.clear()
+        buttonsPlayedStates.clear()
+        frogJunctionPlayedStates.clear()
+        lastPushedRiveState.clear()
         super.onDestroyView()
         topicProgressListener?.remove()
     }

@@ -21,6 +21,7 @@ import com.tetragon.app.databinding.ActivityRegisterBinding
 import com.tetragon.app.fragments.registrationFragments.*
 import com.tetragon.app.gameModel.UserData
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
+import com.tetragon.app.utils.registrationUtils.DeviceUtils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -43,10 +44,10 @@ class RegisterActivity : BaseActivity() {
     var isGoogleAccount = false
     private var isGoogleSignInInProgress = false
 
-    // Flag to manage the introductory presentation state
-    private var isIntroShowing = true
+    private var createdAuthEmail: String? = null
+    private var createdAuthPassword: String? = null
 
-    // Track text animation job to prevent overlapping animations on fast clicks
+    private var isIntroShowing = true
     private var textAnimationJob: Job? = null
 
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -70,14 +71,16 @@ class RegisterActivity : BaseActivity() {
     // 0: LanguageFragment
     // 1: AgeFragment
     // 2: FullNameFragment
-    // 3: AuthMethodFragment -> Combined Progress Step with index 4
-    // 4: EmailFragment      -> Combined Progress Step with index 3
-    // 5: PasswordFragment
-    // 6: UiVerificationFragment
+    // 3: NotificationPermissionFragment
+    // 4: AuthMethodFragment
+    // 5: EmailFragment
+    // 6: PasswordFragment
+    // 7: UiVerificationFragment
     private val fragments = listOf(
         LanguageFragment(),
         AgeFragment(),
         FullNameFragment(),
+        NotificationPermissionFragment(),
         AuthMethodFragment(),
         EmailFragment(),
         PasswordFragment(),
@@ -104,7 +107,6 @@ class RegisterActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         currentFragmentIndex = intent.getIntExtra("START_STEP", 0)
 
-        // If the workflow is restored past the initial selection step, bypass the intro screen
         if (currentFragmentIndex > 0) {
             isIntroShowing = false
         }
@@ -127,7 +129,6 @@ class RegisterActivity : BaseActivity() {
                 setIntroContinueButtonEnabled(true)
             }
         } else {
-            // No transition animation when restoring a specific step on cold start
             showCurrentFragment(navigatingForward = true, animate = false)
         }
 
@@ -137,50 +138,62 @@ class RegisterActivity : BaseActivity() {
         }
 
         binding.continueEnabledBtn.setOnClickListener {
-            if (isIntroShowing) {
-                isIntroShowing = false
-                // Transition layouts and animate elements into view smoothly
-                animateLayoutFromIntroToNormal()
-            } else {
-                binding.mrSquareWelcomeAnim.fireState("State Machine 1", "okay")
-
-                if (currentFragmentIndex == 0) {
-                    applyLocaleInPlace(userData.language)
-                    currentFragmentIndex = 1
-                    setContinueButtonEnabled(false)
-                    showCurrentFragment(navigatingForward = true, animate = true)
-                    return@setOnClickListener
-                }
-
-                if (currentFragmentIndex == fragments.size - 1) {
-                    finishRegistrationAndSaveToFirestore()
-                    return@setOnClickListener
-                }
-
-                if (currentFragmentIndex < fragments.size - 1) {
-                    currentFragmentIndex++
-                    setContinueButtonEnabled(false)
-
-                    if (currentFragmentIndex == 4 && isGoogleAccount) {
-                        finishRegistrationAndSaveToFirestore()
-                        return@setOnClickListener
-                    }
-
-                    if (currentFragmentIndex == fragments.size - 1 && !isGoogleAccount) {
-                        createAuthAccountAndSendEmail()
-                    }
-
-                    showCurrentFragment(navigatingForward = true, animate = true)
-                }
-            }
+            handleContinueClicked()
         }
     }
 
-    /**
-     * Extension helper function to run dynamic typewriter text changes sequentially
-     */
+    private fun handleContinueClicked() {
+        if (isIntroShowing) {
+            isIntroShowing = false
+            animateLayoutFromIntroToNormal()
+            return
+        }
+
+        if (currentFragmentIndex == 0) {
+            binding.mrSquareWelcomeAnim.fireState("State Machine 1", "okay")
+            applyLocaleInPlace(userData.language)
+            currentFragmentIndex = 1
+            setContinueButtonEnabled(false)
+            showCurrentFragment(navigatingForward = true, animate = true)
+            return
+        }
+
+        if (currentFragmentIndex == fragments.size - 1) {
+            finishRegistrationAndSaveToFirestore()
+            return
+        }
+
+        if (currentFragmentIndex < fragments.size - 1) {
+            currentFragmentIndex++
+            setContinueButtonEnabled(false)
+
+            if (currentFragmentIndex == 5 && isGoogleAccount) {
+                finishRegistrationAndSaveToFirestore()
+                return
+            }
+
+            if (currentFragmentIndex == fragments.size - 1 && !isGoogleAccount) {
+                createAuthAccountAndSendEmail()
+            }
+
+            // Fire generic "okay" trigger ONLY when navigating to steps without their own custom Rive trigger
+            val customAnimationIndices = listOf(3, 5, 6)
+            if (currentFragmentIndex !in customAnimationIndices) {
+                binding.mrSquareWelcomeAnim.fireState("State Machine 1", "okay")
+            }
+
+            showCurrentFragment(navigatingForward = true, animate = true)
+        }
+    }
+
+    fun advanceToNextStep() {
+        if (isRegistrationInProgress || isGoogleSignInInProgress) return
+        if (isIntroShowing) return
+        handleContinueClicked()
+    }
+
     private fun TextView.typeWrite(text: String, charDelayMs: Long = 30) {
-        textAnimationJob?.cancel() // Clear prior rolling jobs to avoid overlaps
+        textAnimationJob?.cancel()
         this.text = ""
         textAnimationJob = lifecycleScope.launch {
             for (ch in text) {
@@ -190,18 +203,10 @@ class RegisterActivity : BaseActivity() {
         }
     }
 
-    /**
-     * Exposes a safe reference endpoint for fragments to hook into the global Rive state.
-     */
     fun fireMrSquareAnimation(triggerName: String) {
         binding.mrSquareWelcomeAnim.fireState("State Machine 1", triggerName)
     }
 
-    /**
-     * Applies a new locale to the current activity's resources in-place, without
-     * requiring an activity recreation. All subsequent getString() calls within
-     * this activity instance will use the updated locale immediately.
-     */
     internal fun applyLocaleInPlace(languageCode: String) {
         if (languageCode.isBlank()) return
         val locale = Locale(languageCode)
@@ -212,16 +217,12 @@ class RegisterActivity : BaseActivity() {
         resources.updateConfiguration(config, resources.displayMetrics)
     }
 
-    /**
-     * Preserves layout design integrity on opening, cleanly hiding structural progress
-     * frames while dynamically updating and centering standalone text headers and Rive animations.
-     */
     private fun setupIntroLayoutState() {
         binding.stepProgressContainer.visibility = View.GONE
         binding.questionFragmentContainer.visibility = View.GONE
         binding.questionHeaderContainer.visibility = View.VISIBLE
 
-        binding.globalQuestionTitle.text = "" // Will be populated by typewriter layout launcher coro
+        binding.globalQuestionTitle.text = ""
 
         val constraintLayout = binding.root as ConstraintLayout
         val constraintSet = ConstraintSet()
@@ -242,18 +243,12 @@ class RegisterActivity : BaseActivity() {
         setIntroContinueButtonEnabled(false)
     }
 
-    /**
-     * Re-establishes normal layout metrics and smoothly transitions the progress bar
-     * container and question fragment container via alpha fade and slide animations.
-     */
     private fun animateLayoutFromIntroToNormal() {
-        // Re-apply constraints to base state positions
         val constraintLayout = binding.root as ConstraintLayout
         val constraintSet = ConstraintSet()
         constraintSet.clone(this, R.layout.activity_register)
         constraintSet.applyTo(constraintLayout)
 
-        // Set initial invisible positions before starting properties transitions
         binding.stepProgressContainer.alpha = 0f
         binding.stepProgressContainer.translationY = -40f
         binding.stepProgressContainer.visibility = View.VISIBLE
@@ -262,7 +257,6 @@ class RegisterActivity : BaseActivity() {
         binding.questionFragmentContainer.translationY = 60f
         binding.questionFragmentContainer.visibility = View.VISIBLE
 
-        // Animate the progress layout dropping down lightly
         binding.stepProgressContainer.animate()
             .alpha(1f)
             .translationY(0f)
@@ -270,10 +264,8 @@ class RegisterActivity : BaseActivity() {
             .setInterpolator(android.view.animation.DecelerateInterpolator())
             .start()
 
-        // Load the first setup fragment into context view slots
         showCurrentFragment(navigatingForward = true, animate = false)
 
-        // Animate the whole fragment viewport container lifting smoothly upward into focus
         binding.questionFragmentContainer.animate()
             .alpha(1f)
             .translationY(0f)
@@ -284,9 +276,6 @@ class RegisterActivity : BaseActivity() {
         refreshUiComponents(false)
     }
 
-    /**
-     * Specialized internal button switcher configuration scoped strictly to onboarding introduction windows.
-     */
     private fun setIntroContinueButtonEnabled(enabled: Boolean) {
         if (enabled) {
             binding.continueEnabledBtnContainer.visibility = View.VISIBLE
@@ -306,21 +295,19 @@ class RegisterActivity : BaseActivity() {
         }
 
         if (currentFragmentIndex > 0) {
-            if (currentFragmentIndex == 3 && isGoogleAccount) {
+            if (currentFragmentIndex == 4 && isGoogleAccount) {
                 handleExitCleanup()
             } else {
-                val wasAtAuthMethod = (currentFragmentIndex == 4)
+                val wasAtAuthMethod = (currentFragmentIndex == 5)
                 currentFragmentIndex--
 
                 if (wasAtAuthMethod) {
-                    // Instantly drop back into Auth step clean positions
                     showCurrentFragment(navigatingForward = false, animate = true)
                 } else {
                     showCurrentFragment(navigatingForward = false, animate = true)
                 }
             }
         } else {
-            // Drop backward navigation back into structural introductory presentation frames
             isIntroShowing = true
             setupIntroLayoutState()
 
@@ -415,16 +402,11 @@ class RegisterActivity : BaseActivity() {
             }
     }
 
-    /**
-     * Triggers dynamic slide up and fade in transitions for layout elements when
-     * manual email registration path is selected.
-     */
     fun navigateToManualEmailInput() {
-        if (currentFragmentIndex == 3) {
-            currentFragmentIndex = 4
+        if (currentFragmentIndex == 4) {
+            currentFragmentIndex = 5
             setContinueButtonEnabled(false)
 
-            // Make headers and progress view containers visible with alpha 0 before running transition profiles
             binding.questionHeaderContainer.alpha = 0f
             binding.questionHeaderContainer.translationY = -20f
             binding.questionHeaderContainer.visibility = View.VISIBLE
@@ -436,24 +418,20 @@ class RegisterActivity : BaseActivity() {
             binding.continueDisabledBtnContainer.alpha = 0f
             binding.continueDisabledBtnContainer.translationY = 30f
 
-            // Handle step fragment swap transactions
             showCurrentFragment(navigatingForward = true, animate = true)
 
-            // Animate headers slipping smoothly down into context visibility frames
             binding.questionHeaderContainer.animate()
                 .alpha(1f)
                 .translationY(0f)
                 .setDuration(400)
                 .start()
 
-            // Drop step progress bar into views seamlessly
             binding.stepProgressContainer.animate()
                 .alpha(1f)
                 .translationY(0f)
                 .setDuration(450)
                 .start()
 
-            // Ease bottom continue button states up into scene layout views
             binding.continueDisabledBtnContainer.animate()
                 .alpha(1f)
                 .translationY(0f)
@@ -475,6 +453,8 @@ class RegisterActivity : BaseActivity() {
         val user = auth.currentUser
         if (user != null && !isProfileSaved && !isGoogleAccount) {
             user.delete().addOnCompleteListener {
+                createdAuthEmail = null
+                createdAuthPassword = null
                 stopService(Intent(this, RegistrationCleanupService::class.java))
                 finish()
             }
@@ -490,18 +470,45 @@ class RegisterActivity : BaseActivity() {
 
     private fun createAuthAccountAndSendEmail() {
         if (isGoogleAccount) return
+
+        val existing = auth.currentUser
+        val alreadyCreatedForCurrentCreds = existing != null &&
+                createdAuthEmail == userData.email &&
+                createdAuthPassword == userData.password
+
+        if (alreadyCreatedForCurrentCreds) {
+            existing?.sendEmailVerification()
+            refreshUiComponents(false)
+            return
+        }
+
         isRegistrationInProgress = true
         refreshUiComponents(false)
 
+        if (existing != null) {
+            existing.delete().addOnCompleteListener {
+                createdAuthEmail = null
+                createdAuthPassword = null
+                performAuthCreation()
+            }
+        } else {
+            performAuthCreation()
+        }
+    }
+
+    private fun performAuthCreation() {
         auth.createUserWithEmailAndPassword(userData.email, userData.password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    createdAuthEmail = userData.email
+                    createdAuthPassword = userData.password
                     auth.currentUser?.sendEmailVerification()
                     isRegistrationInProgress = false
+                    refreshUiComponents(false)
                 } else {
                     Toast.makeText(this, getString(R.string.error_prefix, task.exception?.message ?: "Unknown"), Toast.LENGTH_LONG).show()
                     resetLoadingState()
-                    currentFragmentIndex = 4
+                    currentFragmentIndex = 5
                     showCurrentFragment(navigatingForward = false, animate = true)
                 }
             }
@@ -530,6 +537,8 @@ class RegisterActivity : BaseActivity() {
                     "stars" to 15L,
                     "coins" to 30L,
                     "streak" to 0,
+                    "activeDeviceId" to DeviceUtils.getDeviceId(this),
+                    "subscription" to false,
                     "subscriptionUntil" to null,
                     "planType" to "free",
                     "avatarName" to "avatar_1"
@@ -567,9 +576,6 @@ class RegisterActivity : BaseActivity() {
 
     fun updateAge(value: String) { userData.age = value }
 
-    /**
-     * Replaces the fragment container with the current step's fragment.
-     */
     private fun showCurrentFragment(navigatingForward: Boolean, animate: Boolean = true) {
         val transaction = supportFragmentManager.beginTransaction()
 
@@ -593,8 +599,9 @@ class RegisterActivity : BaseActivity() {
 
         // --- RIVE TRIGGER HOOKS ON FRAGMENT NAVIGATION ---
         when (currentFragmentIndex) {
-            4 -> fireMrSquareAnimation("yahoo") // Fire yahoo when Email Fragment opens
-            5 -> fireMrSquareAnimation("plan")  // Fire plan when Password Fragment opens
+            3 -> fireMrSquareAnimation("notification")
+            5 -> fireMrSquareAnimation("yahoo")
+            6 -> fireMrSquareAnimation("plan")
         }
 
         updateProgress(currentFragmentIndex)
@@ -605,7 +612,7 @@ class RegisterActivity : BaseActivity() {
     private fun updateHeaderUi() {
         if (isIntroShowing) return
 
-        if (currentFragmentIndex == 3) {
+        if (currentFragmentIndex == 4) {
             binding.questionHeaderContainer.visibility = View.GONE
             return
         }
@@ -615,14 +622,14 @@ class RegisterActivity : BaseActivity() {
             0 -> R.string.choose_your_language
             1 -> R.string.what_s_your_age
             2 -> R.string.what_s_your_full_name
-            4 -> R.string.enter_your_email_address
-            5 -> R.string.create_a_password
-            6 -> R.string.verify_your_email_address
+            3 -> R.string.notif_description
+            5 -> R.string.enter_your_email_address
+            6 -> R.string.create_a_password
+            7 -> R.string.verify_your_email_address
             else -> null
         }
 
         titleResId?.let {
-            // Apply text layout typewriter animation to structural headers on pipeline navigation steps
             binding.globalQuestionTitle.typeWrite(getString(it), 25)
         }
     }
@@ -633,7 +640,7 @@ class RegisterActivity : BaseActivity() {
     }
 
     private fun refreshUiComponents(isBtnEnabled: Boolean) {
-        if (!isIntroShowing && currentFragmentIndex == 3) {
+        if (!isIntroShowing && currentFragmentIndex == 4) {
             binding.stepProgressContainer.visibility = View.GONE
             binding.continueEnabledBtnContainer.visibility = View.GONE
             binding.continueDisabledBtnContainer.visibility = View.GONE
@@ -643,8 +650,7 @@ class RegisterActivity : BaseActivity() {
 
         if (isIntroShowing) return
 
-        // Managed explicitly with view animations during transition states
-        if (binding.stepProgressContainer.visibility != View.VISIBLE && currentFragmentIndex != 3) {
+        if (binding.stepProgressContainer.visibility != View.VISIBLE && currentFragmentIndex != 4) {
             binding.stepProgressContainer.visibility = View.VISIBLE
         }
 
@@ -664,28 +670,34 @@ class RegisterActivity : BaseActivity() {
     }
 
     private fun updateProgress(stepIndex: Int) {
-        if (isIntroShowing || stepIndex == 3) return
+        if (isIntroShowing || stepIndex == 4) return
 
         val logicalStepIndex = when (stepIndex) {
-            4 -> 3
             5 -> 4
             6 -> 5
+            7 -> 6
             else -> stepIndex
         }
 
-        val totalVisualSteps = 5
-        val percent = logicalStepIndex.toFloat() / totalVisualSteps.toFloat()
+        val totalVisualSteps = 6
+        val targetPercent = logicalStepIndex.toFloat() / totalVisualSteps.toFloat()
 
         val params = binding.progressActive.layoutParams as ConstraintLayout.LayoutParams
-        params.matchConstraintPercentWidth = percent
-        binding.progressActive.layoutParams = params
+        val currentPercent = params.matchConstraintPercentWidth
 
-        val circles = listOf(binding.step1, binding.step2, binding.step3, binding.step4, binding.step5, binding.step6)
-        for (i in circles.indices) {
-            circles[i].setBackgroundResource(
-                if (i <= logicalStepIndex) R.drawable.circle_active else R.drawable.circle_inactive
-            )
+        val progressAnimator = android.animation.ValueAnimator.ofFloat(currentPercent, targetPercent).apply {
+            duration = 500
+            interpolator = android.view.animation.AnticipateOvershootInterpolator(1.2f)
+
+            addUpdateListener { animator ->
+                val animatedValue = animator.animatedValue as Float
+                val currentParams = binding.progressActive.layoutParams as ConstraintLayout.LayoutParams
+                currentParams.matchConstraintPercentWidth = animatedValue
+                binding.progressActive.layoutParams = currentParams
+            }
         }
+
+        progressAnimator.start()
     }
 
     private fun observeConnectivity() {
@@ -700,7 +712,7 @@ class RegisterActivity : BaseActivity() {
                             binding.questionHeaderContainer.visibility = View.VISIBLE
                         } else {
                             binding.questionFragmentContainer.visibility = View.VISIBLE
-                            if (currentFragmentIndex != 3) {
+                            if (currentFragmentIndex != 4) {
                                 binding.questionHeaderContainer.visibility = View.VISIBLE
                             }
                         }

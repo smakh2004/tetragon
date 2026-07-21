@@ -102,20 +102,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
+        <FrameLayout
+            android:id="@+id/progressBarTrack"
             android:layout_width="0dp"
             android:layout_height="14dp"
             android:layout_marginEnd="14dp"
-            android:indeterminate="false"
-            android:max="10"
-            android:progressDrawable="@drawable/custom_progress_bar"
+            android:background="@drawable/line_bg"
+            android:clipToOutline="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/exit_btn"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:progress="3" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/progressBarActive"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/line_active" />
+
+        </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
@@ -155,9 +160,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/complexityContainer" />
 
-    <!-- Clean milestone layer holding exclusively the Rive Animation View -->
     <FrameLayout
-        android:id="@+id/seven_correct_animation"
+        android:id="@+id/level_up_animation"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="invisible"
@@ -167,13 +171,13 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <app.rive.runtime.kotlin.RiveAnimationView
-            android:id="@+id/sevenCorrectRiveView"
+            android:id="@+id/levelUpAnimationRiveView"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             app:riveFit="FIT_HEIGHT"
             app:riveAutoPlay="false"
-            app:riveResource="@raw/seven_correct_answers"
+            app:riveResource="@raw/level_up_animation"
             app:riveStateMachine="State Machine 1" />
     </FrameLayout>
 
@@ -198,7 +202,8 @@
                 android:gravity="center"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <ImageView
                     android:id="@+id/circleState"

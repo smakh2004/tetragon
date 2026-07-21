@@ -147,9 +147,9 @@
     <string name="star">Yulduz</string>
     <string name="refill_your_stars_to_continue_your_learning_journey">O\'qishni davom ettirish uchun yulduzlarni to\'ldiring</string>
     <string name="coins">Tangalar</string>
-    <string name="_0_29">6 500 so\'m</string>
-    <string name="_0_99">13 000 so\'m</string>
-    <string name="_2_29">26 000 so\'m</string>
+    <string name="_0_29">$ 0.49</string>
+    <string name="_0_99">$ 0.99</string>
+    <string name="_2_29">$ 1.99</string>
     <string name="refill_stars_label">Yulduzlarni to\'ldirish</string>
     <string name="monthly_infinity_label">Bir oylik premium</string>
     <string name="full_caps">TO\'LGAN</string>
@@ -171,14 +171,14 @@
     <string name="no_ads">Reklamasiz</string>
     <string name="unlimited_mini_games">Cheksiz mini-o\'yinlar</string>
     <string name="free">Bepul</string>
-    <string name="subscribe_for_1_33">26 000 SO\'MGA OBUNA BO\'LISH</string>
+    <string name="subscribe_for_1_33">$ 1.99 OBUNA BO\'LISH</string>
     <string name="unlock_the_ntetragon_infinity">Tetragon Infinity\nimkoniyatini oching</string>
     <string name="premium_gives_you_full_access_nto_every_features_and_more">Premium barcha funksiyalarga to\'liq\nkirish imkonini beradi va ko\'proq</string>
     <string name="annual">Yillik</string>
-    <string name="_12_month_15">12 oy = 312 000 so\'m</string>
-    <string name="_1_33_mo">26 000 so\'m/oy*</string>
+    <string name="_12_month_15">12 oy = $ 24.00</string>
+    <string name="_1_33_mo">$ 1.99/oy*</string>
     <string name="monthly">Oylik</string>
-    <string name="_3_mo">39 000 so\'m/oy*</string>
+    <string name="_3_mo">$ 2.99/oy*</string>
     <string name="subscribe">OBUNA BO\'LISH</string>
     <string name="math">MATEMATIKA</string>
     <string name="physics">FIZIKA</string>
@@ -233,7 +233,7 @@
     <string name="password_updated">Parol muvaffaqiyatli yangilandi</string>
     <string name="password_update_failed">Parolni yangilab bo\'lmadi: %s</string>
     <string name="error_incorrect_password">Hozirgi parol noto\'g\'ri</string>
-    <string name="session_expired">Sessiya muddati tugadi</string>
+    <string name="session_expired">Akkaunga kirish aniqlandi</string>
     <string name="session_expired_message">Hisobingiz boshqa qurilmada ochildi.</string>
     <string name="refresh">Yangilash</string>
     <string name="math_label">MATEMATIKA</string>
@@ -265,7 +265,7 @@
     <string name="review_text">TAKRORLASH</string>
     <string name="btn_see_solution">JAVOBNI KO\'RISH</string>
     <string name="reward_text_rive">SOVG\'A</string>
-    <string name="_5_correct">5-TA TO\'G\'RI!</string>
+    <string name="_5_correct">5-TA KETMA KET!</string>
     <string name="xp_topic_mastered">Mavzu o‘zlashtirildi! Maksimal XP olindi.</string>
     <string name="xp_collected_desc">Tajriba ochko to‘plandi!</string>
     <string name="days_of_mindful_problem_solving">Diqqat bilan masalalar yechilgan kunlar</string>
@@ -685,4 +685,42 @@
     <string name="question_sum_divisible_by_three">1 dan %d gacha boʻlgan 3 ga boʻlinadigan barcha natural sonlarning yigʻindisini toping.</string>
 
     <string name="question_sum_of_squares">Agar n = %1$d boʻlsa, kvadratlar yigʻindisini toping: 1² + 2² + ... + %2$d².</string>
+    <string name="_8_correct">8-TA KETMA KET!</string>
+
+    <string name="find_the_largest_number">Eng katta sonni toping</string>
+
+    <string name="update_available_title">Yangi yangilanish mavjud!</string>
+    <string name="update_available_message">Biz muhim yangilanishlar va barqarorlik tuzatishlarini kiritdik. O‘yinni davom ettirish uchun ilovani so‘nggi versiyaga yangilang.</string>
+    <string name="update_button_action">YANGILASH</string>
+
+    <string name="billing_error_purchase">Xarid xatoligi: %1$s</string>
+    <string name="billing_error_connection">Google Play Billing xizmatiga ulanib bo\'lmadi</string>
+    <string name="billing_error_product_not_found">Google Play\'da %1$s mahsuloti topilmadi</string>
+    <string name="billing_error_no_base_plan">Mahsulotda faol asosiy tarif rejalari mavjud emas</string>
+    <string name="billing_error_acknowledge">Xaridni tasdiqlashda xatolik yuz berdi</string>
+    <string name="billing_error_fetch_products">Mahsulotlarni yuklashda xatolik: %1$s</string>
+    <string name="error_auth_failed">Foydalanuvchi avtorizatsiya xatoligi</string>
+    <string name="premium_activated_success">Premium muvaffaqiyatli faollashtirildi!</string>
+    <string name="error_firestore_sync">Server bilan sinxronizatsiya xatoligi: %1$s</string>
+    <string name="premium_restored_success">Obuna muvaffaqiyatli tiklandi!</string>
+
+    <string name="coins_purchased_success">Balansingizga %1$d tanga muvaffaqiyatli qo\'shildi!</string>
+    <string name="billing_init_failed">Google Play to\'lov tizimini faollashtirib bo\'lmadi</string>
+    <string name="coin_pack_not_found">Tanga paketi Google Play\'da topilmadi</string>
+
+    <string name="tap_to_open_bag">Sumkani ochish uchun bosing!</string>
+    <string name="you_gained_coins">Siz &lt;font color=\'#FFCC00\'&gt;%1$d tanga&lt;/font&gt; qo\'lga kiritdingiz!</string>
+
+    <string name="stay_on_track">Muntazam shug\'ullaning</string>
+    <string name="notif_description">Eslatmalarni yoqing!</string>
+    <string name="remind_me_btn">Menga eslatib turish</string>
+    <string name="not_now_btn">Hozir emas</string>
+
+    <string name="notif_permission_title">\"Tetragon\" sizga bildirishnomalar yubormoqchi</string>
+    <string name="notif_permission_description">Bildirishnomalar ogohlantirishlar, tovushlar va belgilarni o\'z ichiga olishi mumkin. Bularni Sozlamalarda o\'zgartirish mumkin.</string>
+    <string name="notif_dont_allow">Ruxsat bermaslik</string>
+    <string name="notif_allow">Ruxsat berish</string>
+
+    <string name="find_the_smallest_number">Eng kichik sonni toping</string>
+    <string name="connect_numbers">1 dan %1$d gacha bo‘lgan sonlarni ulang</string>
 </resources>

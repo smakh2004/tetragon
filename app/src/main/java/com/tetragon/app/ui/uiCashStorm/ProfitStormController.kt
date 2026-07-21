@@ -20,6 +20,7 @@ class ProfitStormController(
 ) {
     private var score = 0
     private var mistakes = 0
+    private var questionsAnswered = 0
     private var currentProblem: ProfitProblem? = null
     private var quizTimer: CountDownTimer? = null
     private var countdownTimer: CountDownTimer? = null
@@ -106,6 +107,10 @@ class ProfitStormController(
 
     fun checkAnswer(selectedIndex: Int) {
         if (currentProblem == null || selectedIndex == 0) return
+
+        // A valid answer was submitted for the current problem.
+        questionsAnswered++
+
         if (selectedIndex == currentProblem?.correctIndex) {
             score++
             onScoreChanged(score)
@@ -134,4 +139,6 @@ class ProfitStormController(
     }
 
     fun getCurrentScore() = score
+
+    fun getQuestionsAnswered() = questionsAnswered
 }

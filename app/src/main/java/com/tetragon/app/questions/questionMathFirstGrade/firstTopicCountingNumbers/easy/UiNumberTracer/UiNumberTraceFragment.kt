@@ -1,4 +1,4 @@
-package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.UiNumberTracer
+package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy.UiNumberTracer
 
 import android.media.MediaPlayer
 import android.os.Bundle

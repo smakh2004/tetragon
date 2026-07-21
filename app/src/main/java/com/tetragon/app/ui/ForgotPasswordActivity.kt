@@ -60,16 +60,12 @@ class ForgotPasswordActivity : BaseActivity() {
 
     private fun sendResetEmail(email: String) {
         isWaitingForEmail = true
-        // Updated to use string resource
         setUiProcessingState(true, getString(R.string.sending_text))
 
-        val actionCodeSettings = actionCodeSettings {
-            url = "https://tetragon-dacc5.firebaseapp.com"
-            handleCodeInApp = true
-            setAndroidPackageName("com.tetragon.app", true, null)
-        }
-
-        auth.sendPasswordResetEmail(email, actionCodeSettings).addOnCompleteListener { task ->
+        // 🟢 FIXED: removed handleCodeInApp/actionCodeSettings entirely.
+        // Firebase's own hosted reset page (no Dynamic Links, no in-app deep-link
+        // handler needed) fully completes the reset in the browser.
+        auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 binding.emailEditText.isEnabled = false
                 binding.infoInstructionsText.text = getString(R.string.check_email_spam_instructions)

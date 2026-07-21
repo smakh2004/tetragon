@@ -13,28 +13,28 @@
         android:id="@+id/internetConnection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="10dp"
         android:background="@color/gray_3"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/internet_lost"
-            android:layout_marginEnd="10dp" />
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/internet_lost" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
             android:text="@string/you_are_offline"
             android:textColor="@color/black_3"
-            android:fontFamily="@font/inter_semibold"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -138,10 +138,10 @@
             android:id="@+id/complexityText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
             android:fontFamily="@font/inter_semibold"
             android:text="@string/complexity_easy"
             android:textColor="@color/green_1"
-            android:layout_marginStart="6dp"
             android:textSize="16dp" />
     </LinearLayout>
 
@@ -154,6 +154,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/complexityContainer" />
+
+    <FrameLayout
+        android:id="@+id/level_up_animation"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/stateContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/levelUpAnimationRiveView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            app:riveAutoPlay="false"
+            app:riveFit="FIT_HEIGHT"
+            app:riveResource="@raw/level_up_animation"
+            app:riveStateMachine="State Machine 1" />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/stateContainer"
@@ -187,8 +208,8 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginStart="10dp">
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/stateAnswer"
@@ -217,10 +238,10 @@
         android:id="@+id/btnBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingBottom="16dp"
-        android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -241,6 +262,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="invisible">
+
                 <View
                     android:id="@+id/check_enabled_button_background"
                     android:layout_width="match_parent"
@@ -248,6 +270,7 @@
                     android:background="@drawable/custom_button"
                     android:backgroundTint="@color/blue_1"
                     android:translationY="5dp" />
+
                 <Button
                     android:id="@+id/check_enabled_btn"
                     android:layout_width="match_parent"
@@ -266,12 +289,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="visible">
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/custom_button"
                     android:backgroundTint="@color/gray_2"
                     android:translationY="5dp" />
+
                 <TextView
                     android:id="@+id/check_disabled_btn"
                     android:layout_width="match_parent"
@@ -302,6 +327,7 @@
                 android:id="@+id/see_enabled_btn_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <View
                     android:id="@+id/see_enabled_button_background"
                     android:layout_width="match_parent"
@@ -309,6 +335,7 @@
                     android:background="@drawable/custom_button"
                     android:backgroundTint="@color/gray_2"
                     android:translationY="5dp" />
+
                 <Button
                     android:id="@+id/see_enabled_btn"
                     android:layout_width="match_parent"

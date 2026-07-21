@@ -241,9 +241,9 @@ class UiContinueSequenceOddOrEvenFragment : Fragment(R.layout.fragment_ui_contin
                     if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
+                        resetUIForNext() // always reset first
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
-                            resetUIForNext()
                             activity.showRandomQuestion()
                         }
                     }

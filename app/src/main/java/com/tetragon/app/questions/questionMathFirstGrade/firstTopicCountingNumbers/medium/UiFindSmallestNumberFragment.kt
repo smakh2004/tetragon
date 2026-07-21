@@ -1,4 +1,4 @@
-package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers
+package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.medium
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -6,8 +6,11 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.tetragon.app.R
@@ -15,40 +18,25 @@ import com.tetragon.app.questions.questionMathFirstGrade.Math1GradeQuestionActiv
 import com.tetragon.app.questions.questionMathFirstGrade.MathGrade1Type
 import kotlin.random.Random
 
-private const val ARG_SKIP_COUNT = "skip_count"
+class UiFindSmallestNumberFragment : Fragment(R.layout.fragment_ui_find_smallest_number) {
 
-class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
-
-    private lateinit var tvSeqElement1: TextView
-    private lateinit var tvSeqElement2: TextView
-    private lateinit var tvSeqElement4: TextView
-    private lateinit var tvSeqElement5: TextView
+    private lateinit var sequenceText: TextView
     private lateinit var instructionText: TextView
-    private lateinit var problemImage: ImageView
     private lateinit var options: List<LinearLayout>
-
     private lateinit var checkBtn: Button
     private lateinit var checkBtnBack: View
-    private lateinit var btnBack: ConstraintLayout
+    private lateinit var btnBack: View
     private lateinit var seeBtn: FrameLayout
     private lateinit var seeEnabledButton: Button
     private lateinit var stateAnswer: TextView
     private lateinit var answer: TextView
 
-    private var skipCount: Int = 2
     private var correctAnswer = 0
     private var selectedOptionIndex: Int? = null
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
     private var mediaPlayer: MediaPlayer? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            skipCount = it.getInt(ARG_SKIP_COUNT, 2)
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,11 +50,7 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
     }
 
     private fun initViews(view: View) {
-        tvSeqElement1 = view.findViewById(R.id.tvSeqElement1)
-        tvSeqElement2 = view.findViewById(R.id.tvSeqElement2)
-        tvSeqElement4 = view.findViewById(R.id.tvSeqElement4)
-        tvSeqElement5 = view.findViewById(R.id.tvSeqElement5)
-        problemImage = view.findViewById(R.id.problemImage)
+        sequenceText = view.findViewById(R.id.sequenceText)
         instructionText = view.findViewById(R.id.instructionText)
 
         options = listOf(
@@ -86,10 +70,13 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
     }
 
     private fun setupInstructionText() {
-        val fullText = getString(R.string.count_by, skipCount)
+        val fullText = getString(R.string.find_the_smallest_number)
         val spannable = SpannableString(fullText)
 
-        val wordToStyle = skipCount.toString()
+        val wordToStyle = if (fullText.contains("smallest")) "smallest"
+        else if (fullText.contains("наименьшее")) "наименьшее"
+        else ""
+
         val start = fullText.indexOf(wordToStyle)
         if (start != -1) {
             spannable.setSpan(
@@ -103,43 +90,26 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
     }
 
     private fun generateProblem() {
-        val startMultiplier = Random.nextInt(1, 4)
-        val val1 = skipCount * startMultiplier
-        val val2 = skipCount * (startMultiplier + 1)
-        correctAnswer = skipCount * (startMultiplier + 2)
-        val val4 = skipCount * (startMultiplier + 3)
-        val val5 = skipCount * (startMultiplier + 4)
-
-        tvSeqElement1.text = "$val1, "
-        tvSeqElement2.text = "$val2, "
-        tvSeqElement4.text = ", $val4"
-
-        if (skipCount == 5) {
-            tvSeqElement5.visibility = View.GONE
-        } else {
-            tvSeqElement5.visibility = View.VISIBLE
-            tvSeqElement5.text = ", $val5"
+        // Generate 3 completely unique numbers between 1 and 20
+        val numberSet = mutableSetOf<Int>()
+        while (numberSet.size < 3) {
+            numberSet.add(Random.Default.nextInt(1, 21))
         }
+        val sequenceList = numberSet.toList()
 
-        val optionSet = mutableSetOf(correctAnswer)
-        while (optionSet.size < 3) {
-            val randomOffset = Random.nextInt(1, 5) * skipCount
-            val wrongOption = if (Random.nextBoolean()) correctAnswer + randomOffset else correctAnswer - randomOffset
-            if (wrongOption > 0 && wrongOption != correctAnswer) {
-                optionSet.add(wrongOption)
-            }
-        }
+        // Set the true minimum mathematically
+        correctAnswer = sequenceList.minOrNull() ?: 1
 
-        val shuffledOptions = optionSet.shuffled()
+        // Display sequence cleanly in a line
+        sequenceText.text = "${sequenceList[0]}, ${sequenceList[1]}, ${sequenceList[2]}"
+
+        // Shuffle options so choices are placed randomly inside options lists
+        val shuffledOptions = sequenceList.shuffled()
         options.forEachIndexed { index, layout ->
             val tv = layout.getChildAt(0) as TextView
             tv.text = shuffledOptions[index].toString()
             layout.setBackgroundResource(R.drawable.custom_background)
         }
-
-        val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
-        problemAnswerText.visibility = View.GONE
-        problemImage.setImageResource(R.drawable.answer_blue_box)
 
         selectedOptionIndex = null
         isAnswerChecked = false
@@ -162,11 +132,6 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
                 selectedOptionIndex = index
                 highlightSelectedOption(index)
                 enableCheckButton()
-
-                val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
-                val chosen = (layout.getChildAt(0) as TextView).text.toString()
-                problemAnswerText.text = chosen
-                problemAnswerText.visibility = View.VISIBLE
             }
         }
     }
@@ -193,17 +158,19 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
 
             if (!isAnswerChecked) {
                 selectedOptionIndex?.let { checkAnswer(it, stateContainer, circleState) }
-            } else if (isIncorrectAttempt) {
-                resetForTryAgain()
             } else {
-                val activity = requireActivity() as Math1GradeQuestionActivity
-                if (checkBtn.text == getString(R.string.btn_finish)) {
-                    activity.navigateToXpGained()
+                if (isIncorrectAttempt) {
+                    resetForTryAgain()
                 } else {
-                    val isMilestoneActive = activity.checkAndTriggerMilestone()
-                    if (!isMilestoneActive) {
+                    val activity = requireActivity() as Math1GradeQuestionActivity
+                    if (checkBtn.text == getString(R.string.btn_finish)) {
+                        activity.navigateToXpGained()
+                    } else {
                         resetUIForNext()
-                        activity.showRandomQuestion()
+                        val isMilestoneActive = activity.checkAndTriggerMilestone()
+                        if (!isMilestoneActive) {
+                            activity.showRandomQuestion()
+                        }
                     }
                 }
             }
@@ -213,23 +180,20 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
     private fun checkAnswer(index: Int, stateContainer: FrameLayout, circleState: ImageView) {
         isAnswerChecked = true
         val chosen = (options[index].getChildAt(0) as TextView).text.toString().toInt()
-        val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
         val activity = requireActivity() as Math1GradeQuestionActivity
 
         activity.isResultCurrentlyVisible = true
         stateContainer.visibility = View.VISIBLE
-        problemAnswerText.text = chosen.toString()
-        problemAnswerText.visibility = View.VISIBLE
 
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
             activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
-            problemImage.setImageResource(R.drawable.answer_correct_box)
 
             val isFinished = activity.incrementProgress()
             if (isFirstAttempt) {
-                activity.totalXp += MathGrade1Type.COUNT_BY.xp
+                // Note: Change to FIND_SMALLST_NUMBER if you register a new enum entry
+                activity.totalXp += MathGrade1Type.FIND_SMALLEST_NUMBER.xp
             }
             activity.handleCorrectAnswer()
 
@@ -238,7 +202,6 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
             showCorrectState(stateContainer, circleState, index)
         } else {
             playSound(R.raw.wrong)
-            problemImage.setImageResource(R.drawable.answer_incorrect_box)
             isIncorrectAttempt = true
             activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
@@ -269,16 +232,12 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
     }
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
-        val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
         seeEnabledButton.setOnClickListener {
             seeBtn.visibility = View.GONE
             stateAnswer.text = getString(R.string.state_solution)
             answer.text = getString(R.string.label_answer, correctAnswer.toString())
             answer.visibility = View.VISIBLE
             checkBtn.text = getString(R.string.btn_continue)
-            problemImage.setImageResource(R.drawable.answer_solution_box)
-            problemAnswerText.text = correctAnswer.toString()
-            problemAnswerText.visibility = View.VISIBLE
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
             isIncorrectAttempt = false
@@ -310,13 +269,10 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
     private fun resetForTryAgain() {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
-        val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
         isAnswerChecked = false
         isIncorrectAttempt = false
         selectedOptionIndex = null
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-        problemImage.setImageResource(R.drawable.answer_blue_box)
-        problemAnswerText.visibility = View.GONE
         checkBtn.text = getString(R.string.btn_check)
         checkBtn.isEnabled = false
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
@@ -332,13 +288,11 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
-        val problemAnswerText = requireView().findViewById<TextView>(R.id.problemAnswerText)
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        problemAnswerText.visibility = View.GONE
         checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
@@ -355,15 +309,5 @@ class UiCountByNumberFragment : Fragment(R.layout.fragment_count_by_number) {
         super.onDestroy()
         mediaPlayer?.release()
         mediaPlayer = null
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(skipCountFactor: Int) =
-            UiCountByNumberFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_SKIP_COUNT, skipCountFactor)
-                }
-            }
     }
 }

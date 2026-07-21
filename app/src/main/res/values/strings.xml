@@ -144,9 +144,9 @@
     <string name="star">Star</string>
     <string name="refill_your_stars_to_continue_your_learning_journey">Refill your stars to continue your learning journey</string>
     <string name="coins">Coins</string>
-    <string name="_0_29">0.49 $</string>
-    <string name="_0_99">0.99 $</string>
-    <string name="_2_29">1.99 $</string>
+    <string name="_0_29">$ 0.49</string>
+    <string name="_0_99">$ 0.99</string>
+    <string name="_2_29">$ 1.99</string>
     <string name="refill_stars_label">Refill Stars</string>
     <string name="monthly_infinity_label">Monthly Infinity</string>
     <string name="full_caps">FULL</string>
@@ -168,11 +168,11 @@
     <string name="no_ads">No ads</string>
     <string name="unlimited_mini_games">Unlimited mini games</string>
     <string name="free">Free</string>
-    <string name="subscribe_for_1_33">SUBSCRIBE FOR $1.99</string>
+    <string name="subscribe_for_1_33">SUBSCRIBE FOR $ 1.99</string>
     <string name="unlock_the_ntetragon_infinity">Unlock the\nTetragon Infinity</string>
     <string name="premium_gives_you_full_access_nto_every_features_and_more">Premium gives you full access\nto every features - and more</string>
     <string name="annual">Annual</string>
-    <string name="_12_month_15">12 month = $24</string>
+    <string name="_12_month_15">12 month = $ 24.00</string>
     <string name="_1_33_mo">$ 1.99/mo*</string>
     <string name="monthly">Monthly</string>
     <string name="_3_mo">$ 2.99/mo*</string>
@@ -230,7 +230,7 @@
     <string name="password_updated">Password updated successfully</string>
     <string name="password_update_failed">Failed to update password: %s</string>
     <string name="error_incorrect_password">Current password is incorrect</string>
-    <string name="session_expired">Session Expired</string>
+    <string name="session_expired">External entrance</string>
     <string name="session_expired_message">Your account was opened on another device.</string>
     <string name="refresh">Refresh</string>
     <string name="math_label">MATH</string>
@@ -262,7 +262,7 @@
     <string name="review_text">REVIEW</string>
     <string name="btn_see_solution">SEE SOLUTION</string>
     <string name="reward_text_rive">REWARD</string>
-    <string name="_5_correct">5 CORRECT!</string>
+    <string name="_5_correct">5 IN A ROW!</string>
     <string name="xp_topic_mastered">Topic Mastered! Max XP reached.</string>
     <string name="xp_collected_desc">Experience points collected!</string>
     <string name="days_of_mindful_problem_solving">Days of mindful problem solving</string>
@@ -687,4 +687,42 @@
     <string name="question_sum_divisible_by_three">Find the sum of all natural numbers divisible by 3 from 1 to %d.</string>
 
     <string name="question_sum_of_squares">If n = %1$d, find the sum of squares 1² + 2² + ... + %2$d².</string>
+    <string name="_8_correct">8 IN A ROW!</string>
+
+    <string name="find_the_largest_number">Find the largest number</string>
+
+    <string name="update_available_title">New Update Available!</string>
+    <string name="update_available_message">We have introduced important updates and stability fixes. Please update to the latest version to keep playing.</string>
+    <string name="update_button_action">UPDATE NOW</string>
+
+    <string name="billing_error_purchase">Purchase error: %1$s</string>
+    <string name="billing_error_connection">Failed to connect to Google Play Billing</string>
+    <string name="billing_error_product_not_found">Product %1$s not found in Google Play</string>
+    <string name="billing_error_no_base_plan">The product has no active base subscription plans</string>
+    <string name="billing_error_acknowledge">Failed to acknowledge the purchase</string>
+    <string name="billing_error_fetch_products">Failed to fetch products: %1$s</string>
+    <string name="error_auth_failed">User authentication error</string>
+    <string name="premium_activated_success">Premium successfully activated!</string>
+    <string name="error_firestore_sync">Server sync error: %1$s</string>
+    <string name="premium_restored_success">Subscription successfully restored!</string>
+
+    <string name="coins_purchased_success">Successfully added %1$d coins to your account!</string>
+    <string name="billing_init_failed">Failed to initialize Google Play Billing</string>
+    <string name="coin_pack_not_found">Product package not found in Google Play</string>
+
+    <string name="tap_to_open_bag">Tap to open the bag!</string>
+    <string name="you_gained_coins">You gained &lt;font color=\'#FFCC00\'&gt;%1$d coins&lt;/font&gt;!</string>
+
+    <string name="stay_on_track">Stay on track</string>
+    <string name="notif_description">Enable reminders!</string>
+    <string name="remind_me_btn">Remind me to practice</string>
+    <string name="not_now_btn">Not now</string>
+
+    <string name="notif_permission_title">\"Tetragon\" Would Like to Send You Notifications</string>
+    <string name="notif_permission_description">Notifications may include alerts, sounds, and icon badges. These can be configured in Settings.</string>
+    <string name="notif_dont_allow">Don\'t Allow</string>
+    <string name="notif_allow">Allow</string>
+
+    <string name="find_the_smallest_number">Find the smallest number</string>
+    <string name="connect_numbers">Connect the numbers from 1 to %1$d</string>
 </resources>

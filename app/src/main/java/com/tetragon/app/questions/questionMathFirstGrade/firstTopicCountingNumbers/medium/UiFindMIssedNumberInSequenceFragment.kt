@@ -1,4 +1,4 @@
-package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers
+package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.medium
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -6,7 +6,11 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.tetragon.app.R
@@ -92,7 +96,7 @@ class UiFindMIssedNumberInSequenceFragment : Fragment(R.layout.fragment_ui_find_
 
     private fun generateProblem() {
         val step = 1
-        val start = Random.nextInt(1, 9)
+        val start = Random.Default.nextInt(1, 9)
         val sequence = listOf(start, start + step, start + step * 2)
 
         correctAnswer = sequence[1]
@@ -102,7 +106,7 @@ class UiFindMIssedNumberInSequenceFragment : Fragment(R.layout.fragment_ui_find_
 
         val optionSet = mutableSetOf(correctAnswer)
         while (optionSet.size < 3) {
-            val random = Random.nextInt(1, 11)
+            val random = Random.Default.nextInt(1, 11)
             if (random != correctAnswer) optionSet.add(random)
         }
 
@@ -177,9 +181,9 @@ class UiFindMIssedNumberInSequenceFragment : Fragment(R.layout.fragment_ui_find_
                     if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
+                        resetUIForNext() // always reset first
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
-                            resetUIForNext()
                             activity.showRandomQuestion()
                         }
                     }
