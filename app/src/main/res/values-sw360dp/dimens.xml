@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/values-sw360dp/dimens.xml — the common phone size -->
+<resources>
+    <!-- Top bar -->
+    <dimen name="ms_card_height">60dp</dimen>
+    <dimen name="ms_card_top">58dp</dimen>
+    <dimen name="ms_score_text">30sp</dimen>
+    <dimen name="ms_dot">10dp</dimen>
+    <dimen name="ms_pill_height">34dp</dimen>
+    <dimen name="ms_timer_text">17sp</dimen>
+    <dimen name="ms_timer_icon">21dp</dimen>
+
+    <dimen name="ms_avatar_lift">6dp</dimen>
+
+    <!-- Body -->
+    <dimen name="ms_flag">56dp</dimen>
+    <dimen name="ms_problem_text">40sp</dimen>
+    <dimen name="ms_answer_box">46dp</dimen>
+    <dimen name="ms_input_height">48dp</dimen>
+    <dimen name="ms_key_height">48dp</dimen>
+    <dimen name="ms_key_text">28sp</dimen>
+    <dimen name="ms_countdown_text">92sp</dimen>
+</resources>

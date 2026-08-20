@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    tools:context=".questions.questionMathFirstGrade.thirdTopicSubtraction.medium.UiSubtractionDragFragment">
+
+    <TextView
+        android:id="@+id/instructionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_semibold"
+        android:text="@string/drag_make_subtraction"
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Equation with THREE blanks: [ ] - [ ] = [ ] -->
+    <LinearLayout
+        android:id="@+id/problemRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/tileTray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/instructionText">
+
+        <!-- Slot A (minuend) -->
+        <FrameLayout
+            android:id="@+id/slotA"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginEnd="6dp">
+
+            <ImageView
+                android:id="@+id/slotAEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="slot a"
+                android:src="@drawable/answer_blue_box" />
+
+            <View
+                android:id="@+id/slotAShadow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_shadow"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/slotAButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_top"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/slotAText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="8"
+                    android:textColor="@color/text_color"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="-"
+            android:textColor="@color/blue_2"
+            android:textSize="32sp" />
+
+        <!-- Slot B (subtrahend) -->
+        <FrameLayout
+            android:id="@+id/slotB"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp">
+
+            <ImageView
+                android:id="@+id/slotBEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="slot b"
+                android:src="@drawable/answer_blue_box" />
+
+            <View
+                android:id="@+id/slotBShadow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_shadow"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/slotBButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_top"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/slotBText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="3"
+                    android:textColor="@color/text_color"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="="
+            android:textColor="#64748b"
+            android:textSize="32sp" />
+
+        <!-- Slot C (result) -->
+        <FrameLayout
+            android:id="@+id/slotC"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="6dp">
+
+            <ImageView
+                android:id="@+id/slotCEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="slot c"
+                android:src="@drawable/answer_blue_box" />
+
+            <View
+                android:id="@+id/slotCShadow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_shadow"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/slotCButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_top"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/slotCText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="5"
+                    android:textColor="@color/text_color"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <!-- Draggable tiles: flat white cap over a grey placeholder -->
+    <LinearLayout
+        android:id="@+id/tileTray"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <FrameLayout
+            android:id="@+id/tile1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/option_btn_shadow">
+            <FrameLayout
+                android:id="@+id/tile1Button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_top">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="..."
+                    android:textColor="@color/text_color"
+                    android:textSize="20sp" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tile2"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/option_btn_shadow">
+            <FrameLayout
+                android:id="@+id/tile2Button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_top">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="..."
+                    android:textColor="@color/text_color"
+                    android:textSize="20sp" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tile3"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/option_btn_shadow">
+            <FrameLayout
+                android:id="@+id/tile3Button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_top">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="..."
+                    android:textColor="@color/text_color"
+                    android:textSize="20sp" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tile4"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/option_btn_shadow">
+            <FrameLayout
+                android:id="@+id/tile4Button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_top">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="..."
+                    android:textColor="@color/text_color"
+                    android:textSize="20sp" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tile5"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/option_btn_shadow">
+            <FrameLayout
+                android:id="@+id/tile5Button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/option_btn_top">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:text="..."
+                    android:textColor="@color/text_color"
+                    android:textSize="20sp" />
+            </FrameLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

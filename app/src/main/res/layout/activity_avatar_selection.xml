@@ -1,178 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://tools.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#E5E5E5"
     android:fitsSystemWindows="true"
     tools:context=".avatarSelection.AvatarSelectionActivity">
 
+    <!-- Top Navigation Bar -->
     <ImageView
         android:id="@+id/close_btn"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:padding="5dp"
+        android:padding="4dp"
         android:src="@drawable/exit_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/header_title"
+        android:id="@+id/save_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
         android:fontFamily="@font/inter_semibold"
-        android:text="@string/choose_avatar"
-        android:textColor="@color/gray_1"
-        android:textSize="18sp"
+        android:text="@string/save"
+        android:textColor="@color/blue_2"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/close_btn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/close_btn" />
 
-    <!-- LINE DIVIDER: BELOW TOP BAR -->
-    <View
-        android:id="@+id/top_bar_lower_divider"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/gray_2"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/close_btn" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/avatar_recycler_view"
+    <!-- Interactive Rive View Header — FIXED height, full width -->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/avatar_rive_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingBottom="24dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_divider"
+        android:layout_marginTop="10dp"
+        app:riveAlignment="CENTER"
+        app:riveAutoPlay="true"
+        app:riveFit="COVER"
+        app:riveResource="@raw/avatar"
+        app:riveStateMachine="State Machine 1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/top_bar_lower_divider"
-        tools:listitem="@layout/item_avatar" />
+        app:layout_constraintBottom_toTopOf="@id/bottom_sheet_card"
+        app:layout_constraintTop_toBottomOf="@+id/close_btn" />
 
-    <!-- LINE DIVIDER: ABOVE SAVE BUTTON -->
-    <View
-        android:id="@+id/bottom_divider"
+    <!-- Bottom Creator Sheet — fills everything from below the avatar to the bottom -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bottom_sheet_card"
         android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:layout_marginBottom="16dp"
-        android:background="@color/gray_2"
-        app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- CONTINUE BUTTON CONTAINER -->
-    <FrameLayout
-        android:id="@+id/continue_btn_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:paddingBottom="5dp"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/avatar_rive_view">
 
-        <FrameLayout
-            android:id="@+id/continue_enabled_btn_container"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="invisible">
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="vertical">
 
-            <View
+            <!-- Category Tabs RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/category_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/custom_button"
-                android:backgroundTint="@color/black_2"
-                android:translationY="5dp" />
+                android:layout_height="88dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingHorizontal="0dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_category_tab" />
 
-            <Button
-                android:id="@+id/continue_enabled_btn"
+            <!-- Swappable content: number grid OR background color swatches -->
+            <FrameLayout
+                android:id="@+id/options_container"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/custom_button"
-                android:fontFamily="@font/inter_semibold"
-                android:stateListAnimator="@drawable/button_animator"
-                android:text="@string/save"
-                android:textColor="@color/white"
-                android:textSize="17sp"
-                app:backgroundTint="@color/black_3" />
-        </FrameLayout>
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
-        <FrameLayout
-            android:id="@+id/continue_disabled_btn_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="visible">
+                <LinearLayout
+                    android:id="@+id/grid_and_palette"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/custom_button"
-                android:backgroundTint="@color/gray_2"
-                android:translationY="5dp" />
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/options_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:clipToPadding="false"
+                        android:padding="8dp"
+                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                        app:spanCount="2"
+                        tools:listitem="@layout/item_option_cube" />
 
-            <TextView
-                android:id="@+id/continue_disabled_btn"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:text="@string/save"
-                android:textColor="@color/gray_1"
-                android:textSize="17sp"
-                android:translationY="5dp" />
-        </FrameLayout>
-    </FrameLayout>
+                    <!-- Divider above the color palette -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:background="@color/gray_2" />
 
-    <!-- LOADING OVERLAY (Moved inside the root ConstraintLayout) -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/part_color_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="10dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/color_swatches"
+                    layout="@layout/view_color_swatches"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Loading Overlay -->
     <FrameLayout
         android:id="@+id/loadingOverlayContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#80000000"
         android:clickable="true"
         android:focusable="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:visibility="gone">
 
-        <LinearLayout
-            android:id="@+id/loadingLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#FFFFFF"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ProgressBar
-                android:id="@+id/loadingProgressBar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:indeterminate="true"
-                android:indeterminateTint="@color/blue_2" />
-
-            <TextView
-                android:id="@+id/loadingText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:fontFamily="@font/inter_semibold"
-                android:text="@string/loading"
-                android:textColor="@color/text_color" />
-        </LinearLayout>
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/white" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

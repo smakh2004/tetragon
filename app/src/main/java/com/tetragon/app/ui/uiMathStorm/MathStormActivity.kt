@@ -1,22 +1,23 @@
 package com.tetragon.app.ui.uiMathStorm
 
 import android.content.Intent
+import android.graphics.Color
 import android.media.MediaPlayer
-import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import app.rive.runtime.kotlin.core.Rive
+import app.rive.runtime.kotlin.core.ViewModelInstance
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.tetragon.app.R
 import com.tetragon.app.connectivityCheck.AndroidConnectivityObserver
 import com.tetragon.app.connectivityCheck.ConnectivityViewModel
@@ -24,52 +25,53 @@ import com.tetragon.app.databinding.ActivityMathStormBinding
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.tetragon.app.utils.mathStormUtils.MathStormController
 import com.tetragon.app.utils.soundUtils.SoundManager
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 class MathStormActivity : BaseActivity() {
+
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
     private lateinit var binding: ActivityMathStormBinding
+
     private var isNavigatingToResult = false
     private var sessionHighestScore = 0
-
-    // Counts every answer the user submits (one per answer-button tap).
     private var questionsAnswered = 0
+    private var currentMistakes = 0
 
+    private var userListener: ListenerRegistration? = null
+
+    // ---------------- Connectivity ----------------
     private val viewModel: ConnectivityViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
                 return ConnectivityViewModel(AndroidConnectivityObserver(applicationContext)) as T
             }
         }
     }
 
-    // UI ELEMENTS
-    private lateinit var inputEditText: EditText
-    private lateinit var enabledButtonFrame: FrameLayout
-    private lateinit var enabledButton: Button
-    private lateinit var disabledButton: FrameLayout
-    private lateinit var problemTextView: TextView
-    private lateinit var countdownOverlay: FrameLayout
-    private lateinit var countdownText: TextView
-    private lateinit var afterCountdownImage: ImageView
-    private lateinit var scoreText: TextView
-    private lateinit var mistake1: ImageView
-    private lateinit var mistake2: ImageView
-    private lateinit var mistake3: ImageView
-    private lateinit var timerText: TextView
-    private lateinit var signFlag: ImageView
-    private lateinit var squareImage: ImageView
-
-    // SOUNDS
+    // ---------------- Sound Players ----------------
     private lateinit var timerPlayer: MediaPlayer
     private lateinit var finishPlayer: MediaPlayer
     private lateinit var wrongPlayer: MediaPlayer
     private lateinit var correctPlayer: MediaPlayer
 
+    // ---------------- Controller ----------------
     private lateinit var controller: MathStormController
+
+    // ---------------- Rive Avatar State ----------------
+    private var playerViewModelInstance: ViewModelInstance? = null
+    private var defaultFace: Float = 1f
+
+    companion object {
+        private const val MAX_RIVE_ATTEMPTS = 60
+        private const val RIVE_RETRY_DELAY_MS = 50L
+        private const val VIEW_MODEL_NAME = "ViewModel1"
+
+        private const val FACE_HAPPY = 11f
+        private const val FACE_SAD = 10f
+        private const val FACE_REACTION_MS = 900L
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,34 +80,124 @@ class MathStormActivity : BaseActivity() {
         setContentView(binding.root)
 
         observeConnectivity()
-        initViews()
         initSounds()
         initController()
         initButtons()
+        loadAndApplyAvatarConfig()
 
-        signFlag.setOnClickListener { showQuitBottomSheet() }
+        binding.signFlag.setOnClickListener { showQuitBottomSheet() }
         onBackPressedDispatcher.addCallback(this) { showQuitBottomSheet() }
 
         startCountdownOverlay(3)
     }
 
-    private fun initViews() {
-        inputEditText = findViewById(R.id.editText)
-        enabledButtonFrame = findViewById(R.id.enabledButtonFrame)
-        enabledButton = findViewById(R.id.enabledButton)
-        disabledButton = findViewById(R.id.disabledButtonFrame)
-        problemTextView = findViewById(R.id.problemText)
-        countdownOverlay = findViewById(R.id.countdownOverlay)
-        countdownText = findViewById(R.id.countdownText)
-        afterCountdownImage = findViewById(R.id.afterCountdownImage)
-        signFlag = findViewById(R.id.signFlag)
-        squareImage = findViewById(R.id.problemImage)
-        scoreText = findViewById(R.id.scoreText)
-        mistake1 = findViewById(R.id.mistake1)
-        mistake2 = findViewById(R.id.mistake2)
-        mistake3 = findViewById(R.id.mistake3)
-        timerText = findViewById(R.id.timerText)
+    // ==================== RIVE AVATAR & REACTIONS ====================
+
+    private fun loadAndApplyAvatarConfig() {
+        val uid = auth.currentUser?.uid ?: return
+
+        userListener?.remove()
+        userListener = db.collection("users").document(uid)
+            .addSnapshotListener { snapshot, error ->
+                if (isFinishing || isDestroyed || error != null) return@addSnapshotListener
+                val config = snapshot?.get("avatarConfig") as? Map<*, *> ?: return@addSnapshotListener
+                applyAvatarConfigToRive(config)
+            }
     }
+
+    private fun applyAvatarConfigToRive(config: Map<*, *>, attempt: Int = 0) {
+        binding.playerAvatar.post {
+            if (isFinishing || isDestroyed) return@post
+
+            val riveController = binding.playerAvatar.controller
+            val file = riveController.file
+            val stateMachine = riveController.stateMachines.firstOrNull()
+
+            if (file == null || stateMachine == null) {
+                if (attempt < MAX_RIVE_ATTEMPTS) {
+                    binding.playerAvatar.postDelayed({
+                        applyAvatarConfigToRive(config, attempt + 1)
+                    }, RIVE_RETRY_DELAY_MS)
+                }
+                return@post
+            }
+
+            try {
+                val vm = file.getViewModelByName(VIEW_MODEL_NAME) ?: return@post
+                val vmi = vm.createDefaultInstance()
+                playerViewModelInstance = vmi
+
+                riveController.activeArtboard?.viewModelInstance = vmi
+                riveController.stateMachines.forEach { it.viewModelInstance = vmi }
+
+                defaultFace = (config["face"] as? Number)?.toFloat() ?: 1f
+
+                listOf("face", "hair", "glasses", "hat", "mustache", "body").forEach { key ->
+                    val num = if (key == "face") {
+                        getCurrentBaseFace()
+                    } else {
+                        (config[key] as? Number)?.toFloat() ?: 1f
+                    }
+                    setNumber(vmi, key, num)
+                }
+
+                val hatValue = (config["hat"] as? Number)?.toInt() ?: 1
+                runCatching { vmi.getBooleanProperty("hatOn")?.value = (hatValue > 1) }
+
+                listOf(
+                    "skinColor", "hairColor", "glassColor", "capColor",
+                    "mustacheColor", "clothColor", "backgroundColor", "eyebrowColor", "eyeColor"
+                ).forEach { propName ->
+                    val hex = config[propName] as? String ?: return@forEach
+                    val colorInt = runCatching { Color.parseColor(hex) }.getOrNull() ?: return@forEach
+                    setColor(vmi, propName, colorInt)
+                }
+            } catch (e: Exception) {
+                Log.e("MathStorm", "Error binding Rive avatar: ${e.message}")
+            }
+        }
+    }
+
+    private fun setNumber(vmi: ViewModelInstance, name: String, value: Float) {
+        runCatching { vmi.getNumberProperty(name)?.value = value }
+    }
+
+    private fun setColor(vmi: ViewModelInstance, name: String, value: Int) {
+        runCatching { vmi.getColorProperty(name)?.value = value }
+    }
+
+    private fun reactWithFace(face: Float) {
+        setFace(face)
+        binding.playerAvatar.postDelayed({
+            if (!isFinishing && !isDestroyed) {
+                setFace(getCurrentBaseFace())
+            }
+        }, FACE_REACTION_MS)
+    }
+
+    private fun setFace(face: Float) {
+        val vmi = playerViewModelInstance ?: return
+        setNumber(vmi, "face", face)
+    }
+
+    private fun getSadFaceForMistake(mistakesCount: Int): Float {
+        return when (mistakesCount) {
+            1 -> 12f
+            2 -> 13f
+            3 -> 14f
+            else -> 14f
+        }
+    }
+
+    private fun getCurrentBaseFace(): Float {
+        return if (currentMistakes > 0) {
+            getSadFaceForMistake(currentMistakes)
+        } else {
+            defaultFace
+        }
+    }
+
+    // ==================== SOUNDS & CONTROLLER ====================
 
     private fun initSounds() {
         timerPlayer = MediaPlayer.create(this, R.raw.start)
@@ -116,41 +208,63 @@ class MathStormActivity : BaseActivity() {
 
     private fun initController() {
         controller = MathStormController(
-            onInputChanged = { input -> inputEditText.setText(input); toggleContinueButton(input.isNotEmpty()) },
-            onProblemChanged = { problem -> problemTextView.text = problem.text },
-            onScoreChanged = { score -> scoreText.text = score.toString(); if (score > sessionHighestScore) sessionHighestScore = score },
-            onMistakeChanged = { mistakes -> updateMistakesUI(mistakes); if (mistakes > 0) playWrongSound() },
-            onCorrectChanged = { if (it) playCorrectSound() },
-            onCountdownTick = { seconds -> timerText.text = formatTime(seconds) },
-            onQuizFinished = { score -> if (!isFinishing) navigateToResult(score) }
+            onInputChanged = { input ->
+                binding.editText.setText(input)
+                toggleContinueButton(input.isNotEmpty())
+            },
+            onProblemChanged = { problem ->
+                binding.problemText.text = problem.text
+            },
+            onScoreChanged = { score ->
+                binding.scoreText.text = score.toString()
+                if (score > sessionHighestScore) sessionHighestScore = score
+            },
+            onMistakeChanged = { mistakes ->
+                currentMistakes = mistakes
+                updateMistakesUI(mistakes)
+                if (mistakes > 0) {
+                    playWrongSound()
+                    reactWithFace(FACE_SAD)
+                }
+            },
+            onCorrectChanged = { isCorrect ->
+                if (isCorrect) {
+                    playCorrectSound()
+                    reactWithFace(FACE_HAPPY)
+                }
+            },
+            onCountdownTick = { seconds ->
+                binding.timerText.text = formatTime(seconds)
+            },
+            onQuizFinished = { score ->
+                if (!isFinishing) navigateToResult(score)
+            }
         )
     }
 
     private fun startCountdownOverlay(seconds: Int) {
-        countdownOverlay.visibility = View.VISIBLE
-        afterCountdownImage.visibility = View.GONE
+        binding.countdownOverlay.visibility = View.VISIBLE
+        binding.afterCountdownImage.visibility = View.GONE
 
         controller.startCountdown(
             seconds,
             tick = { sec ->
                 if (!isFinishing) {
-                    countdownText.text = sec.toString()
+                    binding.countdownText.text = sec.toString()
                     playTimerSound()
                 }
             },
             finish = {
                 if (!isFinishing) {
-                    countdownText.visibility = View.GONE
-                    afterCountdownImage.visibility = View.VISIBLE
+                    binding.countdownText.visibility = View.GONE
+                    binding.afterCountdownImage.visibility = View.VISIBLE
                     playFinishSound()
 
-                    // Critical safety: Use a handler check or check isFinishing inside delay
-                    afterCountdownImage.postDelayed({
+                    binding.afterCountdownImage.postDelayed({
                         if (!isFinishing && !isDestroyed) {
-                            countdownOverlay.visibility = View.GONE
-                            afterCountdownImage.visibility = View.GONE
+                            binding.countdownOverlay.visibility = View.GONE
+                            binding.afterCountdownImage.visibility = View.GONE
                             startQuiz()
-                            squareImage.visibility = View.VISIBLE
                         }
                     }, 1000)
                 }
@@ -159,23 +273,24 @@ class MathStormActivity : BaseActivity() {
     }
 
     private fun startQuiz() {
+        binding.problemImage.visibility = View.VISIBLE
         controller.showNextProblem()
         controller.startQuizTimer()
     }
 
     private fun initButtons() {
         val buttonMap = mapOf(
-            R.id.btn0 to "0", R.id.btn1 to "1", R.id.btn2 to "2", R.id.btn3 to "3",
-            R.id.btn4 to "4", R.id.btn5 to "5", R.id.btn6 to "6", R.id.btn7 to "7",
-            R.id.btn8 to "8", R.id.btn9 to "9", R.id.btnMinus to "-", R.id.btnDel to "DEL"
+            binding.btn0 to "0", binding.btn1 to "1", binding.btn2 to "2", binding.btn3 to "3",
+            binding.btn4 to "4", binding.btn5 to "5", binding.btn6 to "6", binding.btn7 to "7",
+            binding.btn8 to "8", binding.btn9 to "9", binding.btnMinus to "-", binding.btnDel to "DEL"
         )
-        buttonMap.forEach { (id, value) ->
-            findViewById<Button>(id).setOnClickListener {
+        buttonMap.forEach { (button, value) ->
+            button.setOnClickListener {
                 if (value == "DEL") controller.deleteInput() else controller.addInput(value)
             }
         }
-        enabledButton.setOnClickListener {
-            questionsAnswered++          // count this submitted answer
+        binding.enabledButton.setOnClickListener {
+            questionsAnswered++
             controller.checkAnswer()
         }
     }
@@ -193,21 +308,44 @@ class MathStormActivity : BaseActivity() {
     }
 
     private fun updateMistakesUI(count: Int) {
-        val images = listOf(mistake1, mistake2, mistake3)
+        val images = listOf(binding.mistake1, binding.mistake2, binding.mistake3)
         images.forEachIndexed { index, image ->
             image.setImageResource(if (index < count) R.drawable.wrong_circle else R.drawable.circle_empty)
         }
     }
 
     private fun toggleContinueButton(hasInput: Boolean) {
-        enabledButtonFrame.visibility = if (hasInput) View.VISIBLE else View.INVISIBLE
-        disabledButton.visibility = if (hasInput) View.INVISIBLE else View.VISIBLE
+        binding.enabledButtonFrame.visibility = if (hasInput) View.VISIBLE else View.INVISIBLE
+        binding.disabledButtonFrame.visibility = if (hasInput) View.INVISIBLE else View.VISIBLE
     }
 
-    private fun playTimerSound() { if (SoundManager.isSoundEnabled(this)) { if (timerPlayer.isPlaying) timerPlayer.seekTo(0); timerPlayer.start() } }
-    private fun playFinishSound() { if (SoundManager.isSoundEnabled(this)) { if (finishPlayer.isPlaying) finishPlayer.seekTo(0); finishPlayer.start() } }
-    private fun playWrongSound() { if (SoundManager.isSoundEnabled(this)) { if (wrongPlayer.isPlaying) wrongPlayer.seekTo(0); wrongPlayer.start() } }
-    private fun playCorrectSound() { if (SoundManager.isSoundEnabled(this)) { if (correctPlayer.isPlaying) correctPlayer.seekTo(0); correctPlayer.start() } }
+    private fun playTimerSound() {
+        if (SoundManager.isSoundEnabled(this)) {
+            if (timerPlayer.isPlaying) timerPlayer.seekTo(0)
+            timerPlayer.start()
+        }
+    }
+
+    private fun playFinishSound() {
+        if (SoundManager.isSoundEnabled(this)) {
+            if (finishPlayer.isPlaying) finishPlayer.seekTo(0)
+            finishPlayer.start()
+        }
+    }
+
+    private fun playWrongSound() {
+        if (SoundManager.isSoundEnabled(this)) {
+            if (wrongPlayer.isPlaying) wrongPlayer.seekTo(0)
+            wrongPlayer.start()
+        }
+    }
+
+    private fun playCorrectSound() {
+        if (SoundManager.isSoundEnabled(this)) {
+            if (correctPlayer.isPlaying) correctPlayer.seekTo(0)
+            correctPlayer.start()
+        }
+    }
 
     private fun formatTime(seconds: Int): String = String.format("%d:%02d", seconds / 60, seconds % 60)
 
@@ -227,12 +365,17 @@ class MathStormActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        // Essential cleanup to prevent crashes
         controller.cancelCountdown()
         controller.cancelQuizTimer()
-        afterCountdownImage.removeCallbacks(null)
+        binding.afterCountdownImage.removeCallbacks(null)
 
-        if (isFinishing && sessionHighestScore > 0) saveScoreIfHigher(sessionHighestScore)
+        if (isFinishing && sessionHighestScore > 0) {
+            saveScoreIfHigher(sessionHighestScore)
+        }
+
+        userListener?.remove()
+        userListener = null
+        playerViewModelInstance = null
 
         timerPlayer.release()
         finishPlayer.release()
@@ -242,7 +385,7 @@ class MathStormActivity : BaseActivity() {
     }
 
     private fun saveScoreIfHigher(newScore: Int) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid ?: return
         val docRef = db.collection("users").document(uid).collection("games").document("MathStorm")
         db.runTransaction { transaction ->
             val snapshot = transaction.get(docRef)

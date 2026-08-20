@@ -66,16 +66,10 @@ class SplashScreenActivity : BaseActivity() {
     }
 
     private fun handleInitialRouting() {
-        checkAppUpdateStatus { isUpdateRequired ->
-            if (isFinishing || isDestroyed) return@checkAppUpdateStatus
-
-            if (isUpdateRequired) {
-                // Update dialog is showing — lock navigation.
-                isNavigating.set(true)
-            } else {
-                proceedWithUserSessionValidation()
-            }
-        }
+        // Always route into the app. The update dialog (if the user is behind
+        // the current version) is handled inside MainActivity by the live
+        // Firestore listener — this avoids ever getting stuck on a blank splash.
+        proceedWithUserSessionValidation()
     }
 
     private fun proceedWithUserSessionValidation() {

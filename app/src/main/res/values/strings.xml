@@ -691,8 +691,6 @@
 
     <string name="find_the_largest_number">Find the largest number</string>
 
-    <string name="update_available_title">New Update Available!</string>
-    <string name="update_available_message">We have introduced important updates and stability fixes. Please update to the latest version to keep playing.</string>
     <string name="update_button_action">UPDATE NOW</string>
 
     <string name="billing_error_purchase">Purchase error: %1$s</string>
@@ -725,4 +723,51 @@
 
     <string name="find_the_smallest_number">Find the smallest number</string>
     <string name="connect_numbers">Connect the numbers from 1 to %1$d</string>
+
+    <string name="count_on_problem">Start at %1$d. Count %2$d more.</string>
+    <string name="count_on_problem_preview">Start at 5. Count 3 more.</string>
+
+    <string name="solve_the_addition">Solve the addition</string>
+    <string name="solve_the_subtraction">Solve the subtraction</string>
+
+    <string name="count_back_problem">Start at %1$d and count back %2$d. What number do you reach?</string>
+    <string name="count_back_problem_preview">Start at 8 and count back 3. What number do you reach?</string>
+
+    <string name="drag_make_subtraction">Drag the numbers to make a correct subtraction</string>
+
+    <string name="instruction_represent_difference">Represent %1$s as a difference of %2$s</string>
+
+    <string name="instruction_subtraction_tree">Subtract to find the missing number.</string>
+
+    <string name="instruction_odd_even">Is the answer odd or even?</string>
+    <string name="label_even">Even</string>
+    <string name="label_odd">Odd</string>
+
+    <string name="instruction_find_number">Find the %1$s %2$s number</string>
+    <string name="instruction_find_number_preview">Choose the smallest odd number</string>
+    <string name="word_smallest">smallest</string>
+    <string name="word_largest">largest</string>
+    <string name="word_odd">odd</string>
+    <string name="word_even">even</string>
+
+    <string name="instruction_even_neighbors">Drag the even neighbors into the blanks</string>
+
+    <string name="instruction_change_parity">Which operation changes the parity?</string>
+
+    <string name="instruction_connect_even">Connect the even numbers in order</string>
+    <string name="instruction_connect_odd">Connect the odd numbers in order</string>
+
+    <string name="instruction_choose_two">Choose two numbers</string>
+
+    <string name="update_available_title">Update Available</string>
+    <string name="update_available_message">A new version of Tetragon is available. Please update to continue enjoying the latest features.</string>
+    <string name="update_now">Update now</string>
+    <string name="dismiss">Dismiss</string>
+
+    <string name="you_won">You Won!</string>
+    <string name="you_lose">You Lose!</string>
+    <string name="you_draw">Draw</string>
+    <string name="math_storm_label" translatable="false">MathStorm</string>
+
+    <string name="xp_gain">+%1$d XP</string>
 </resources>

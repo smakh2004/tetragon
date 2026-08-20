@@ -23,6 +23,7 @@ import com.tetragon.app.connectivityCheck.userPresenceUtils.UserPresenceHelper
 import com.tetragon.app.questions.StreakManager
 import com.tetragon.app.ui.LoginActivity
 import com.tetragon.app.ui.WelcomeActivity
+import com.tetragon.app.utils.AppUpdateManager
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.tetragon.app.utils.registrationUtils.DeviceUtils
 import com.tetragon.app.gameModel.GradeManager
@@ -41,6 +42,7 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val db = FirebaseFirestore.getInstance()
     private var sessionListener: ListenerRegistration? = null
+    private var updateListener: ListenerRegistration? = null
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
     private val viewModel: ConnectivityViewModel by viewModels {
@@ -114,6 +116,10 @@ class MainActivity : BaseActivity() {
         StreakManager.checkAndResetIfMissed()
         UserPresenceHelper.startTracking()
         startSessionListener()
+
+        // Live-listens for manual Firestore edits to system/appConfig and
+        // shows the update dialog immediately without needing a restart.
+        updateListener = AppUpdateManager.attachUpdateListener(this)
 
         setMiniGamesVisible(true)
     }
@@ -332,10 +338,14 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         sessionListener?.remove()
+        updateListener?.remove()
     }
 
     override fun onResume() {
         super.onResume()
         setMiniGamesVisible(true)
+        // Re-show the update dialog if the user is still behind the current
+        // version (e.g. came back from the Play Store without updating).
+        AppUpdateManager.recheckAndShowIfNeeded(this)
     }
 }

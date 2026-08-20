@@ -8,128 +8,119 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import app.rive.runtime.kotlin.RiveAnimationView
 import com.tetragon.app.R
 
 class LeaderboardAdapter(
     private val users: List<LeaderboardUser>,
-    private val currentEmail: String?, // Pass current user email here
-    private val onItemClick: (LeaderboardUser) -> Unit
+    private val currentUserEmail: String?,
+    private val onUserClick: (LeaderboardUser) -> Unit
 ) : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val rankText: TextView = view.findViewById(R.id.rankText)
-        val rankImage: ImageView = view.findViewById(R.id.rankImage)
-        val name: TextView = view.findViewById(R.id.nameText)
-        val xp: TextView = view.findViewById(R.id.xpText)
-        val onlineStatusDot: View = view.findViewById(R.id.onlineStatusDot)
+    private val avatarNumberKeys = listOf("face", "hair", "glasses", "hat", "mustache", "body")
 
-        // ADDED: Reference for the avatar ImageView
-        val avatar: ImageView = view.findViewById(R.id.avatar)
+    inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val rowRoot: View = v.findViewById(R.id.rowRoot)
+        val rankText: TextView = v.findViewById(R.id.rankText)
+        val rankImage: ImageView = v.findViewById(R.id.rankImage)
+        val avatarRive: RiveAnimationView = v.findViewById(R.id.avatarRive)
+        val avatarFallback: ImageView = v.findViewById(R.id.avatarFallback)
+        val onlineDot: View = v.findViewById(R.id.onlineStatusDot)
+        val nameText: TextView = v.findViewById(R.id.nameText)
+        val xpText: TextView = v.findViewById(R.id.xpText)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.iteam_leaderboard, parent, false)
+            .inflate(R.layout.item_leaderboard, parent, false)
         return ViewHolder(view)
     }
-
-    override fun getItemCount(): Int = users.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = users[position]
         val rank = position + 1
-        val context = holder.itemView.context
-        val isHighlighted = user.email == currentEmail
+        val ctx = holder.itemView.context
 
-        holder.name.text = "${user.firstName}"
-        holder.xp.text = context.getString(R.string.xp_format, user.monthlyXP.toInt())
+        holder.nameText.text = user.firstName
+        holder.xpText.text = "${user.monthlyXP} XP"
+        holder.onlineDot.visibility = if (user.isOnline) View.VISIBLE else View.GONE
 
-        // ADDED: Avatar Logic
-        val avatarName = user.avatarName ?: "player_icon"
-        val resId = context.resources.getIdentifier(avatarName, "drawable", context.packageName)
-        if (resId != 0) {
-            holder.avatar.setImageResource(resId)
+        // ----- Rank: medal image for top 3, number otherwise -----
+        val medal = when (rank) {
+            1 -> R.drawable.ic_gold
+            2 -> R.drawable.ic_silver
+            3 -> R.drawable.ic_bronze
+            else -> null
+        }
+        if (medal != null) {
+            holder.rankImage.visibility = View.VISIBLE
+            holder.rankImage.setImageResource(medal)
+            holder.rankText.visibility = View.INVISIBLE
         } else {
-            holder.avatar.setImageResource(R.drawable.avatar_1)
+            holder.rankImage.visibility = View.GONE
+            holder.rankText.visibility = View.VISIBLE
+            holder.rankText.text = rank.toString()
         }
 
-        // Toggle the Green Dot
-        if (user.isOnline) {
-            holder.onlineStatusDot.visibility = View.VISIBLE
+        // ----- Current-user highlight -----
+        val isCurrentUser = currentUserEmail != null && user.email == currentUserEmail
+        holder.rowRoot.setBackgroundColor(
+            if (isCurrentUser) ContextCompat.getColor(ctx, R.color.blue_4)
+            else Color.TRANSPARENT
+        )
+
+        // ----- Avatar: Rive if config exists, else avatar_1 -----
+        val config = user.avatarConfig
+        if (config != null) {
+            holder.avatarRive.visibility = View.VISIBLE
+            holder.avatarFallback.visibility = View.GONE
+            applyConfigToRive(holder.avatarRive, config)
         } else {
-            holder.onlineStatusDot.visibility = View.GONE
+            holder.avatarRive.visibility = View.GONE
+            holder.avatarFallback.visibility = View.VISIBLE
+            holder.avatarFallback.setImageResource(R.drawable.avatar_1)
         }
 
-        // 1. Highlight Name: Always blue_1 if it's the current user
-        if (isHighlighted) {
-            holder.name.setTextColor(ContextCompat.getColor(context, R.color.blue_2))
-        } else {
-            // Set your default text color for other users
-            holder.name.setTextColor(ContextCompat.getColor(context, R.color.text_color))
-        }
+        holder.itemView.setOnClickListener { onUserClick(user) }
+    }
 
-        // 2. Handle Rank View, Rank Text Color, and XP Color
-        when (rank) {
-            1 -> {
-                holder.rankImage.visibility = View.VISIBLE
-                holder.rankText.visibility = View.GONE
-                holder.rankImage.setImageResource(R.drawable.ic_gold)
+    private fun applyConfigToRive(rive: RiveAnimationView, config: Map<*, *>) {
+        rive.post {
+            try {
+                val file = rive.controller.file ?: return@post
+                val vm = file.getViewModelByName("ViewModel1") ?: return@post
+                val vmi = vm.createDefaultInstance()
+                rive.controller.stateMachines.firstOrNull()?.viewModelInstance = vmi
 
-                if (isHighlighted) {
-                    holder.xp.setTextColor(ContextCompat.getColor(context, R.color.blue_2))
-                } else {
-                    holder.xp.setTextColor(Color.parseColor("#FFC107"))
+                avatarNumberKeys.forEach { key ->
+                    val value = (config[key] as? Number)?.toInt() ?: 1
+                    vmi.getNumberProperty(key)?.value = value.toFloat()
+                    if (key == "hat") {
+                        vmi.getBooleanProperty("hatOn")?.value = value > 1
+                    }
                 }
-            }
-            2 -> {
-                holder.rankImage.visibility = View.VISIBLE
-                holder.rankText.visibility = View.GONE
-                holder.rankImage.setImageResource(R.drawable.ic_silver)
 
-                if (isHighlighted) {
-                    holder.xp.setTextColor(ContextCompat.getColor(context, R.color.blue_2))
-                } else {
-                    holder.xp.setTextColor(Color.parseColor("#90A4AE"))
+                (config["backgroundColor"] as? String)?.let { hex ->
+                    runCatching { Color.parseColor(hex) }.getOrNull()?.let { color ->
+                        vmi.getColorProperty("backgroundColor")?.value = color
+                    }
                 }
-            }
-            3 -> {
-                holder.rankImage.visibility = View.VISIBLE
-                holder.rankText.visibility = View.GONE
-                holder.rankImage.setImageResource(R.drawable.ic_bronze)
 
-                if (isHighlighted) {
-                    holder.xp.setTextColor(ContextCompat.getColor(context, R.color.blue_2))
-                } else {
-                    holder.xp.setTextColor(Color.parseColor("#A1887F"))
+                // >>> ADD HERE: per-part colors <
+                val colorProps = listOf("skinColor", "hairColor", "glassColor", "capColor", "mustacheColor", "clothColor")
+                colorProps.forEach { propName ->
+                    (config[propName] as? String)?.let { hex ->
+                        runCatching { Color.parseColor(hex) }.getOrNull()?.let { c ->
+                            vmi.getColorProperty(propName)?.value = c
+                        }
+                    }
                 }
+
+            } catch (e: Exception) {
+                android.util.Log.e("LeaderboardAdapter", "Rive config error: ${e.message}")
             }
-            else -> {
-                holder.rankImage.visibility = View.GONE
-                holder.rankText.visibility = View.VISIBLE
-                holder.rankText.text = rank.toString()
-
-                // Logic for Rank 4+
-                if (isHighlighted) {
-                    // If it's the current user and not top 3, make Rank and XP blue_1
-                    holder.rankText.setTextColor(ContextCompat.getColor(context, R.color.blue_2))
-                    holder.xp.setTextColor(ContextCompat.getColor(context, R.color.blue_2))
-                } else {
-                    // Default colors for everyone else
-                    holder.rankText.setTextColor(ContextCompat.getColor(context, R.color.text_color))
-                    holder.xp.setTextColor(ContextCompat.getColor(context, R.color.gray_1))
-                }
-            }
-        }
-
-        // 3. Highlight Background
-        if (isHighlighted) {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.blue_4))
-        } else {
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
-        }
-
-        holder.itemView.setOnClickListener {
-            onItemClick(user)
         }
     }
+
+    override fun getItemCount(): Int = users.size
 }

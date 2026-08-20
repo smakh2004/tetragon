@@ -108,7 +108,8 @@ class RoomActivity : BaseActivity() {
                     model.gameStatus = PrivateGameStatus.JOINED
                     PrivateGameData.saveGameModel(model)
                     hasNavigated = true
-                    startActivity(Intent(this, PrivateBattleMathStormActivity::class.java))
+                    // FIX: Direct Player 2 to PrivateWaitingRoomMathStorm first
+                    startActivity(Intent(this, PrivateWaitingRoomMathStorm::class.java))
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
                 }
             }
@@ -183,7 +184,6 @@ class RoomActivity : BaseActivity() {
                         binding.internetConnection.visibility = View.VISIBLE
                         binding.gameIdInput.isEnabled = false
 
-                        // Force disable visual state
                         binding.createOnlineGameBtnEnabled.visibility = View.GONE
                         binding.createOnlineGameBtnDisabled.visibility = View.VISIBLE
                         binding.joinOnlineGameBtnContainer.visibility = View.GONE

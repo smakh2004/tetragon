@@ -86,6 +86,8 @@
         android:id="@+id/mainContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,132 +96,140 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:fitsSystemWindows="true">
-
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:padding="16dp">
 
+                <!-- TOP SECTION: CLOSE BUTTON & CAPSULE -->
                 <ImageView
                     android:id="@+id/signFlag"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:contentDescription="Score circle"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:contentDescription="Close button"
                     android:src="@drawable/sign_flag"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- TOP BAR + SCORE CIRCLE -->
-                <FrameLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/topBarContainer"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toBottomOf="@id/signFlag">
 
-                    <!-- TOP BAR BACKGROUND -->
-                    <LinearLayout
+                    <!-- CAPSULE BACKGROUND CARD -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/timerMistakeBar"
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:layout_gravity="center"
+                        android:layout_height="64dp"
                         android:background="@drawable/top_bar_background"
                         android:clipChildren="false"
                         android:clipToPadding="false"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp">
+                        android:paddingHorizontal="16dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <!-- TIMER -->
+                        <!-- TIMER (LEFT) -->
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:id="@+id/timerContainer"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:gravity="center_vertical"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
 
                             <ImageView
                                 android:id="@+id/clockIcon"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
                                 android:src="@drawable/ic_clock" />
 
                             <TextView
                                 android:id="@+id/timerText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
+                                android:layout_marginStart="8dp"
                                 android:fontFamily="@font/inter_semibold"
-                                android:text="3:00"
+                                android:includeFontPadding="false"
+                                android:text="3:30"
                                 android:textColor="#f0565d"
-                                android:textSize="20sp" />
+                                android:textSize="22sp" />
                         </LinearLayout>
 
-                        <!-- MISTAKES -->
+                        <!-- MISTAKES (RIGHT) -->
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:id="@+id/mistakesContainer"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end|center_vertical"
+                            android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:paddingRight="10dp">
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
 
                             <ImageView
                                 android:id="@+id/mistake1"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_marginEnd="5dp"
-                                android:src="@drawable/circle_empty" />
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_marginEnd="6dp"
+                                android:src="@drawable/wrong_circle" />
 
                             <ImageView
                                 android:id="@+id/mistake2"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_marginEnd="5dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_marginEnd="6dp"
                                 android:src="@drawable/circle_empty" />
 
                             <ImageView
                                 android:id="@+id/mistake3"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
                                 android:src="@drawable/circle_empty" />
                         </LinearLayout>
-                    </LinearLayout>
 
-                    <!-- SCORE CIRCLE -->
-                    <FrameLayout
-                        android:id="@+id/scoreCircleContainer"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:layout_gravity="center"
-                        android:clipChildren="false"
-                        android:clipToPadding="false"
-                        android:translationY="0dp">
-
-                        <ImageView
-                            android:id="@+id/scoreCircle"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Score circle"
-                            android:src="@drawable/circle_background" />
-
+                        <!-- HIDDEN SCORE TEXT -->
                         <TextView
                             android:id="@+id/scoreText"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:fontFamily="@font/inter_semibold"
-                            android:gravity="center"
-                            android:text="0"
-                            android:textColor="#64748b"
-                            android:textSize="30sp" />
-                    </FrameLayout>
-                </FrameLayout>
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            tools:ignore="MissingConstraints" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- ENLARGED AVATAR OVERLAY -->
+                    <app.rive.runtime.kotlin.RiveAnimationView
+                        android:id="@+id/playerAvatar"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:translationY="-24dp"
+                        app:layout_constraintBottom_toBottomOf="@id/timerMistakeBar"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/timerMistakeBar"
+                        app:riveAlignment="CENTER"
+                        app:riveAutoPlay="true"
+                        app:riveFit="CONTAIN"
+                        app:riveResource="@raw/avatar_math_storm_realtime"
+                        app:riveStateMachine="State Machine 1" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- GENERATED PROBLEM ROW -->
                 <LinearLayout
@@ -297,7 +307,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <!-- Button 1 -->
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="48dp"
@@ -329,7 +338,6 @@
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
-                    <!-- Button 2 -->
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="48dp"
@@ -362,7 +370,6 @@
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
-                    <!-- Button 3 -->
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="48dp"
@@ -395,7 +402,6 @@
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
-                    <!-- Delete Button -->
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="48dp"
@@ -443,7 +449,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <!-- Buttons 4,5,6,- same as row1 -->
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="48dp"
@@ -586,7 +591,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <!-- Buttons 7,8,9,0 -->
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="48dp"
@@ -714,8 +718,7 @@
                     </FrameLayout>
                 </LinearLayout>
 
-                <!-- CONTINUE BUTTON -->
-                <!-- ENABLED BUTTON -->
+                <!-- CONTINUE BUTTONS -->
                 <FrameLayout
                     android:id="@+id/enabledButtonFrame"
                     android:layout_width="match_parent"
@@ -727,7 +730,6 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 
-                    <!-- shadow -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
@@ -735,7 +737,6 @@
                         android:backgroundTint="#0060e2"
                         android:translationY="5dp" />
 
-                    <!-- button -->
                     <Button
                         android:id="@+id/enabledButton"
                         android:layout_width="match_parent"
@@ -752,7 +753,6 @@
                         app:backgroundTint="@null" />
                 </FrameLayout>
 
-                <!-- DISABLED BUTTON (shadow + text only, not clickable) -->
                 <FrameLayout
                     android:id="@+id/disabledButtonFrame"
                     android:layout_width="match_parent"
@@ -764,7 +764,6 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 
-                    <!-- shadow -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
@@ -772,7 +771,6 @@
                         android:backgroundTint="#E5E5E5"
                         android:translationY="5dp" />
 
-                    <!-- text over shadow -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
@@ -785,7 +783,6 @@
                 </FrameLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
             <!-- FULLSCREEN COUNTDOWN OVERLAY -->
             <FrameLayout
@@ -810,7 +807,6 @@
                     android:textColor="#FFFFFF"
                     android:textSize="100sp" />
 
-                <!-- Image to show after countdown -->
                 <ImageView
                     android:id="@+id/afterCountdownImage"
                     android:layout_width="wrap_content"
@@ -821,7 +817,6 @@
                     android:visibility="gone" />
 
             </FrameLayout>
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

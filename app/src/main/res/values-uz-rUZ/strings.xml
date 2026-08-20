@@ -689,8 +689,6 @@
 
     <string name="find_the_largest_number">Eng katta sonni toping</string>
 
-    <string name="update_available_title">Yangi yangilanish mavjud!</string>
-    <string name="update_available_message">Biz muhim yangilanishlar va barqarorlik tuzatishlarini kiritdik. O‘yinni davom ettirish uchun ilovani so‘nggi versiyaga yangilang.</string>
     <string name="update_button_action">YANGILASH</string>
 
     <string name="billing_error_purchase">Xarid xatoligi: %1$s</string>
@@ -723,4 +721,50 @@
 
     <string name="find_the_smallest_number">Eng kichik sonni toping</string>
     <string name="connect_numbers">1 dan %1$d gacha bo‘lgan sonlarni ulang</string>
+
+    <string name="count_on_problem">%1$d dan boshlab %2$d ta oldinga sana.</string>
+    <string name="count_on_problem_preview">5 dan boshlab 3 ta oldinga sana.</string>
+
+    <string name="solve_the_addition">Qo\'shish amalini yeching</string>
+    <string name="solve_the_subtraction">Ayirish amalini yeching</string>
+
+    <string name="count_back_problem">%1$d dan boshlab %2$d ga orqaga sanang. Qaysi songa yetasiz?</string>
+    <string name="count_back_problem_preview">8 dan boshlab 3 ga orqaga sanang. Qaysi songa yetasiz?</string>
+
+    <string name="drag_make_subtraction">Toʻgʻri ayirish hosil qilish uchun raqamlarni torting</string>
+
+    <string name="instruction_represent_difference">%1$s ni %2$s ayirmasi shaklida ifodalang</string>
+
+    <string name="instruction_subtraction_tree">Yetishmayotgan sonni topish uchun ayiring.</string>
+
+    <string name="instruction_odd_even">Javob juft yoki toq?</string>
+    <string name="label_even">Juft</string>
+    <string name="label_odd">Toq</string>
+
+    <string name="instruction_find_number">Eng %1$s %2$s sonni toping</string>
+    <string name="instruction_find_number_preview">Eng kichik toq sonni tanglang</string>
+    <string name="word_smallest">kichik</string>
+    <string name="word_largest">katta</string>
+    <string name="word_odd">toq</string>
+    <string name="word_even">juft</string>
+
+    <string name="instruction_even_neighbors">Juft qoʻshnilarni boʻsh katakchalarga torting</string>
+
+    <string name="instruction_change_parity">Qaysi amal juft-toqlikni oʻzgartiradi?</string>
+
+    <string name="instruction_connect_even">Juft sonlarni tartib bilan ulang</string>
+    <string name="instruction_connect_odd">Toq sonlarni tartib bilan ulang</string>
+
+    <string name="instruction_choose_two">Ikkita sonni tanlang</string>
+
+    <string name="update_available_title">Yangilanish mavjud</string>
+    <string name="update_available_message">Tetragon’ning yangi versiyasi mavjud. Eng so‘nggi funksiyalardan foydalanishda davom etish uchun ilovani yangilang.</string>
+    <string name="update_now">Hozir yangilash</string>
+    <string name="dismiss">Keyinroq</string>
+
+    <string name="you_won">Siz yutdingiz!</string>
+    <string name="you_lose">Siz yutqazdingiz!</string>
+    <string name="you_draw">Durang</string>
+
+    <string name="xp_gain">+%1$d XP</string>
 </resources>

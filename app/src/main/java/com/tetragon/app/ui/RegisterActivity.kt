@@ -541,7 +541,16 @@ class RegisterActivity : BaseActivity() {
                     "subscription" to false,
                     "subscriptionUntil" to null,
                     "planType" to "free",
-                    "avatarName" to "avatar_1"
+                    "avatarName" to "avatar_1",
+                    "avatarConfig" to hashMapOf(
+                        "face" to 1L,
+                        "hair" to 1L,
+                        "glasses" to 1L,
+                        "hat" to 1L,
+                        "mustache" to 1L,
+                        "body" to 1L,
+                        "backgroundColor" to "#00AEEF"
+                    )
                 )
 
                 db.collection("users").document(user.uid).set(userMap)

@@ -691,8 +691,6 @@
 
     <string name="find_the_largest_number">Найди наибольшее число</string>
 
-    <string name="update_available_title">Доступно новое обновление!</string>
-    <string name="update_available_message">Мы добавили важные обновления и исправления стабильности. Пожалуйста, обновите приложение до последней версии, чтобы продолжить игру.</string>
     <string name="update_button_action">ОБНОВИТЬ</string>
 
     <string name="billing_error_purchase">Ошибка покупки: %1$s</string>
@@ -725,4 +723,50 @@
 
     <string name="find_the_smallest_number">Найди наименьшее число</string>
     <string name="connect_numbers">Соедини числа от 1 до %1$d</string>
+
+    <string name="count_on_problem">Начни с %1$d. Отсчитай ещё %2$d.</string>
+    <string name="count_on_problem_preview">Начни с 5. Отсчитай ещё 3.</string>
+
+    <string name="solve_the_addition">Реши пример на сложение</string>
+    <string name="solve_the_subtraction">Реши пример на вычитание</string>
+
+    <string name="count_back_problem">Начни с %1$d и отсчитай назад %2$d. Какое число получится?</string>
+    <string name="count_back_problem_preview">Начни с 8 и отсчитай назад 3. Какое число получится?</string>
+
+    <string name="drag_make_subtraction">Перетащи числа, чтобы получить верное вычитание</string>
+
+    <string name="instruction_represent_difference">Представь %1$s как разность %2$s</string>
+
+    <string name="instruction_subtraction_tree">Вычти, чтобы найти пропущенное число.</string>
+
+    <string name="instruction_odd_even">Ответ чётный или нечётный?</string>
+    <string name="label_even">Чётное</string>
+    <string name="label_odd">Нечётное</string>
+
+    <string name="instruction_find_number">Найди %1$s %2$s число</string>
+    <string name="instruction_find_number_preview">Выбери наименьшее нечётное число</string>
+    <string name="word_smallest">наименьшее</string>
+    <string name="word_largest">наибольшее</string>
+    <string name="word_odd">нечётное</string>
+    <string name="word_even">чётное</string>
+
+    <string name="instruction_even_neighbors">Перетащи чётных соседей в пропуски</string>
+
+    <string name="instruction_change_parity">Какая операция меняет чётность?</string>
+
+    <string name="instruction_connect_even">Соедини чётные числа по порядку</string>
+    <string name="instruction_connect_odd">Соедини нечётные числа по порядку</string>
+
+    <string name="instruction_choose_two">Выбери два числа</string>
+
+    <string name="update_available_title">Доступно обновление</string>
+    <string name="update_available_message">Доступна новая версия Tetragon. Обновите приложение, чтобы продолжить пользоваться новейшими функциями.</string>
+    <string name="update_now">Обновить</string>
+    <string name="dismiss">Позже</string>
+
+    <string name="you_won">Вы победили!</string>
+    <string name="you_lose">Вы проиграли!</string>
+    <string name="you_draw">Ничья</string>
+
+    <string name="xp_gain">+%1$d XP</string>
 </resources>

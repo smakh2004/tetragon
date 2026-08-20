@@ -1,11 +1,15 @@
 package com.tetragon.app.otherProfile
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
+import app.rive.runtime.kotlin.RiveAnimationView
+import app.rive.runtime.kotlin.core.Rive
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tetragon.app.R
@@ -21,9 +25,11 @@ class OtherUserProfileActivity : BaseActivity() {
 
     private val loadingOverlay by lazy { findViewById<FrameLayout>(R.id.loadingOverlayContainer) }
     private val fullNameText by lazy { findViewById<TextView>(R.id.fullNameText) }
+    private val joinedText by lazy { findViewById<TextView>(R.id.joinedText) }
     private val xpValueText by lazy { findViewById<TextView>(R.id.xp_value) }
     private val maxStreakText by lazy { findViewById<TextView>(R.id.max_streak_value) }
     private val streakCountText by lazy { findViewById<TextView>(R.id.streak_count_text) }
+    private val streakSubtitle by lazy { findViewById<TextView>(R.id.streak_subtitle) }
     private val streakActivationIcon by lazy { findViewById<ImageView>(R.id.streak_activation) }
 
     private val mathStormText by lazy { findViewById<TextView>(R.id.mathStormCount) }
@@ -33,6 +39,7 @@ class OtherUserProfileActivity : BaseActivity() {
     private val onlineStatusDot by lazy { findViewById<View>(R.id.onlineStatusDot) }
 
     private val weeklyProgressGraph by lazy { findViewById<WeeklyProgressGraphView>(R.id.weeklyProgressGraph) }
+    private lateinit var profileRiveAvatar: RiveAnimationView
 
     private lateinit var tickViews: List<ImageView>
     private lateinit var dayLabels: List<TextView>
@@ -40,9 +47,33 @@ class OtherUserProfileActivity : BaseActivity() {
     private var completedQueries = 0
     private val totalQueriesExpected = 4
 
+    private val avatarNumberKeys = listOf("face", "hair", "glasses", "hat", "mustache", "body")
+    private val defaultBackgroundHex = "#00AEEF"
+
+    private fun buildDefaultAvatarConfig(): HashMap<String, Any> {
+        val config = HashMap<String, Any>()
+        avatarNumberKeys.forEach { config[it] = 1L }
+        config["backgroundColor"] = defaultBackgroundHex
+        return config
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        try {
+            Rive.init(this)
+        } catch (_: Exception) {
+        }
+
         setContentView(R.layout.activity_other_user_profile)
+
+        profileRiveAvatar = findViewById(R.id.profileRiveAvatar)
+        val profileScrollView = findViewById<NestedScrollView>(R.id.profileScrollView)
+        val profileLineDivider = findViewById<View>(R.id.profileLineDivider)
+
+        profileScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
+            profileLineDivider.visibility = if (scrollY > 0) View.VISIBLE else View.INVISIBLE
+        })
 
         tickViews = listOf(findViewById(R.id.mo_tick), findViewById(R.id.tu_tick), findViewById(R.id.we_tick), findViewById(R.id.th_tick), findViewById(R.id.fr_tick), findViewById(R.id.sa_tick), findViewById(R.id.su_tick))
         dayLabels = listOf(findViewById(R.id.mo_label), findViewById(R.id.tu_label), findViewById(R.id.we_label), findViewById(R.id.th_label), findViewById(R.id.fr_label), findViewById(R.id.sa_label), findViewById(R.id.su_label))
@@ -64,7 +95,6 @@ class OtherUserProfileActivity : BaseActivity() {
         leaderboardText.text = if (passedRank > 0) "#$passedRank" else "-"
         onlineStatusDot.visibility = if (user.isOnline) View.VISIBLE else View.GONE
 
-        updateProfileAvatar(user.avatarName)
         fetchDetailedStats(user.uid.trim())
     }
 
@@ -75,12 +105,27 @@ class OtherUserProfileActivity : BaseActivity() {
             if (task.isSuccessful) {
                 val doc = task.result
                 if (doc != null && doc.exists()) {
+                    val avatarConfig = doc.get("avatarConfig") as? Map<*, *> ?: buildDefaultAvatarConfig()
+                    applyAvatarConfig(avatarConfig)
+
                     fullNameText.text = "${doc.getString("firstName") ?: ""} ${doc.getString("lastName") ?: ""}".trim()
+
+                    doc.getTimestamp("registeredAt")?.let {
+                        joinedText.text = getString(R.string.joined_format, SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(it.toDate()))
+                    } ?: run {
+                        joinedText.visibility = View.GONE
+                    }
+
                     xpValueText.text = (doc.getLong("xp") ?: doc.getLong("monthlyXP") ?: 0L).toString()
                     maxStreakText.text = (doc.getLong("maxStreak") ?: 0L).toString()
 
                     val currentStreak = doc.getLong("streak") ?: 0L
                     streakCountText.text = getString(R.string.day_streak_format, currentStreak.toInt())
+                    streakSubtitle.text = when {
+                        currentStreak > 10 -> getString(R.string.streak_beast)
+                        currentStreak > 0 -> getString(R.string.streak_good)
+                        else -> getString(R.string.streak_practice)
+                    }
                     streakActivationIcon.setImageResource(if (currentStreak > 0) R.drawable.streak else R.drawable.streak_null)
 
                     val dailyXpMap = doc.get("dailyXPGains") as? Map<*, *> ?: emptyMap<String, Any>()
@@ -128,6 +173,44 @@ class OtherUserProfileActivity : BaseActivity() {
         }
     }
 
+    private fun applyAvatarConfig(config: Map<*, *>?) {
+        if (config == null) return
+
+        profileRiveAvatar.post {
+            try {
+                val file = profileRiveAvatar.controller.file ?: return@post
+                val vm = file.getViewModelByName("ViewModel1") ?: return@post
+                val vmi = vm.createDefaultInstance()
+                profileRiveAvatar.controller.stateMachines.firstOrNull()?.viewModelInstance = vmi
+
+                avatarNumberKeys.forEach { key ->
+                    val value = (config[key] as? Number)?.toInt() ?: 1
+                    vmi.getNumberProperty(key)?.value = value.toFloat()
+                    if (key == "hat") {
+                        vmi.getBooleanProperty("hatOn")?.value = value > 1
+                    }
+                }
+
+                (config["backgroundColor"] as? String)?.let { hex ->
+                    runCatching { Color.parseColor(hex) }.getOrNull()?.let { color ->
+                        vmi.getColorProperty("backgroundColor")?.value = color
+                    }
+                }
+
+                val colorProps = listOf("skinColor", "hairColor", "glassColor", "capColor", "mustacheColor", "clothColor")
+                colorProps.forEach { propName ->
+                    (config[propName] as? String)?.let { hex ->
+                        runCatching { Color.parseColor(hex) }.getOrNull()?.let { c ->
+                            vmi.getColorProperty(propName)?.value = c
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("OtherUserProfileActivity", "Avatar config error: ${e.message}")
+            }
+        }
+    }
+
     private fun checkQueryProgress() {
         completedQueries++
         if (completedQueries >= totalQueriesExpected) {
@@ -146,8 +229,13 @@ class OtherUserProfileActivity : BaseActivity() {
         else -> getString(R.string.su)
     }
 
-    private fun updateProfileAvatar(avatarName: String?) {
-        val resId = resources.getIdentifier(avatarName ?: "player_icon", "drawable", packageName)
-        findViewById<ImageView>(R.id.profileImage).setImageResource(if (resId != 0) resId else R.drawable.avatar_1)
+    override fun onResume() {
+        super.onResume()
+        if (::profileRiveAvatar.isInitialized) profileRiveAvatar.play()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::profileRiveAvatar.isInitialized) profileRiveAvatar.pause()
     }
 }

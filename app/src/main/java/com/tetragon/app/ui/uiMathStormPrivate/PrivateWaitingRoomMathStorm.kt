@@ -1,16 +1,20 @@
 package com.tetragon.app.ui.uiMathStormPrivate
 
 import android.content.Intent
-import android.os.Build
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import app.rive.runtime.kotlin.RiveAnimationView
+import app.rive.runtime.kotlin.core.Rive
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.tetragon.app.R
 import com.tetragon.app.connectivityCheck.AndroidConnectivityObserver
 import com.tetragon.app.connectivityCheck.ConnectivityViewModel
@@ -19,16 +23,17 @@ import com.tetragon.app.gameModel.PrivateGameModel
 import com.tetragon.app.gameModel.PrivateGameStatus
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.tetragon.app.utils.mathStormUtils.PrivateGameData
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
-import kotlin.getValue
 
 class PrivateWaitingRoomMathStorm : BaseActivity() {
 
     private lateinit var binding: ActivityPrivateWaitingRoomMathStormBinding
     private var gameModel: PrivateGameModel? = null
-    private var navigated = false
     private val db = FirebaseFirestore.getInstance()
+
+    private var opponentListener: ListenerRegistration? = null
+    private var myListener: ListenerRegistration? = null
+    private var gameStarted = false
 
     private val viewModel: ConnectivityViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
@@ -45,6 +50,7 @@ class PrivateWaitingRoomMathStorm : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Rive.init(this)
         binding = ActivityPrivateWaitingRoomMathStormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -53,85 +59,132 @@ class PrivateWaitingRoomMathStorm : BaseActivity() {
         binding.cancelButton.setOnClickListener {
             cleanupRoomIfOwner()
             finish()
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+            overridePendingTransition(
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
+            )
         }
 
-        PrivateGameData.fetchGameModel()
-        PrivateGameData.gameModel.observe(this) {
-            gameModel = it
-            updateUI()
-        }
+        observeGame()
     }
 
-    private fun fetchUserData(uid: String, callback: (String, String) -> Unit) {
-        val unknown = getString(R.string.unknown_player)
-        if (uid.isEmpty()) {
-            callback(unknown, "")
-            return
-        }
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { doc ->
-                val name = doc?.getString("firstName") ?: unknown
-                val avatar = doc?.getString("avatarName") ?: ""
-                callback(name, avatar)
-            }
-            .addOnFailureListener { callback(unknown, "") }
-    }
+    private fun observeGame() {
+        PrivateGameData.gameModel.observe(this) { model ->
+            gameModel = model
 
-    private fun updateUI() {
-        val model = gameModel ?: return
-        val myUID = if (PrivateGameData.myID == "P1") model.player1 else model.player2
-        val opponentUID = if (PrivateGameData.myID == "P1") model.player2 else model.player1
+            // Robust host check handling both Firebase UID and "P1" string references
+            val isHost = PrivateGameData.myID == model.player1 || PrivateGameData.myID == "P1"
+            val myUID = if (isHost) model.player1 else model.player2
+            val opponentUID = if (isHost) model.player2 else model.player1
 
-        // 1. Set "YOU" (Bottom slot)
-        fetchUserData(myUID) { name, avatar ->
-            binding.playerOneName.text = "$name (${getString(R.string.you_caps)})"
-            loadAvatar(binding.myPlayerIconImage, avatar)
-        }
+            // Display Room ID Header
+            binding.gameIdText.text = "${getString(R.string.room_id_prefix)} ${model.gameID}"
 
-        // 2. Set "OPPONENT" (Top slot)
-        if (opponentUID.isEmpty()) {
-            binding.playerTwoName.text = getString(R.string.searching)
-            binding.searchIcon.visibility = View.VISIBLE
-            binding.opponentAvatarContainer.visibility = View.GONE
-        } else {
-            fetchUserData(opponentUID) { name, avatar ->
-                binding.playerTwoName.text = name
-                loadAvatar(binding.playerIconImage, avatar)
+            // 1. MY AVATAR DATA FETCH
+            if (myUID.isNotEmpty() && myListener == null) {
+                myListener = db.collection("users").document(myUID)
+                    .addSnapshotListener { snapshot, _ ->
+                        val myName = snapshot?.getString("firstName") ?: getString(R.string.you_caps)
+                        val myConfig = snapshot?.get("avatarConfig") as? Map<*, *>
 
-                binding.searchIcon.visibility = View.GONE
-                binding.opponentAvatarContainer.visibility = View.VISIBLE
-            }
-        }
-
-        // 3. Handle Room ID and Status
-        // Extracted "Room ID:" prefix
-        binding.gameIdText.text = "${getString(R.string.room_id_prefix)} ${model.gameID}"
-
-        when (model.gameStatus) {
-            PrivateGameStatus.CREATED -> {
-                binding.cancelButton.visibility =
-                    if (PrivateGameData.myID == "P1") View.VISIBLE else View.GONE
+                        applyAvatarConfigToRive(binding.myPlayerIconImage, myConfig, myName)
+                    }
             }
 
-            PrivateGameStatus.JOINED -> {
-                binding.cancelButton.visibility = View.GONE
-                if (!navigated) {
-                    navigated = true
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        startActivity(Intent(this, PrivateBattleMathStormActivity::class.java))
-                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-                        finish()
-                    }, 1500)
+            // 2. OPPONENT AVATAR FETCH
+            if (opponentUID.isNotEmpty()) {
+                if (opponentListener == null) {
+                    opponentListener = db.collection("users").document(opponentUID)
+                        .addSnapshotListener { snapshot, _ ->
+                            val opponentName = snapshot?.getString("firstName") ?: getString(R.string.opponent_caps)
+                            val opponentConfig = snapshot?.get("avatarConfig") as? Map<*, *>
+
+                            applyAvatarConfigToRive(binding.opponentPlayerIconImage, opponentConfig, opponentName)
+                        }
                 }
+            } else {
+                opponentListener?.remove()
+                opponentListener = null
+                binding.searchingContainer.visibility = View.VISIBLE
+                binding.opponentSection.visibility = View.GONE
+                binding.mySection.visibility = View.GONE
+            }
+
+            // 3. MATCH JOINED: SHOW BOTH RIVE AVATARS FOR 5 SECONDS
+            if (!gameStarted && model.gameStatus == PrivateGameStatus.JOINED && opponentUID.isNotEmpty()) {
+                gameStarted = true
+
+                binding.searchingContainer.visibility = View.GONE
+                binding.mySection.visibility = View.VISIBLE
+                binding.opponentSection.visibility = View.VISIBLE
+                binding.cancelButton.visibility = View.GONE
+
+                startGameWithDelay()
             }
         }
+        PrivateGameData.fetchGameModel()
+    }
+
+    private fun applyAvatarConfigToRive(riveView: RiveAnimationView, config: Map<*, *>?, firstName: String) {
+        riveView.post {
+            try {
+                val file = riveView.controller.file ?: return@post
+                val vm = file.getViewModelByName("ViewModel1") ?: return@post
+                val vmi = vm.createDefaultInstance()
+                riveView.controller.stateMachines.firstOrNull()?.viewModelInstance = vmi
+
+                // Assign First Name Text Property inside Rive State Machine
+                vmi.getStringProperty("firstName")?.value = firstName
+
+                // Number Properties (Force face = 9f for both players)
+                val numberKeys = listOf("face", "hair", "glasses", "hat", "mustache", "body")
+                numberKeys.forEach { key ->
+                    val num = if (key == "face") {
+                        9f
+                    } else {
+                        (config?.get(key) as? Number)?.toFloat() ?: 1f
+                    }
+                    vmi.getNumberProperty(key)?.value = num
+                }
+
+                // Hat Boolean
+                val hatValue = (config?.get("hat") as? Number)?.toInt() ?: 1
+                vmi.getBooleanProperty("hatOn")?.value = (hatValue > 1)
+
+                // Color Properties
+                val colorKeys = listOf(
+                    "skinColor", "hairColor", "glassColor",
+                    "capColor", "mustacheColor", "clothColor", "backgroundColor"
+                )
+                colorKeys.forEach { propName ->
+                    (config?.get(propName) as? String)?.let { hex ->
+                        runCatching { Color.parseColor(hex) }.getOrNull()?.let { colorInt ->
+                            vmi.getColorProperty(propName)?.value = colorInt
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("PrivateWaitingRoomRive", "Error applying avatar config: ${e.message}")
+            }
+        }
+    }
+
+    private fun startGameWithDelay() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this, PrivateBattleMathStormActivity::class.java))
+            overridePendingTransition(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left
+            )
+            finish()
+        }, 5000)
     }
 
     private fun cleanupRoomIfOwner() {
         val model = gameModel ?: return
         if (model.gameStatus != PrivateGameStatus.CREATED) return
-        if (PrivateGameData.myID == "P1") {
+        val isHost = PrivateGameData.myID == model.player1 || PrivateGameData.myID == "P1"
+        if (isHost) {
             db.collection("private_games").document(model.gameID).delete()
         }
     }
@@ -143,15 +196,16 @@ class PrivateWaitingRoomMathStorm : BaseActivity() {
 
     override fun onStop() {
         super.onStop()
-        // Only cleanup if we aren't navigating to the game
-        if (!navigated) {
+        if (!gameStarted) {
             cleanupRoomIfOwner()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!navigated) {
+        opponentListener?.remove()
+        myListener?.remove()
+        if (!gameStarted) {
             cleanupRoomIfOwner()
         }
     }
@@ -173,12 +227,5 @@ class PrivateWaitingRoomMathStorm : BaseActivity() {
                 }
             }
         }
-    }
-
-    private fun loadAvatar(imageView: android.widget.ImageView, avatarName: String?) {
-        val resId = if (!avatarName.isNullOrEmpty()) {
-            resources.getIdentifier(avatarName, "drawable", packageName)
-        } else { 0 }
-        if (resId != 0) imageView.setImageResource(resId)
     }
 }

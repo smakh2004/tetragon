@@ -1,7 +1,9 @@
 package com.tetragon.app.fragments
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -11,15 +13,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.tetragon.app.R
-import com.tetragon.app.streakCalendar.StreakCalendarActivity
-import com.tetragon.app.ui.uiSettings.SettingsActivity
-import com.tetragon.app.ui.WelcomeActivity
+import app.rive.runtime.kotlin.RiveAnimationView
+import app.rive.runtime.kotlin.core.Rive
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.tetragon.app.R
 import com.tetragon.app.avatarSelection.AvatarSelectionActivity
 import com.tetragon.app.otherProfile.WeeklyProgressGraphView
+import com.tetragon.app.streakCalendar.StreakCalendarActivity
+import com.tetragon.app.ui.WelcomeActivity
+import com.tetragon.app.ui.uiSettings.SettingsActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,6 +50,20 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private lateinit var weeklyProgressGraph: WeeklyProgressGraphView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
+    private lateinit var profileRiveAvatar: RiveAnimationView
+
+    // Category keys that map to Rive number properties (matches the avatar creator)
+    private val avatarNumberKeys = listOf("face", "hair", "glasses", "hat", "mustache", "body")
+
+    // Default config applied and saved on first login (all values 1, default background)
+    private val defaultBackgroundHex = "#00AEEF"
+    private fun buildDefaultAvatarConfig(): HashMap<String, Any> {
+        val config = HashMap<String, Any>()
+        avatarNumberKeys.forEach { config[it] = 1L }
+        config["backgroundColor"] = defaultBackgroundHex
+        return config
+    }
+
     private var completedQueries = 0
     private val totalQueriesExpected = 6
 
@@ -56,23 +74,24 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        try {
+            Rive.init(requireContext())
+        } catch (_: Exception) {
+        }
+
         val profileScrollView = view.findViewById<NestedScrollView>(R.id.profileScrollView)
         val profileLineDivider = view.findViewById<View>(R.id.profileLineDivider)
         loadingOverlayContainer = view.findViewById(R.id.loadingOverlayContainer)
         weeklyProgressGraph = view.findViewById(R.id.weeklyProgressGraph)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
+        profileRiveAvatar = view.findViewById(R.id.profileRiveAvatar)
 
-        // Configuration to remove default circle backgrounds and shadows
         context?.let { ctx ->
             swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(ctx, R.color.blue_2))
         }
         swipeRefreshLayout.setSlingshotDistance(0)
         swipeRefreshLayout.setProgressViewEndTarget(false, 140)
-
-        // Setup refresh listener for manual pulling gestures
-        swipeRefreshLayout.setOnRefreshListener {
-            refreshPageData(isManualSwipe = true)
-        }
+        swipeRefreshLayout.setOnRefreshListener { refreshPageData(isManualSwipe = true) }
 
         fullNameText = view.findViewById(R.id.fullNameText)
         joinedText = view.findViewById(R.id.joinedText)
@@ -91,15 +110,25 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         cashStormText = view.findViewById(R.id.cashStormCount)
         leaderboardText = view.findViewById(R.id.leaderboardPosition)
 
+        // Divider appears only when the scrollable content is scrolled
         profileScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
             profileLineDivider.visibility = if (scrollY > 0) View.VISIBLE else View.INVISIBLE
         })
 
         streakContainer.setOnClickListener { startActivity(Intent(requireContext(), StreakCalendarActivity::class.java)) }
-        settingsIcon.setOnClickListener { context?.let { startActivity(Intent(it, SettingsActivity::class.java)); requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left) } }
-        view.findViewById<FrameLayout>(R.id.avatarContainer).setOnClickListener { startActivity(Intent(requireContext(), AvatarSelectionActivity::class.java)); requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left) }
+        settingsIcon.setOnClickListener {
+            context?.let {
+                startActivity(Intent(it, SettingsActivity::class.java))
+                requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            }
+        }
 
-        // First initial page load execution
+        // Tap the avatar animation itself → open the creator
+        profileRiveAvatar.setOnClickListener {
+            startActivity(Intent(requireContext(), AvatarSelectionActivity::class.java))
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
+
         refreshPageData(isManualSwipe = false)
     }
 
@@ -160,11 +189,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         completedQueries++
         if (completedQueries >= totalQueriesExpected) {
             if (!isAdded || context == null) return
-
-            // Turn off pull-to-refresh spinner safely
             swipeRefreshLayout.isRefreshing = false
-
-            // Dismiss full-screen overlay if it's currently showing
             if (loadingOverlayContainer.visibility == View.VISIBLE) {
                 loadingOverlayContainer.animate().alpha(0f).setDuration(250).withEndAction {
                     if (isAdded && context != null) loadingOverlayContainer.visibility = View.GONE
@@ -188,9 +213,22 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         db.collection("users").document(userId).get().addOnSuccessListener { document ->
             if (!isAdded) return@addOnSuccessListener
             if (document != null && document.exists()) {
-                updateProfileAvatar(document.getString("avatarName"))
+
+                val existingConfig = document.get("avatarConfig") as? Map<*, *>
+                if (existingConfig == null) {
+                    // First login (no avatar yet) → assign all default values (1) and save them
+                    val defaultConfig = buildDefaultAvatarConfig()
+                    db.collection("users").document(userId)
+                        .update("avatarConfig", defaultConfig)
+                    applyAvatarConfig(defaultConfig)
+                } else {
+                    applyAvatarConfig(existingConfig)
+                }
+
                 fullNameText.text = "${document.getString("firstName") ?: ""} ${document.getString("lastName") ?: ""}"
-                document.getTimestamp("registeredAt")?.let { joinedText.text = getString(R.string.joined_format, SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(it.toDate())) }
+                document.getTimestamp("registeredAt")?.let {
+                    joinedText.text = getString(R.string.joined_format, SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(it.toDate()))
+                }
             }
             checkQueryProgress()
         }.addOnFailureListener { if (isAdded) startActivity(Intent(requireContext(), WelcomeActivity::class.java)) }
@@ -203,6 +241,48 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         userRef.collection("games").document("MathStorm").get().addOnSuccessListener { doc -> mathStormText.text = (doc.getLong("highScore") ?: 0L).toString(); checkQueryProgress() }
         userRef.collection("games").document("OnlineMathStorm").get().addOnSuccessListener { doc -> battleWinsText.text = (doc.getLong("onlineScore") ?: 0L).toString(); checkQueryProgress() }
         userRef.collection("games").document("CashStorm").get().addOnSuccessListener { doc -> cashStormText.text = (doc.getLong("highScore") ?: 0L).toString(); checkQueryProgress() }
+    }
+
+    // Apply a saved (or default) avatarConfig map to the profile's Rive avatar
+    private fun applyAvatarConfig(config: Map<*, *>?) {
+        if (!isAdded || config == null) return
+
+        profileRiveAvatar.post {
+            try {
+                val file = profileRiveAvatar.controller.file ?: return@post
+                val vm = file.getViewModelByName("ViewModel1") ?: return@post
+                val vmi = vm.createDefaultInstance()
+                profileRiveAvatar.controller.stateMachines.firstOrNull()?.viewModelInstance = vmi
+
+                avatarNumberKeys.forEach { key ->
+                    val value = (config[key] as? Number)?.toInt() ?: 1
+                    vmi.getNumberProperty(key)?.value = value.toFloat()
+                    if (key == "hat") {
+                        vmi.getBooleanProperty("hatOn")?.value = value > 1
+                    }
+                }
+
+                // Background color
+                (config["backgroundColor"] as? String)?.let { hex ->
+                    runCatching { Color.parseColor(hex) }.getOrNull()?.let { color ->
+                        vmi.getColorProperty("backgroundColor")?.value = color
+                    }
+                }
+
+                // >>> ADD HERE: per-part colors <
+                val colorProps = listOf("skinColor", "hairColor", "glassColor", "capColor", "mustacheColor", "clothColor")
+                colorProps.forEach { propName ->
+                    (config[propName] as? String)?.let { hex ->
+                        runCatching { Color.parseColor(hex) }.getOrNull()?.let { c ->
+                            vmi.getColorProperty(propName)?.value = c
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                android.util.Log.e("ProfileFragment", "Avatar config error: ${e.message}")
+            }
+        }
     }
 
     private fun getLocalMidnight(): Calendar = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }
@@ -224,18 +304,18 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         Calendar.MONDAY -> getString(R.string.mo); Calendar.TUESDAY -> getString(R.string.tu); Calendar.WEDNESDAY -> getString(R.string.we); Calendar.THURSDAY -> getString(R.string.th); Calendar.FRIDAY -> getString(R.string.fr); Calendar.SATURDAY -> getString(R.string.sa); Calendar.SUNDAY -> getString(R.string.su); else -> ""
     }
 
-    private fun updateProfileAvatar(n: String?) {
-        if (!isAdded || view == null) return
-        val resId = resources.getIdentifier(n ?: "player_icon", "drawable", requireContext().packageName)
-        view?.findViewById<ImageView>(R.id.profileImage)?.setImageResource(if (resId != 0) resId else R.drawable.avatar_1)
-    }
-
     override fun onResume() {
         super.onResume()
+        if (::profileRiveAvatar.isInitialized) profileRiveAvatar.play()
         auth.currentUser?.uid?.let { uid ->
             db.collection("users").document(uid).get().addOnSuccessListener { doc ->
-                if (isAdded) updateProfileAvatar(doc.getString("avatarName"))
+                if (isAdded) applyAvatarConfig(doc.get("avatarConfig") as? Map<*, *>)
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::profileRiveAvatar.isInitialized) profileRiveAvatar.pause()
     }
 }

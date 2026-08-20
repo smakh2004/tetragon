@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
-    tools:context=".questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.UiOddOrEvenNumberFragment">
+    tools:context=".questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.medium.UiOddOrEvenNumberFragment">
 
     <!-- Question Text -->
     <TextView

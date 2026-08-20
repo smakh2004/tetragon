@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    res/values/dimens.xml
+    BASE BUCKET = smallest phones (under 360dp wide, e.g. 320dp devices).
+    values-sw360dp and values-sw400dp override these for bigger screens.
+    If you already have a dimens.xml, merge these <dimen> lines into it.
+-->
+<resources>
+    <!-- Top bar -->
+    <dimen name="ms_card_height">54dp</dimen>
+    <dimen name="ms_card_top">50dp</dimen>
+    <dimen name="ms_score_text">25sp</dimen>
+    <dimen name="ms_dot">8dp</dimen>
+    <dimen name="ms_pill_height">30dp</dimen>
+    <dimen name="ms_timer_text">15sp</dimen>
+    <dimen name="ms_timer_icon">18dp</dimen>
+
+    <dimen name="ms_avatar_lift">-2dp</dimen>
+
+    <!-- Body -->
+    <dimen name="ms_flag">48dp</dimen>
+    <dimen name="ms_problem_text">34sp</dimen>
+    <dimen name="ms_answer_box">40dp</dimen>
+    <dimen name="ms_input_height">44dp</dimen>
+    <dimen name="ms_key_height">42dp</dimen>
+    <dimen name="ms_key_text">24sp</dimen>
+    <dimen name="ms_countdown_text">80sp</dimen>
+</resources>

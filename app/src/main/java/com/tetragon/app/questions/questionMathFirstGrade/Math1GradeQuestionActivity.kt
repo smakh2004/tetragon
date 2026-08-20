@@ -36,7 +36,6 @@ import com.tetragon.app.questions.questionMathFirstGrade.fifthTopicComparison.*
 import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy.UiNumberTracer.UiNumberTraceFragment
 import com.tetragon.app.questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.*
 import com.tetragon.app.questions.questionMathFirstGrade.ninthTopicRoundNumbers.*
-import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.*
 import com.tetragon.app.questions.questionMathFirstGrade.seventhTopicAdditionUpTo20.*
 import com.tetragon.app.questions.questionMathFirstGrade.sixthTopicParentheses.*
 import com.tetragon.app.questions.questionMathFirstGrade.tenthTopicTwoDigitNumbers.*
@@ -45,6 +44,10 @@ import com.tetragon.app.questions.questionMathFirstGrade.twelvesTopicLengthCenti
 import com.tetragon.app.questions.questionMathFirstGrade.twelvesTopicLengthCentimeter.UiDmInCmFragment
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCounting.hard.UiCountBackFragment
+import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCounting.hard.UiCountOnFragment
+import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCounting.hard.UiEvenNeighborsFragment
+import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCounting.hard.UiFindParityNumberFragment
 import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy.UiAppleCountFragment
 import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy.UiAppleQuestionFragment
 import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy.UiCountWithHandsFragment
@@ -56,6 +59,38 @@ import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbe
 import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.medium.UiFindMIssedNumberInSequenceFragment
 import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.medium.UiFindSmallestNumberFragment
 import com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.medium.UiNumberOfAnglesShapeFragment
+import com.tetragon.app.questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.easy.UiContinueSequenceOddOrEvenFragment
+import com.tetragon.app.questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.easy.UiOddEvenSubtractionFragment
+import com.tetragon.app.questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.hard.UiChooseTwoParityFragment
+import com.tetragon.app.questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.hard.UiConnectParityNumbersFragment
+import com.tetragon.app.questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.hard.UiWhatIsEvenOrOddNumberUpToFragment
+import com.tetragon.app.questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.medium.UiFindOddOrEvenNumbersInSequenceFragment
+import com.tetragon.app.questions.questionMathFirstGrade.fourthTopicOddOrEvenNumbers.medium.UiOddOrEvenNumberFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.easy.UiAdditionFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.easy.UiSimpleAdditionInteractiveFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.easy.UiSimpleAdditionPairsFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.easy.UiVisualAdditionProblemFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.hard.UiBalancedAdditionFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.hard.UiParityOperationFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.hard.UiRepeatedAdditionInteractiveFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.hard.UiRepresentSumOfThreeNumbersFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.hard.UiRepresentSumOfTwoNumbersFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.medium.UiAdditionTreeFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.medium.UiFindMissedNumberInAddition
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.medium.UiOddEvenAdditionFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.medium.UiParityRuleFragment
+import com.tetragon.app.questions.questionMathFirstGrade.secondTopicAddition.medium.UiTrippleAdditionInteractiveFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.easy.UiSimpleSubtractionPairsFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.easy.UiSubtractionFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.easy.UiSubtractionInteractiveFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.easy.UiVisualSubtractionProblemFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.hard.UiBalancedSubtractionFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.hard.UiRepresentDifferenceOfThreeNumbersFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.hard.UiRepresentSubtractionOfTwoNumbersFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.hard.UiSubtractionTreeFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.medium.UiFindMissedNumberInSubtractionFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.medium.UiSubtractionDragFragment
+import com.tetragon.app.questions.questionMathFirstGrade.thirdTopicSubtraction.medium.UiSubtractionMissingDragFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -317,16 +352,27 @@ class Math1GradeQuestionActivity : BaseActivity() {
             )
             MathGrade1Topic.ADDITION -> listOf(
                 MathGrade1Type.ADDITION_NUMBERS, MathGrade1Type.ADDITION_MISSED_NUMBER,
+                MathGrade1Type.FIND_COUNT_ON, MathGrade1Type.ADDITION_ANIMATION,
+                MathGrade1Type.ADDITION_TRIPLE_ANIMATION, MathGrade1Type.ADDITION_MATCH,
                 MathGrade1Type.ADDITION_TWO_REPRESENTATION, MathGrade1Type.ADDITION_THREE_REPRESENTATION,
-                MathGrade1Type.ADDITION_VISUAL_PROBLEM, MathGrade1Type.ADDITION_TREE
+                MathGrade1Type.ADDITION_VISUAL_PROBLEM, MathGrade1Type.ADDITION_TREE,
+                MathGrade1Type.ADDITION_NUMBERS_REPEATED, MathGrade1Type.ADDITION_BALANCED
             )
             MathGrade1Topic.SUBTRACTION -> listOf(
-                MathGrade1Type.SUBTRACTION_NUMBERS, MathGrade1Type.SUBTRACTION_MISSED_NUMBER,
-                MathGrade1Type.SUBTRACTION_TWO_REPRESENTATION
+                MathGrade1Type.SUBTRACTION_NUMBERS, MathGrade1Type.SUBTRACTION_ANIMATION,
+                MathGrade1Type.SUBTRACTION_VISUAL_PROBLEM, MathGrade1Type.FIND_COUNT_BACK,
+                MathGrade1Type.SUBTRACTION_MISSED_NUMBER, MathGrade1Type.SUBTRACTION_DRAG,
+                MathGrade1Type.SUBTRACTION_DRAG_THREE, MathGrade1Type.SUBTRACTION_MATCH,
+                MathGrade1Type.SUBTRACTION_TWO_REPRESENTATION, MathGrade1Type.SUBTRACTION_REPRESENTATION,
+                MathGrade1Type.SUBTRACTION_TREE, MathGrade1Type.SUBTRACTION_BALANCED,
             )
             MathGrade1Topic.ODD_OR_EVEN -> listOf(
+                MathGrade1Type.CONTINUE_SEQUENCE_ODD_OR_EVEN, MathGrade1Type.SUBTRACTION_ODD_EVEN,
+                MathGrade1Type.ADDITION_ODD_EVEN, MathGrade1Type.ADDITION_PARITY_RULE,
                 MathGrade1Type.UP_TO_EVEN_OR_ODD, MathGrade1Type.EVEN_OR_ODD,
-                MathGrade1Type.FIND_EVEN_OR_ODD_SEQUENCE, MathGrade1Type.CONTINUE_SEQUENCE_ODD_OR_EVEN
+                MathGrade1Type.FIND_PARITY_NUMBER, MathGrade1Type.EVEN_NEIGHBORS,
+                MathGrade1Type.FIND_EVEN_OR_ODD_SEQUENCE, MathGrade1Type.PARITY_OPERATION,
+                MathGrade1Type.CONNECT_PARITY, MathGrade1Type.CHOOSE_TWO_PARITY
             )
             MathGrade1Topic.COMPARISON -> listOf(
                 MathGrade1Type.COMPARISON, MathGrade1Type.COMPARISON_TRUE_OR_FALSE,
@@ -416,49 +462,92 @@ class Math1GradeQuestionActivity : BaseActivity() {
         lastQuestionType = nextType
 
         val fragment = when (nextType) {
+            // easy 1 topic
             MathGrade1Type.APPLE -> UiAppleQuestionFragment()
             MathGrade1Type.APPLE_COUNT -> UiAppleCountFragment()
             MathGrade1Type.NUMBER_DRAWING -> UiNumberTraceFragment()
             MathGrade1Type.HAND_COUNT -> UiCountWithHandsFragment()
+            // medium 1 topic
             MathGrade1Type.FIND_MISSED_NUMBER -> UiFindMIssedNumberInSequenceFragment()
             MathGrade1Type.ANGLES -> UiNumberOfAnglesShapeFragment()
             MathGrade1Type.FIND_LARGEST_NUMBER -> UiFindLargestNumberFragment()
             MathGrade1Type.FIND_SMALLEST_NUMBER -> UiFindSmallestNumberFragment()
+            // hard 1 topic
             MathGrade1Type.COUNT_BY -> UiCountByNumberFragment()
             MathGrade1Type.FIND_NEXT_NUMBER -> UiFindNextNumberFragment()
             MathGrade1Type.COUNT_BY_DRAG -> UiCountByDragFragment()
             MathGrade1Type.NUMBER_CONNECTING -> UiConnectionNumberFragment()
 
+            // easy 2 topic
             MathGrade1Type.ADDITION_NUMBERS -> UiAdditionFragment()
+            MathGrade1Type.ADDITION_VISUAL_PROBLEM -> UiVisualAdditionProblemFragment()
+            MathGrade1Type.FIND_COUNT_ON -> UiCountOnFragment()
+            MathGrade1Type.ADDITION_ANIMATION -> UiSimpleAdditionInteractiveFragment()
+            // medium 2 topic
             MathGrade1Type.ADDITION_MISSED_NUMBER -> UiFindMissedNumberInAddition()
+            MathGrade1Type.ADDITION_TREE -> UiAdditionTreeFragment()
+            MathGrade1Type.ADDITION_MATCH -> UiSimpleAdditionPairsFragment()
+            MathGrade1Type.ADDITION_TRIPLE_ANIMATION -> UiTrippleAdditionInteractiveFragment()
+            // hard 2 topic
             MathGrade1Type.ADDITION_TWO_REPRESENTATION -> UiRepresentSumOfTwoNumbersFragment()
             MathGrade1Type.ADDITION_THREE_REPRESENTATION -> UiRepresentSumOfThreeNumbersFragment()
-            MathGrade1Type.ADDITION_VISUAL_PROBLEM -> UiVisualAdditionProblemFragment()
-            MathGrade1Type.ADDITION_TREE -> UiAdditionTreeFragment()
+            MathGrade1Type.ADDITION_NUMBERS_REPEATED -> UiRepeatedAdditionInteractiveFragment()
+            MathGrade1Type.ADDITION_BALANCED -> UiBalancedAdditionFragment()
+
+            // easy 3 topic
             MathGrade1Type.SUBTRACTION_NUMBERS -> UiSubtractionFragment()
+            MathGrade1Type.SUBTRACTION_ANIMATION -> UiSubtractionInteractiveFragment()
+            MathGrade1Type.SUBTRACTION_VISUAL_PROBLEM -> UiVisualSubtractionProblemFragment()
+            MathGrade1Type.FIND_COUNT_BACK -> UiCountBackFragment()
+            // medium 3 topic
             MathGrade1Type.SUBTRACTION_MISSED_NUMBER -> UiFindMissedNumberInSubtractionFragment()
+            MathGrade1Type.SUBTRACTION_DRAG -> UiSubtractionDragFragment()
+            MathGrade1Type.SUBTRACTION_DRAG_THREE -> UiSubtractionMissingDragFragment()
+            MathGrade1Type.SUBTRACTION_MATCH -> UiSimpleSubtractionPairsFragment()
+            // hard 3 topic
             MathGrade1Type.SUBTRACTION_TWO_REPRESENTATION -> UiRepresentSubtractionOfTwoNumbersFragment()
-            MathGrade1Type.UP_TO_EVEN_OR_ODD -> UiWhatIsEvenOrOddNumberUpToFragment()
+            MathGrade1Type.SUBTRACTION_REPRESENTATION -> UiRepresentDifferenceOfThreeNumbersFragment()
+            MathGrade1Type.SUBTRACTION_TREE -> UiSubtractionTreeFragment()
+            MathGrade1Type.SUBTRACTION_BALANCED -> UiBalancedSubtractionFragment()
+
+            // easy 4 topic
+            MathGrade1Type.CONTINUE_SEQUENCE_ODD_OR_EVEN -> UiContinueSequenceOddOrEvenFragment()
+            MathGrade1Type.SUBTRACTION_ODD_EVEN -> UiOddEvenSubtractionFragment()
+            MathGrade1Type.ADDITION_ODD_EVEN -> UiOddEvenAdditionFragment()
+            MathGrade1Type.ADDITION_PARITY_RULE -> UiParityRuleFragment()
+            // medium 4 topic
             MathGrade1Type.EVEN_OR_ODD -> UiOddOrEvenNumberFragment()
             MathGrade1Type.FIND_EVEN_OR_ODD_SEQUENCE -> UiFindOddOrEvenNumbersInSequenceFragment()
-            MathGrade1Type.CONTINUE_SEQUENCE_ODD_OR_EVEN -> UiContinueSequenceOddOrEvenFragment()
+            MathGrade1Type.FIND_PARITY_NUMBER -> UiFindParityNumberFragment()
+            MathGrade1Type.EVEN_NEIGHBORS -> UiEvenNeighborsFragment()
+            // hard 4 topic
+            MathGrade1Type.UP_TO_EVEN_OR_ODD -> UiWhatIsEvenOrOddNumberUpToFragment()
+            MathGrade1Type.PARITY_OPERATION -> UiParityOperationFragment()
+            MathGrade1Type.CONNECT_PARITY -> UiConnectParityNumbersFragment()
+            MathGrade1Type.CHOOSE_TWO_PARITY -> UiChooseTwoParityFragment()
+
             MathGrade1Type.COMPARISON -> UiComparisonNumbersFragment()
             MathGrade1Type.COMPARISON_TRUE_OR_FALSE -> UiTrueOrFalseComparisonFragment()
             MathGrade1Type.COMPARISON_GRAPE_OR_STRAWBERRY -> UiComparisonAppleAndStrawberryFragment()
+
             MathGrade1Type.PARENTHESES -> UiParenthesesFragment()
             MathGrade1Type.PARENTHESES_MISSED -> UiParenthesesMissedFragment()
+
             MathGrade1Type.ADDITION_20 -> UiAdditionUpTo20Fragment()
             MathGrade1Type.ADDITION_MISSED_NUMBER_20 -> UiFindMissedNumberInAddition20Fragment()
             MathGrade1Type.ADDITION_THREE_REPRESENTATION_20 -> UiRepresentSumOfThreeNumbers20Fragment()
             MathGrade1Type.ADDITION_TWO_REPRESENT_20 -> UiRepresentSumOfTwoNumbers20Fragment()
             MathGrade1Type.ADDITION_VISUAL_PROBLEM_20 -> UiVisualAdditionProblem20Fragment()
+
             MathGrade1Type.SUBTRACTION_MISSED_NUMBER_20 -> UiFindMissedNumberInSubtraction20Fragment()
             MathGrade1Type.SUBTRACTION_TWO_REPRESENTATION_20 -> UiRepresentSubtractionOfTwoNumbers20Fragment()
             MathGrade1Type.SUBTRACTION_NUMBERS_20 -> UiSubtraction20Fragment()
+
             MathGrade1Type.CONTINUE_SEQUENCE_ROUND_NUMBERS -> UiContinueSequenceRoundNumbersFragment()
             MathGrade1Type.ARITHMETICS_ROUND_NUMBERS -> UiArithmeticsRoundNumbersFragment()
             MathGrade1Type.CLOSEST_ROUND_NUMBERS -> UiFindCloseRoundNumberFragment()
             MathGrade1Type.HOW_MANY_TENS_ROUND_NUMBERS -> UiHowManyTensFragment()
+
             MathGrade1Type.COMPARISON_TWO_DIGITS -> UiComparisonTwoDigitNumbersFragment()
             MathGrade1Type.ARITHMETICS_TWO_DIGIT_NUMBERS -> UiArithmeticsTwoDigitNumbersFragment()
             MathGrade1Type.COMPARISON_TRUE_OR_FALSE_TWO_DIGIT_NUMBERS -> UiTrueOrFalseComparisonTwoDigitNumbersFragment()
@@ -466,8 +555,10 @@ class Math1GradeQuestionActivity : BaseActivity() {
             MathGrade1Type.ARITHMETICS_VISUAL_TWO_DIGIT_NUMBERS_PROBLEM -> UiVisualArithmeticsTwoDigitNumbersFragment()
             MathGrade1Type.PARENTHESES_TWO_DIGIT_NUMBERS -> UiParenthesesTwoDigitNumbersFragment()
             MathGrade1Type.PARENTHESES_MISSED_TWO_DIGIT_NUMBERS -> UiParenthesesMissedTwoDigitNumbersFragment()
+
             MathGrade1Type.FISH -> UiFishArithmeticProblemFragment()
             MathGrade1Type.AZIZ_APPLE_PROBLEM -> UiApplesAzizProblemFragment()
+
             MathGrade1Type.CM_RULER -> ShowCmInRullerFragment()
             MathGrade1Type.DM_IN_CM -> UiDmInCmFragment()
         }

@@ -7,7 +7,7 @@
     android:background="@color/white"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
-    tools:context=".questions.questionMathFirstGrade.secondTopicAddition.UiFindMissedNumberInAddition">
+    tools:context=".questions.questionMathFirstGrade.secondTopicAddition.medium.UiFindMissedNumberInAddition">
 
     <!-- Question Text -->
     <TextView

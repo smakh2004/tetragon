@@ -6,122 +6,113 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:fitsSystemWindows="true"
     tools:context=".ui.uiMathStormOnline.OnlineResultBattleMathStormActivity">
 
+    <!-- MAIN CONTENT CONTAINER -->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:fitsSystemWindows="true">
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
+        <!-- RESULT TITLE (TOP) -->
+        <TextView
+            android:id="@+id/resultTitleText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <FrameLayout
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/avatar_circle_background"
-                android:padding="5dp">
-
-                <ImageView
-                    android:id="@+id/opponentAvatar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="fitCenter" />
-            </FrameLayout>
-
-            <!-- CENTER STATUS TEXT -->
-            <TextView
-                android:id="@+id/opponent_name"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:text="@string/opponent"
-                android:textColor="#64748b"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/opponent_status"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:text="@string/loser"
-                android:textColor="@color/red_1"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/opponent_result_text"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:text="..."
-                android:textColor="@color/red_1"
-                android:textSize="40sp"
-                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-        </LinearLayout>
-
-        <!-- VS LINE WITH TEXT -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/vs_line_container"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="180dp"
+            android:fontFamily="@font/inter_semibold"
+            android:letterSpacing="0"
+            android:textColor="@color/text_color"
+            android:textSize="28sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="You Won!" />
 
-            <!-- Horizontal line -->
-            <View
-                android:id="@+id/horizontal_line"
+        <!-- XP GAIN LABEL (DIRECTLY UNDER THE TITLE) -->
+        <TextView
+            android:id="@+id/xpGainLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:letterSpacing="0"
+            android:textColor="@color/blue_2"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/resultTitleText"
+            tools:text="+30 XP" />
+
+        <!-- MY SECTION (LEFT HALF) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mySection"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toTopOf="@+id/exit_btn_container"
+            app:layout_constraintEnd_toStartOf="@+id/opponentSection"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/xpGainLabel">
+
+            <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/myPlayerIconImage"
                 android:layout_width="0dp"
-                android:layout_height="2dp"
-                android:background="#e5e5e5"
+                android:layout_height="0dp"
+                android:scaleX="1.25"
+                android:scaleY="1.25"
+                android:translationX="5dp"
+                android:translationY="-94dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Text on top of line -->
-            <TextView
-                android:id="@+id/line_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/background_vs_text"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="10dp"
-                android:text="VS"
-                android:textColor="#64748b"
-                android:textSize="28sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:riveAlignment="CENTER"
+                app:riveAutoPlay="true"
+                app:riveFit="FIT_WIDTH"
+                app:riveResource="@raw/avatar_result_math_storm"
+                app:riveStateMachine="State Machine 1" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- CANCEL BUTTON AT BOTTOM -->
+        <!-- OPPONENT SECTION (RIGHT HALF) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/opponentSection"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toBottomOf="@+id/mySection"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@+id/mySection"
+            app:layout_constraintTop_toTopOf="@+id/mySection">
+
+            <app.rive.runtime.kotlin.RiveAnimationView
+                android:id="@+id/opponentPlayerIconImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleX="1.25"
+                android:scaleY="1.25"
+                android:translationX="-5dp"
+                android:translationY="-94dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:riveAlignment="CENTER"
+                app:riveAutoPlay="true"
+                app:riveFit="FIT_WIDTH"
+                app:riveResource="@raw/avatar_result_math_storm"
+                app:riveStateMachine="State Machine 1" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- EXIT / CONTINUE BUTTON AT BOTTOM -->
         <FrameLayout
             android:id="@+id/exit_btn_container"
             android:layout_width="0dp"
@@ -165,70 +156,9 @@
             </FrameLayout>
         </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/exit_btn_container"
-            app:layout_constraintTop_toBottomOf="@+id/vs_line_container">
-
-            <FrameLayout
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/avatar_circle_background"
-                android:padding="5dp">
-
-                <ImageView
-                    android:id="@+id/yourAvatar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="fitCenter" />
-            </FrameLayout>
-            <!-- CENTER STATUS TEXT -->
-            <TextView
-                android:id="@+id/your_name"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:text="@string/you"
-                android:textColor="#64748b"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/your_status"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:text="@string/winner"
-                android:textColor="@color/green_1"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/your_result_text"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:text="..."
-                android:textColor="@color/green_1"
-                android:textSize="40sp"
-                app:layout_constraintBottom_toTopOf="@+id/vs_line_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- LOADING OVERLAY CONTAINER -->
     <FrameLayout
         android:id="@+id/loadingOverlayContainer"
         android:layout_width="match_parent"
@@ -262,4 +192,20 @@
                 android:textColor="@color/text_color" />
         </LinearLayout>
     </FrameLayout>
+
+    <!-- XP COUNTER ANIMATION — last child so it draws above the avatars and title -->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/xpAnimationView"
+        android:layout_width="310dp"
+        android:layout_height="320dp"
+        android:clickable="false"
+        android:visibility="gone"
+        android:focusable="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riveAlignment="TOP_RIGHT"
+        app:riveAutoPlay="true"
+        app:riveFit="COVER"
+        app:riveResource="@raw/xp_animation"
+        app:riveStateMachine="State Machine 1" />
 </androidx.constraintlayout.widget.ConstraintLayout>

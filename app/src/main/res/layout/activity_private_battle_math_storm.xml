@@ -86,6 +86,8 @@
         android:id="@+id/mainContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,207 +96,274 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:padding="16dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:fitsSystemWindows="true">
 
-
-                <!-- TOP BAR + SCORES + TIMER -->
-                <ImageView
-                    android:id="@+id/signFlag"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="10dp"
-                    android:contentDescription="Score circle"
-                    android:src="@drawable/sign_flag"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer" />
-
-                <FrameLayout
+                <!-- ============ TOP BAR ============ -->
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/topBarContainer"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
+                    <!-- Increased avatar width bounds to 35% / 65% -->
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/avatarGuideStart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.35" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/avatarGuideEnd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.65" />
+
+                    <!-- SCORE CARD -->
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="70dp"
+                        android:id="@+id/scoreCard"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/ms_card_height"
+                        android:layout_marginTop="@dimen/ms_card_top"
                         android:background="@drawable/top_bar_background"
                         android:clipChildren="false"
                         android:clipToPadding="false"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp">
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <!-- Vertical line -->
+                        <!-- Matched score guidelines to 35% / 65% so text aligns with larger avatars -->
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/scoreGuideStart"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.35" />
+
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/scoreGuideEnd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.65" />
+
+                        <!-- Vertical divider -->
                         <View
                             android:id="@+id/view"
                             android:layout_width="2dp"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:background="#E5E5E5"
+                            android:layout_height="0dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:background="#EEEEEE"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <!-- TIMER -->
-                        <FrameLayout
-                            android:id="@+id/timerCircleContainer"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/circle_background"
-                            android:clipChildren="false"
-                            android:clipToPadding="false"
-                            android:padding="5dp"
+                        <!-- LEFT (YOU) -->
+                        <LinearLayout
+                            android:id="@+id/leftScoreBlock"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/rightPlayerContainer"
-                            app:layout_constraintStart_toEndOf="@+id/leftPlayerContainer"
+                            app:layout_constraintEnd_toStartOf="@id/view"
+                            app:layout_constraintStart_toStartOf="@id/scoreGuideStart"
                             app:layout_constraintTop_toTopOf="parent">
 
                             <TextView
-                                android:id="@+id/game_timer"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:id="@+id/game_your_score"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:fontFamily="@font/inter_semibold"
-                                android:gravity="center"
-                                android:text="3:00"
-                                android:textColor="#f0565d"
-                                android:textSize="20sp" />
-                        </FrameLayout>
-
-                        <!-- LEFT PLAYER -->
-                        <LinearLayout
-                            android:id="@+id/leftPlayerContainer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <ImageView
-                                android:layout_width="50dp"
-                                android:layout_height="50dp"
-                                android:src="@drawable/avatar_1" />
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:text="0"
+                                android:textColor="#64748b"
+                                android:textSize="@dimen/ms_score_text" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="12dp"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:paddingBottom="5dp">
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="5dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
-                                <TextView
-                                    android:id="@+id/game_your_score"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/inter_semibold"
-                                    android:text="0"
-                                    android:textColor="#64748b"
-                                    android:textSize="30sp" />
+                                <ImageView
+                                    android:id="@+id/your_mistake1"
+                                    android:layout_width="@dimen/ms_dot"
+                                    android:layout_height="@dimen/ms_dot"
+                                    android:layout_marginEnd="4dp"
+                                    android:src="@drawable/circle_empty" />
 
-                                <LinearLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
+                                <ImageView
+                                    android:id="@+id/your_mistake2"
+                                    android:layout_width="@dimen/ms_dot"
+                                    android:layout_height="@dimen/ms_dot"
+                                    android:layout_marginEnd="4dp"
+                                    android:src="@drawable/circle_empty" />
 
-                                    <ImageView
-                                        android:id="@+id/your_mistake1"
-                                        android:layout_width="18dp"
-                                        android:layout_height="18dp"
-                                        android:layout_marginEnd="4dp"
-                                        android:src="@drawable/circle_empty" />
-
-                                    <ImageView
-                                        android:id="@+id/your_mistake2"
-                                        android:layout_width="18dp"
-                                        android:layout_height="18dp"
-                                        android:layout_marginEnd="4dp"
-                                        android:src="@drawable/circle_empty" />
-
-                                    <ImageView
-                                        android:id="@+id/your_mistake3"
-                                        android:layout_width="18dp"
-                                        android:layout_height="18dp"
-                                        android:src="@drawable/circle_empty" />
-                                </LinearLayout>
+                                <ImageView
+                                    android:id="@+id/your_mistake3"
+                                    android:layout_width="@dimen/ms_dot"
+                                    android:layout_height="@dimen/ms_dot"
+                                    android:src="@drawable/circle_empty" />
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- RIGHT PLAYER -->
+                        <!-- RIGHT (OPPONENT) -->
                         <LinearLayout
-                            android:id="@+id/rightPlayerContainer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
+                            android:id="@+id/rightScoreBlock"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintEnd_toEndOf="@id/scoreGuideEnd"
+                            app:layout_constraintStart_toEndOf="@id/view"
                             app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:id="@+id/game_opponent_score"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_semibold"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:text="0"
+                                android:textColor="#64748b"
+                                android:textSize="@dimen/ms_score_text" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:layout_marginEnd="12dp"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:paddingBottom="5dp">
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="5dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
-                                <TextView
-                                    android:id="@+id/game_opponent_score"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/inter_semibold"
-                                    android:text="0"
-                                    android:textColor="#64748b"
-                                    android:textSize="30sp" />
+                                <ImageView
+                                    android:id="@+id/opponent_mistake1"
+                                    android:layout_width="@dimen/ms_dot"
+                                    android:layout_height="@dimen/ms_dot"
+                                    android:layout_marginEnd="4dp"
+                                    android:src="@drawable/circle_empty" />
 
-                                <LinearLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
+                                <ImageView
+                                    android:id="@+id/opponent_mistake2"
+                                    android:layout_width="@dimen/ms_dot"
+                                    android:layout_height="@dimen/ms_dot"
+                                    android:layout_marginEnd="4dp"
+                                    android:src="@drawable/circle_empty" />
 
-                                    <ImageView
-                                        android:id="@+id/opponent_mistake1"
-                                        android:layout_width="18dp"
-                                        android:layout_height="18dp"
-                                        android:layout_marginEnd="4dp"
-                                        android:src="@drawable/circle_empty" />
-
-                                    <ImageView
-                                        android:id="@+id/opponent_mistake2"
-                                        android:layout_width="18dp"
-                                        android:layout_height="18dp"
-                                        android:layout_marginEnd="4dp"
-                                        android:src="@drawable/circle_empty" />
-
-                                    <ImageView
-                                        android:id="@+id/opponent_mistake3"
-                                        android:layout_width="18dp"
-                                        android:layout_height="18dp"
-                                        android:src="@drawable/circle_empty" />
-                                </LinearLayout>
+                                <ImageView
+                                    android:id="@+id/opponent_mistake3"
+                                    android:layout_width="@dimen/ms_dot"
+                                    android:layout_height="@dimen/ms_dot"
+                                    android:src="@drawable/circle_empty" />
                             </LinearLayout>
-
-                            <!-- Player Icon -->
-                            <ImageView
-                                android:layout_width="50dp"
-                                android:layout_height="50dp"
-                                android:src="@drawable/avatar_1" />
                         </LinearLayout>
-
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </FrameLayout>
+
+                    <!-- LEFT AVATAR: width runs from the card edge to the 35% guideline,
+                         height follows via the 1:1 ratio, so it scales with the screen. -->
+                    <app.rive.runtime.kotlin.RiveAnimationView
+                        android:id="@+id/yourAvatar"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="-10dp"
+                        android:translationY="@dimen/ms_avatar_lift"
+                        app:layout_constraintBottom_toBottomOf="@id/scoreCard"
+                        app:layout_constraintDimensionRatio="H,1:1"
+                        app:layout_constraintEnd_toStartOf="@id/avatarGuideStart"
+                        app:layout_constraintStart_toStartOf="@id/scoreCard"
+                        app:riveAlignment="CENTER"
+                        app:riveAutoPlay="true"
+                        app:riveFit="FIT_HEIGHT"
+                        app:riveResource="@raw/avatar_math_storm_realtime"
+                        app:riveStateMachine="State Machine 1" />
+
+                    <!-- RIGHT AVATAR -->
+                    <app.rive.runtime.kotlin.RiveAnimationView
+                        android:id="@+id/opponentAvatar"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginEnd="-10dp"
+                        android:translationY="@dimen/ms_avatar_lift"
+                        app:layout_constraintBottom_toBottomOf="@id/scoreCard"
+                        app:layout_constraintDimensionRatio="H,1:1"
+                        app:layout_constraintEnd_toEndOf="@id/scoreCard"
+                        app:layout_constraintStart_toEndOf="@id/avatarGuideEnd"
+                        app:riveAlignment="CENTER"
+                        app:riveAutoPlay="true"
+                        app:riveFit="FIT_HEIGHT"
+                        app:riveResource="@raw/avatar_math_storm_realtime"
+                        app:riveStateMachine="State Machine 1" />
+
+                    <!-- TIMER PILL — fully ABOVE the card, never overlapping it -->
+                    <LinearLayout
+                        android:id="@+id/timerCircleContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/ms_pill_height"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/timer_pill_background"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="16dp"
+                        app:layout_constraintBottom_toTopOf="@id/scoreCard"
+                        app:layout_constraintEnd_toEndOf="@id/scoreCard"
+                        app:layout_constraintStart_toStartOf="@id/scoreCard">
+
+                        <app.rive.runtime.kotlin.RiveAnimationView
+                            android:id="@+id/timerIcon"
+                            android:layout_width="@dimen/ms_timer_icon"
+                            android:layout_height="@dimen/ms_timer_icon"
+                            android:layout_marginEnd="7dp"
+                            android:visibility="visible"
+                            app:riveAutoPlay="true"
+                            app:riveResource="@raw/timer_math_storm"
+                            app:riveStateMachine="State Machine 1" />
+
+                        <TextView
+                            android:id="@+id/game_timer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_semibold"
+                            android:includeFontPadding="false"
+                            android:maxLines="1"
+                            android:text="3:00"
+                            android:textColor="#f0565d"
+                            android:textSize="@dimen/ms_timer_text" />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- ============ /TOP BAR ============ -->
+
+                <ImageView
+                    android:id="@+id/signFlag"
+                    android:layout_width="@dimen/ms_flag"
+                    android:layout_height="@dimen/ms_flag"
+                    android:layout_marginTop="10dp"
+                    android:contentDescription="Score circle"
+                    android:src="@drawable/sign_flag"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer" />
 
                 <!-- GENERATED PROBLEM ROW -->
                 <LinearLayout
@@ -316,12 +385,12 @@
                         android:fontFamily="@font/inter_semibold"
                         android:text="2+2="
                         android:textColor="#64748b"
-                        android:textSize="44sp" />
+                        android:textSize="@dimen/ms_problem_text" />
 
                     <ImageView
                         android:id="@+id/problemImage"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="@dimen/ms_answer_box"
+                        android:layout_height="@dimen/ms_answer_box"
                         android:layout_marginStart="12dp"
                         android:contentDescription="problem image"
                         android:src="@drawable/answer_blue_box" />
@@ -343,7 +412,7 @@
                     <EditText
                         android:id="@+id/answer_input"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="@dimen/ms_input_height"
                         android:background="@android:color/transparent"
                         android:cursorVisible="false"
                         android:focusable="false"
@@ -374,7 +443,7 @@
                     <!-- Button 1 -->
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -399,14 +468,14 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="1"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <!-- Button 2 -->
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -432,14 +501,14 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="2"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <!-- Button 3 -->
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -465,14 +534,14 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="3"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <!-- Delete Button -->
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -497,7 +566,7 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="⌫"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
                 </LinearLayout>
@@ -517,10 +586,9 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <!-- Buttons 4,5,6,- same as row1 -->
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -545,13 +613,13 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="4"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -577,13 +645,13 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="5"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -609,13 +677,13 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="6"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -640,7 +708,7 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="-"
                             android:textColor="#FFFFFF"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
                 </LinearLayout>
@@ -660,10 +728,9 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <!-- Buttons 7,8,9,0 -->
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -688,13 +755,13 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="7"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -720,13 +787,13 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="8"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -752,13 +819,13 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="9"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="@dimen/ms_key_height"
                         android:layout_weight="1"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -783,7 +850,7 @@
                             android:stateListAnimator="@drawable/button_animator"
                             android:text="0"
                             android:textColor="#64748b"
-                            android:textSize="30sp"
+                            android:textSize="@dimen/ms_key_text"
                             app:backgroundTint="@null" />
                     </FrameLayout>
                 </LinearLayout>
@@ -810,7 +877,7 @@
                         <!-- shadow -->
                         <View
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
+                            android:layout_height="@dimen/ms_key_height"
                             android:background="@drawable/custom_button"
                             android:backgroundTint="#0060e2"
                             android:translationY="5dp" />
@@ -819,7 +886,7 @@
                         <Button
                             android:id="@+id/check_btn"
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
+                            android:layout_height="@dimen/ms_key_height"
                             android:background="@drawable/main_button"
                             android:fontFamily="@font/inter_semibold"
                             android:letterSpacing="0"
@@ -840,7 +907,7 @@
                         <!-- shadow -->
                         <View
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
+                            android:layout_height="@dimen/ms_key_height"
                             android:background="@drawable/custom_button"
                             android:backgroundTint="#E5E5E5"
                             android:translationY="5dp" />
@@ -848,7 +915,7 @@
                         <!-- text over shadow -->
                         <TextView
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
+                            android:layout_height="@dimen/ms_key_height"
                             android:fontFamily="@font/inter_semibold"
                             android:gravity="center"
                             android:text="@string/check"
@@ -882,7 +949,7 @@
                 android:fontFamily="@font/inter_semibold"
                 android:text="3"
                 android:textColor="#FFFFFF"
-                android:textSize="100sp" />
+                android:textSize="@dimen/ms_countdown_text" />
 
             <!-- Image to show after countdown -->
             <ImageView
