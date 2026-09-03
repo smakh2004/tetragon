@@ -8,9 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.Fragment
-import com.tetragon.app.utils.registrationUtils.PasswordToggleHelper
 import com.tetragon.app.R
 import com.tetragon.app.ui.RegisterActivity
+import com.tetragon.app.utils.registrationUtils.PasswordToggleHelper
 
 class PasswordFragment : Fragment() {
 
@@ -20,9 +20,7 @@ class PasswordFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_password, container, false)
-    }
+    ): View? = inflater.inflate(R.layout.fragment_password, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,19 +41,30 @@ class PasswordFragment : Fragment() {
             }
         )
 
+        // Restore on back navigation, so the user isn't forced to retype.
+        val savedPassword = (activity as? RegisterActivity)?.userData?.password.orEmpty()
+        if (savedPassword.isNotEmpty()) {
+            passwordEditText.setText(savedPassword)
+            passwordEditText.setSelection(savedPassword.length)
+        }
+        validate(passwordEditText.text?.toString().orEmpty())
+
         passwordEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {}
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                onTextPresent(!p0.isNullOrEmpty())
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                validate(s?.toString().orEmpty())
             }
         })
     }
 
-    private fun onTextPresent(hasText: Boolean) {
-        val activity = activity as? RegisterActivity
-        activity?.userData?.password = passwordEditText.text.toString()
-        activity?.setContinueButtonEnabled(hasText)
+    private fun validate(password: String) {
+        val activity = activity as? RegisterActivity ?: return
+        activity.userData.password = password
+
+        // Firebase rejects anything under 6 characters with a weak-password error, which
+        // previously only surfaced two screens later as a toast. Block it here instead.
+        activity.setContinueButtonEnabled(password.length >= RegisterActivity.MIN_PASSWORD_LENGTH)
     }
 
     override fun onDestroyView() {

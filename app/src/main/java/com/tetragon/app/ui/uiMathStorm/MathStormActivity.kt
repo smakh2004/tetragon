@@ -36,7 +36,7 @@ class MathStormActivity : BaseActivity() {
     private var isNavigatingToResult = false
     private var sessionHighestScore = 0
     private var questionsAnswered = 0
-    private var currentMistakes = 0
+    private var correctAnswers = 0
 
     private var userListener: ListenerRegistration? = null
 
@@ -59,18 +59,33 @@ class MathStormActivity : BaseActivity() {
     // ---------------- Controller ----------------
     private lateinit var controller: MathStormController
 
-    // ---------------- Rive Avatar State ----------------
-    private var playerViewModelInstance: ViewModelInstance? = null
-    private var defaultFace: Float = 1f
+    // ---------------- Rive top bar state ----------------
+    private var topBarVmi: ViewModelInstance? = null
+
+    /** Always 1 — the saved avatarConfig no longer decides the neutral face. */
+    private val defaultFace: Float = FACE_DEFAULT
+
+    // values produced before the Rive file finishes loading
+    private var pendingTimerText: String? = null
+    private var pendingScore: Int? = null
+    private var pendingConfig: Map<*, *>? = null
 
     companion object {
         private const val MAX_RIVE_ATTEMPTS = 60
         private const val RIVE_RETRY_DELAY_MS = 50L
         private const val VIEW_MODEL_NAME = "ViewModel1"
 
+        // Rive ViewModel property names
+        private const val PROP_TIMER = "timer"
+        private const val PROP_SCORE = "score"
+        private const val PROP_SCORE_TEXT = "scoreText"
+
         private const val FACE_HAPPY = 11f
-        private const val FACE_SAD = 10f
+        private const val FACE_SAD = 12f
         private const val FACE_REACTION_MS = 900L
+
+        /** Neutral face is always 1 — never taken from the saved avatarConfig. */
+        private const val FACE_DEFAULT = 1f
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +98,9 @@ class MathStormActivity : BaseActivity() {
         initSounds()
         initController()
         initButtons()
+
+        // bind the Rive view model as early as possible so timer/score have a target
+        bindTopBarRive()
         loadAndApplyAvatarConfig()
 
         binding.signFlag.setOnClickListener { showQuitBottomSheet() }
@@ -91,7 +109,7 @@ class MathStormActivity : BaseActivity() {
         startCountdownOverlay(3)
     }
 
-    // ==================== RIVE AVATAR & REACTIONS ====================
+    // ==================== RIVE TOP BAR ====================
 
     private fun loadAndApplyAvatarConfig() {
         val uid = auth.currentUser?.uid ?: return
@@ -101,59 +119,78 @@ class MathStormActivity : BaseActivity() {
             .addSnapshotListener { snapshot, error ->
                 if (isFinishing || isDestroyed || error != null) return@addSnapshotListener
                 val config = snapshot?.get("avatarConfig") as? Map<*, *> ?: return@addSnapshotListener
-                applyAvatarConfigToRive(config)
+                pendingConfig = config
+                bindTopBarRive()
             }
     }
 
-    private fun applyAvatarConfigToRive(config: Map<*, *>, attempt: Int = 0) {
-        binding.playerAvatar.post {
+    /**
+     * Creates (once) the ViewModel1 instance on the top-bar artboard and pushes
+     * everything we currently know: avatar config, timer string, score, score label.
+     * Retries while the .riv file is still loading.
+     */
+    private fun bindTopBarRive(attempt: Int = 0) {
+        binding.topBarRive.post {
             if (isFinishing || isDestroyed) return@post
 
-            val riveController = binding.playerAvatar.controller
+            val riveController = binding.topBarRive.controller
             val file = riveController.file
             val stateMachine = riveController.stateMachines.firstOrNull()
 
             if (file == null || stateMachine == null) {
                 if (attempt < MAX_RIVE_ATTEMPTS) {
-                    binding.playerAvatar.postDelayed({
-                        applyAvatarConfigToRive(config, attempt + 1)
-                    }, RIVE_RETRY_DELAY_MS)
+                    binding.topBarRive.postDelayed(
+                        { bindTopBarRive(attempt + 1) },
+                        RIVE_RETRY_DELAY_MS
+                    )
                 }
                 return@post
             }
 
             try {
-                val vm = file.getViewModelByName(VIEW_MODEL_NAME) ?: return@post
-                val vmi = vm.createDefaultInstance()
-                playerViewModelInstance = vmi
+                val vmi = topBarVmi ?: run {
+                    val vm = file.getViewModelByName(VIEW_MODEL_NAME) ?: return@post
+                    val created = vm.createDefaultInstance()
+                    riveController.activeArtboard?.viewModelInstance = created
+                    riveController.stateMachines.forEach { it.viewModelInstance = created }
+                    topBarVmi = created
+                    created
+                }
 
-                riveController.activeArtboard?.viewModelInstance = vmi
-                riveController.stateMachines.forEach { it.viewModelInstance = vmi }
-
-                defaultFace = (config["face"] as? Number)?.toFloat() ?: 1f
-
-                listOf("face", "hair", "glasses", "hat", "mustache", "body").forEach { key ->
-                    val num = if (key == "face") {
-                        getCurrentBaseFace()
-                    } else {
-                        (config[key] as? Number)?.toFloat() ?: 1f
+                // ---- avatar look ----
+                pendingConfig?.let { config ->
+                    listOf("face", "hair", "glasses", "hat", "mustache", "body").forEach { key ->
+                        val num = if (key == "face") {
+                            // face is never taken from Firestore
+                            defaultFace
+                        } else {
+                            (config[key] as? Number)?.toFloat() ?: 1f
+                        }
+                        setNumber(vmi, key, num)
                     }
-                    setNumber(vmi, key, num)
+
+                    val hatValue = (config["hat"] as? Number)?.toInt() ?: 1
+                    runCatching { vmi.getBooleanProperty("hatOn")?.value = (hatValue > 1) }
+
+                    listOf(
+                        "skinColor", "hairColor", "glassColor", "capColor",
+                        "mustacheColor", "clothColor", "backgroundColor", "eyebrowColor", "eyeColor"
+                    ).forEach { propName ->
+                        val hex = config[propName] as? String ?: return@forEach
+                        val colorInt = runCatching { Color.parseColor(hex) }.getOrNull() ?: return@forEach
+                        setColor(vmi, propName, colorInt)
+                    }
                 }
 
-                val hatValue = (config["hat"] as? Number)?.toInt() ?: 1
-                runCatching { vmi.getBooleanProperty("hatOn")?.value = (hatValue > 1) }
+                // ---- localized "score" label (en / ru / uz via resources) ----
+                setString(vmi, PROP_SCORE_TEXT, getString(R.string.ms_score_label))
 
-                listOf(
-                    "skinColor", "hairColor", "glassColor", "capColor",
-                    "mustacheColor", "clothColor", "backgroundColor", "eyebrowColor", "eyeColor"
-                ).forEach { propName ->
-                    val hex = config[propName] as? String ?: return@forEach
-                    val colorInt = runCatching { Color.parseColor(hex) }.getOrNull() ?: return@forEach
-                    setColor(vmi, propName, colorInt)
-                }
+                // ---- flush anything produced before binding ----
+                pendingTimerText?.let { setString(vmi, PROP_TIMER, it) }
+                pendingScore?.let { setNumber(vmi, PROP_SCORE, it.toFloat()) }
+
             } catch (e: Exception) {
-                Log.e("MathStorm", "Error binding Rive avatar: ${e.message}")
+                Log.e("MathStorm", "Error binding Rive top bar: ${e.message}")
             }
         }
     }
@@ -162,39 +199,48 @@ class MathStormActivity : BaseActivity() {
         runCatching { vmi.getNumberProperty(name)?.value = value }
     }
 
+    private fun setString(vmi: ViewModelInstance, name: String, value: String) {
+        runCatching { vmi.getStringProperty(name)?.value = value }
+    }
+
     private fun setColor(vmi: ViewModelInstance, name: String, value: Int) {
         runCatching { vmi.getColorProperty(name)?.value = value }
     }
 
+    // ---- data pushed into the Rive top bar ----
+
+    private fun setTimerText(text: String) {
+        pendingTimerText = text
+        val vmi = topBarVmi ?: return
+        setString(vmi, PROP_TIMER, text)
+    }
+
+    private fun setScore(score: Int) {
+        pendingScore = score
+        val vmi = topBarVmi ?: return
+        setNumber(vmi, PROP_SCORE, score.toFloat())
+    }
+
     private fun reactWithFace(face: Float) {
         setFace(face)
-        binding.playerAvatar.postDelayed({
-            if (!isFinishing && !isDestroyed) {
-                setFace(getCurrentBaseFace())
-            }
+        binding.topBarRive.postDelayed({
+            if (!isFinishing && !isDestroyed) setFace(defaultFace)
         }, FACE_REACTION_MS)
     }
 
     private fun setFace(face: Float) {
-        val vmi = playerViewModelInstance ?: return
+        val vmi = topBarVmi ?: return
         setNumber(vmi, "face", face)
     }
 
-    private fun getSadFaceForMistake(mistakesCount: Int): Float {
-        return when (mistakesCount) {
-            1 -> 12f
-            2 -> 13f
-            3 -> 14f
-            else -> 14f
-        }
-    }
+    // ==================== ANSWER BOX ====================
 
-    private fun getCurrentBaseFace(): Float {
-        return if (currentMistakes > 0) {
-            getSadFaceForMistake(currentMistakes)
-        } else {
-            defaultFace
-        }
+    /**
+     * Mirrors the current input into the blue answer box in the problem row.
+     * The box is wrap_content with a 56dp minimum, so it grows with the digits.
+     */
+    private fun renderAnswerBox(input: String) {
+        binding.answerBox.text = input
     }
 
     // ==================== SOUNDS & CONTROLLER ====================
@@ -210,31 +256,31 @@ class MathStormActivity : BaseActivity() {
         controller = MathStormController(
             onInputChanged = { input ->
                 binding.editText.setText(input)
+                renderAnswerBox(input)
                 toggleContinueButton(input.isNotEmpty())
             },
             onProblemChanged = { problem ->
                 binding.problemText.text = problem.text
+                // new problem -> empty box
+                renderAnswerBox("")
             },
             onScoreChanged = { score ->
-                binding.scoreText.text = score.toString()
+                setScore(score)
                 if (score > sessionHighestScore) sessionHighestScore = score
             },
-            onMistakeChanged = { mistakes ->
-                currentMistakes = mistakes
-                updateMistakesUI(mistakes)
-                if (mistakes > 0) {
+            onCorrectChanged = { isCorrect ->
+                if (isCorrect) {
+                    correctAnswers++
+                    playCorrectSound()
+                    reactWithFace(FACE_HAPPY)
+                } else {
+                    // wrong answer: feedback only, nothing is counted
                     playWrongSound()
                     reactWithFace(FACE_SAD)
                 }
             },
-            onCorrectChanged = { isCorrect ->
-                if (isCorrect) {
-                    playCorrectSound()
-                    reactWithFace(FACE_HAPPY)
-                }
-            },
             onCountdownTick = { seconds ->
-                binding.timerText.text = formatTime(seconds)
+                setTimerText(formatTime(seconds))
             },
             onQuizFinished = { score ->
                 if (!isFinishing) navigateToResult(score)
@@ -273,7 +319,7 @@ class MathStormActivity : BaseActivity() {
     }
 
     private fun startQuiz() {
-        binding.problemImage.visibility = View.VISIBLE
+        binding.answerBox.visibility = View.VISIBLE
         controller.showNextProblem()
         controller.startQuizTimer()
     }
@@ -305,13 +351,6 @@ class MathStormActivity : BaseActivity() {
             navigateToResult(controller.getCurrentScore())
         }
         dialog.show()
-    }
-
-    private fun updateMistakesUI(count: Int) {
-        val images = listOf(binding.mistake1, binding.mistake2, binding.mistake3)
-        images.forEachIndexed { index, image ->
-            image.setImageResource(if (index < count) R.drawable.wrong_circle else R.drawable.circle_empty)
-        }
     }
 
     private fun toggleContinueButton(hasInput: Boolean) {
@@ -347,7 +386,8 @@ class MathStormActivity : BaseActivity() {
         }
     }
 
-    private fun formatTime(seconds: Int): String = String.format("%d:%02d", seconds / 60, seconds % 60)
+    private fun formatTime(seconds: Int): String =
+        String.format("%02d:%02d", seconds / 60, seconds % 60)
 
     private fun navigateToResult(score: Int) {
         if (isNavigatingToResult) return
@@ -358,6 +398,7 @@ class MathStormActivity : BaseActivity() {
         val intent = Intent(this, ResultMathStormActivity::class.java).apply {
             putExtra("score", score)
             putExtra("questionsAnswered", questionsAnswered)
+            putExtra("correctAnswers", correctAnswers)
         }
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
@@ -368,6 +409,7 @@ class MathStormActivity : BaseActivity() {
         controller.cancelCountdown()
         controller.cancelQuizTimer()
         binding.afterCountdownImage.removeCallbacks(null)
+        binding.topBarRive.removeCallbacks(null)
 
         if (isFinishing && sessionHighestScore > 0) {
             saveScoreIfHigher(sessionHighestScore)
@@ -375,7 +417,7 @@ class MathStormActivity : BaseActivity() {
 
         userListener?.remove()
         userListener = null
-        playerViewModelInstance = null
+        topBarVmi = null
 
         timerPlayer.release()
         finishPlayer.release()

@@ -7,7 +7,6 @@ class MathStormController(
     private val onInputChanged: (String) -> Unit,
     private val onProblemChanged: (MathStormModel) -> Unit,
     private val onScoreChanged: (Int) -> Unit,
-    private val onMistakeChanged: (Int) -> Unit,
     private val onCorrectChanged: (Boolean) -> Unit,
     private val onCountdownTick: (Int) -> Unit,
     private val onQuizFinished: (score: Int) -> Unit
@@ -18,7 +17,6 @@ class MathStormController(
     private val generator = MathProblemGenerator()
 
     private var score = 0
-    private var mistakes = 0
 
     private var quizTimer: CountDownTimer? = null
     private var overlayCountdownTimer: CountDownTimer? = null // Reference to stop crashes
@@ -56,13 +54,10 @@ class MathStormController(
             onCorrectChanged(true)
             showNextProblem()
         } else {
-            mistakes++
-            onMistakeChanged(mistakes)
-            if (mistakes >= 3) finishQuiz()
-            else {
-                currentInput = ""
-                onInputChanged(currentInput)
-            }
+            // wrong answer: feedback only, nothing is counted and the quiz keeps running
+            onCorrectChanged(false)
+            currentInput = ""
+            onInputChanged(currentInput)
         }
     }
 
@@ -76,6 +71,7 @@ class MathStormController(
             }
 
             override fun onFinish() {
+                onCountdownTick(0)
                 finishQuiz()
             }
         }.start()

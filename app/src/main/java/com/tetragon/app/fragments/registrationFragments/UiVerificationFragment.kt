@@ -12,50 +12,58 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 import com.tetragon.app.R
 import com.tetragon.app.ui.RegisterActivity
-import com.google.firebase.auth.FirebaseAuth
 
 class UiVerificationFragment : Fragment() {
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val handler = Handler(Looper.getMainLooper())
 
+    private var isPollingActive = false
+    private var isVerified = false
+
     private val checkVerificationRunnable = object : Runnable {
         override fun run() {
+            if (!isPollingActive || !isAdded) return
+
             val user = auth.currentUser
             if (user == null) {
-                handler.postDelayed(this, 3000)
+                scheduleNextCheck()
                 return
             }
 
-            user.reload().addOnCompleteListener { task ->
-                if (isAdded && activity != null) {
-                    if (task.isSuccessful && user.isEmailVerified) {
-                        val registerActivity = activity as? RegisterActivity
+            user.reload().addOnCompleteListener {
+                // The reload result can land after onPause/onDestroyView. Without this
+                // check the loop re-scheduled itself in the background and, combined with
+                // the fresh post in onResume, ended up running several times over.
+                if (!isPollingActive || !isAdded || activity == null) return@addOnCompleteListener
 
-                        // 1. Enable the layout continue button layout setups
-                        registerActivity?.setContinueButtonEnabled(true)
+                if (it.isSuccessful && user.isEmailVerified) {
+                    isVerified = true
+                    isPollingActive = false
 
-                        // 2. Safely instruct the activity to trigger the "yahoo" Rive state machine item
-                        registerActivity?.fireMrSquareAnimation("yahoo")
-
-                        handler.removeCallbacks(this)
-                    } else {
-                        handler.postDelayed(this, 3000)
-                    }
+                    val registerActivity = activity as? RegisterActivity
+                    registerActivity?.setContinueButtonEnabled(true)
+                    registerActivity?.fireMrSquareAnimation("yahoo")
+                } else {
+                    scheduleNextCheck()
                 }
             }
         }
+    }
+
+    private fun scheduleNextCheck() {
+        handler.removeCallbacks(checkVerificationRunnable)
+        handler.postDelayed(checkVerificationRunnable, 3000)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_ui_verification, container, false)
-    }
+    ): View = inflater.inflate(R.layout.fragment_ui_verification, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -67,11 +75,9 @@ class UiVerificationFragment : Fragment() {
         val spannable = SpannableString(fullText)
 
         val start = fullText.indexOf(email)
-
         if (start != -1) {
             val end = start + email.length
             val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
-
             spannable.setSpan(
                 ForegroundColorSpan(blueColor),
                 start,
@@ -85,18 +91,28 @@ class UiVerificationFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Force immediate check when user returns focus to app from email client
+
+        if (isVerified) {
+            // Already confirmed before the user left the screen — just restore the button.
+            (activity as? RegisterActivity)?.setContinueButtonEnabled(true)
+            return
+        }
+
+        // Force an immediate check when the user returns from their email client.
+        isPollingActive = true
+        handler.removeCallbacks(checkVerificationRunnable)
         handler.post(checkVerificationRunnable)
     }
 
     override fun onPause() {
         super.onPause()
-        // Avoid loose loops scheduling tasks while application is out of context focus
+        isPollingActive = false
         handler.removeCallbacks(checkVerificationRunnable)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        isPollingActive = false
         handler.removeCallbacks(checkVerificationRunnable)
     }
 }

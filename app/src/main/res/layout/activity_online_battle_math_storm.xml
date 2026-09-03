@@ -93,307 +93,97 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/internetConnection">
 
+        <!-- OUTER: consumes system window insets -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:padding="16dp">
+            android:fitsSystemWindows="true">
 
+            <!-- INNER: content padding — must NOT have fitsSystemWindows -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:fitsSystemWindows="true">
+                android:padding="16dp">
 
-                <!-- ============ TOP BAR ============ -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/topBarContainer"
+                <!-- TOP BAR: ENTIRELY RIVE (timer + both scores + avatars) -->
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/topBarRive"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
+                    android:layout_height="165dp"
+                    android:layout_marginTop="-70dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveAlignment="TOP_CENTER"
+                    app:riveAutoPlay="true"
+                    app:riveFit="LAYOUT"
+                    app:riveResource="@raw/top_bar_battle_storm"
+                    app:riveStateMachine="State Machine 1" />
 
-                    <!-- Increased avatar width bounds to 35% / 65% -->
-                    <androidx.constraintlayout.widget.Guideline
-                        android:id="@+id/avatarGuideStart"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.35" />
-
-                    <androidx.constraintlayout.widget.Guideline
-                        android:id="@+id/avatarGuideEnd"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.65" />
-
-                    <!-- SCORE CARD -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/scoreCard"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/ms_card_height"
-                        android:layout_marginTop="@dimen/ms_card_top"
-                        android:background="@drawable/top_bar_background"
-                        android:clipChildren="false"
-                        android:clipToPadding="false"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <!-- Matched score guidelines to 35% / 65% so text aligns with larger avatars -->
-                        <androidx.constraintlayout.widget.Guideline
-                            android:id="@+id/scoreGuideStart"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            app:layout_constraintGuide_percent="0.35" />
-
-                        <androidx.constraintlayout.widget.Guideline
-                            android:id="@+id/scoreGuideEnd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            app:layout_constraintGuide_percent="0.65" />
-
-                        <!-- Vertical divider -->
-                        <View
-                            android:id="@+id/view"
-                            android:layout_width="2dp"
-                            android:layout_height="0dp"
-                            android:layout_marginTop="4dp"
-                            android:layout_marginBottom="4dp"
-                            android:background="#EEEEEE"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <!-- LEFT (YOU) -->
-                        <LinearLayout
-                            android:id="@+id/leftScoreBlock"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/view"
-                            app:layout_constraintStart_toStartOf="@id/scoreGuideStart"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <TextView
-                                android:id="@+id/game_your_score"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/inter_semibold"
-                                android:includeFontPadding="false"
-                                android:maxLines="1"
-                                android:text="0"
-                                android:textColor="#64748b"
-                                android:textSize="@dimen/ms_score_text" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:layout_marginBottom="5dp"
-                                android:orientation="horizontal">
-
-                                <ImageView
-                                    android:id="@+id/your_mistake1"
-                                    android:layout_width="@dimen/ms_dot"
-                                    android:layout_height="@dimen/ms_dot"
-                                    android:layout_marginEnd="4dp"
-                                    android:src="@drawable/circle_empty" />
-
-                                <ImageView
-                                    android:id="@+id/your_mistake2"
-                                    android:layout_width="@dimen/ms_dot"
-                                    android:layout_height="@dimen/ms_dot"
-                                    android:layout_marginEnd="4dp"
-                                    android:src="@drawable/circle_empty" />
-
-                                <ImageView
-                                    android:id="@+id/your_mistake3"
-                                    android:layout_width="@dimen/ms_dot"
-                                    android:layout_height="@dimen/ms_dot"
-                                    android:src="@drawable/circle_empty" />
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <!-- RIGHT (OPPONENT) -->
-                        <LinearLayout
-                            android:id="@+id/rightScoreBlock"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="@id/scoreGuideEnd"
-                            app:layout_constraintStart_toEndOf="@id/view"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <TextView
-                                android:id="@+id/game_opponent_score"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/inter_semibold"
-                                android:includeFontPadding="false"
-                                android:maxLines="1"
-                                android:text="0"
-                                android:textColor="#64748b"
-                                android:textSize="@dimen/ms_score_text" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="5dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <ImageView
-                                    android:id="@+id/opponent_mistake1"
-                                    android:layout_width="@dimen/ms_dot"
-                                    android:layout_height="@dimen/ms_dot"
-                                    android:layout_marginEnd="4dp"
-                                    android:src="@drawable/circle_empty" />
-
-                                <ImageView
-                                    android:id="@+id/opponent_mistake2"
-                                    android:layout_width="@dimen/ms_dot"
-                                    android:layout_height="@dimen/ms_dot"
-                                    android:layout_marginEnd="4dp"
-                                    android:src="@drawable/circle_empty" />
-
-                                <ImageView
-                                    android:id="@+id/opponent_mistake3"
-                                    android:layout_width="@dimen/ms_dot"
-                                    android:layout_height="@dimen/ms_dot"
-                                    android:src="@drawable/circle_empty" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- LEFT AVATAR: width runs from the card edge to the 34% guideline,
-                         height follows via the 1:1 ratio, so it scales with the screen. -->
-                    <app.rive.runtime.kotlin.RiveAnimationView
-                        android:id="@+id/yourAvatar"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_marginStart="-10dp"
-                        android:translationY="@dimen/ms_avatar_lift"
-                        app:layout_constraintBottom_toBottomOf="@id/scoreCard"
-                        app:layout_constraintDimensionRatio="H,1:1"
-                        app:layout_constraintEnd_toStartOf="@id/avatarGuideStart"
-                        app:layout_constraintStart_toStartOf="@id/scoreCard"
-                        app:riveAlignment="CENTER"
-                        app:riveAutoPlay="true"
-                        app:riveFit="FIT_HEIGHT"
-                        app:riveResource="@raw/avatar_math_storm_realtime"
-                        app:riveStateMachine="State Machine 1" />
-
-                    <!-- RIGHT AVATAR -->
-                    <app.rive.runtime.kotlin.RiveAnimationView
-                        android:id="@+id/opponentAvatar"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_marginEnd="-10dp"
-                        android:translationY="@dimen/ms_avatar_lift"
-                        app:layout_constraintBottom_toBottomOf="@id/scoreCard"
-                        app:layout_constraintDimensionRatio="H,1:1"
-                        app:layout_constraintEnd_toEndOf="@id/scoreCard"
-                        app:layout_constraintStart_toEndOf="@id/avatarGuideEnd"
-                        app:riveAlignment="CENTER"
-                        app:riveAutoPlay="true"
-                        app:riveFit="FIT_HEIGHT"
-                        app:riveResource="@raw/avatar_math_storm_realtime"
-                        app:riveStateMachine="State Machine 1" />
-
-                    <!-- TIMER PILL — fully ABOVE the card, never overlapping it -->
-                    <LinearLayout
-                        android:id="@+id/timerCircleContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/ms_pill_height"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/timer_pill_background"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="16dp"
-                        app:layout_constraintBottom_toTopOf="@id/scoreCard"
-                        app:layout_constraintEnd_toEndOf="@id/scoreCard"
-                        app:layout_constraintStart_toStartOf="@id/scoreCard">
-
-                        <app.rive.runtime.kotlin.RiveAnimationView
-                            android:id="@+id/timerIcon"
-                            android:layout_width="@dimen/ms_timer_icon"
-                            android:layout_height="@dimen/ms_timer_icon"
-                            android:layout_marginEnd="7dp"
-                            android:visibility="visible"
-                            app:riveAutoPlay="true"
-                            app:riveResource="@raw/timer_math_storm"
-                            app:riveStateMachine="State Machine 1" />
-
-                        <TextView
-                            android:id="@+id/game_timer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_semibold"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text="3:00"
-                            android:textColor="#f0565d"
-                            android:textSize="@dimen/ms_timer_text" />
-                    </LinearLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-                <!-- ============ /TOP BAR ============ -->
-
+                <!-- CLOSE BUTTON — below the bar -->
                 <ImageView
                     android:id="@+id/signFlag"
-                    android:layout_width="@dimen/ms_flag"
-                    android:layout_height="@dimen/ms_flag"
-                    android:layout_marginTop="10dp"
-                    android:contentDescription="Score circle"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:contentDescription="Close button"
+                    android:padding="4dp"
                     android:src="@drawable/sign_flag"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer" />
+                    app:layout_constraintTop_toBottomOf="@+id/topBarRive" />
 
                 <!-- GENERATED PROBLEM ROW -->
                 <LinearLayout
                     android:id="@+id/problemRow"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:visibility="invisible"
                     app:layout_constraintBottom_toTopOf="@+id/inputContainer"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer">
+                    app:layout_constraintTop_toBottomOf="@+id/topBarRive">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/problemText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_semibold"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
                         android:text="2+2="
                         android:textColor="#64748b"
-                        android:textSize="@dimen/ms_problem_text" />
+                        android:textSize="@dimen/ms_problem_text"
+                        app:autoSizeMaxTextSize="@dimen/ms_problem_text"
+                        app:autoSizeMinTextSize="22sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:autoSizeTextType="uniform" />
 
-                    <ImageView
-                        android:id="@+id/problemImage"
-                        android:layout_width="@dimen/ms_answer_box"
-                        android:layout_height="@dimen/ms_answer_box"
+                    <!-- ANSWER BOX: the typed answer lives inside this blue box.
+                         wrap_content + minWidth/minHeight makes it grow with the digits. -->
+                    <TextView
+                        android:id="@+id/answerBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:contentDescription="problem image"
-                        android:src="@drawable/answer_blue_box" />
+                        android:background="@drawable/answer_blue_box"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:minHeight="@dimen/ms_answer_box"
+                        android:minWidth="@dimen/ms_answer_box"
+                        android:paddingHorizontal="12dp"
+                        android:text=""
+                        android:textColor="@color/text_color"
+                        android:textSize="34sp" />
                 </LinearLayout>
 
                 <!-- INPUT CONTAINER -->
@@ -874,7 +664,6 @@
                         android:layout_height="wrap_content"
                         android:visibility="gone">
 
-                        <!-- shadow -->
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/ms_key_height"
@@ -882,7 +671,6 @@
                             android:backgroundTint="#0060e2"
                             android:translationY="5dp" />
 
-                        <!-- button -->
                         <Button
                             android:id="@+id/check_btn"
                             android:layout_width="match_parent"
@@ -904,7 +692,6 @@
                         android:layout_height="wrap_content"
                         android:visibility="visible">
 
-                        <!-- shadow -->
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/ms_key_height"
@@ -912,7 +699,6 @@
                             android:backgroundTint="#E5E5E5"
                             android:translationY="5dp" />
 
-                        <!-- text over shadow -->
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/ms_key_height"
@@ -926,42 +712,41 @@
 
                 </FrameLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- FULLSCREEN COUNTDOWN OVERLAY — inside the insets wrapper, as in MathStorm -->
+            <FrameLayout
+                android:id="@+id/countdownOverlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#5C404040"
+                android:padding="0dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/countdownText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="3"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/ms_countdown_text" />
+
+                <ImageView
+                    android:id="@+id/afterCountdownImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="After countdown image"
+                    android:src="@drawable/go_online"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- FULLSCREEN COUNTDOWN OVERLAY -->
-        <FrameLayout
-            android:id="@+id/countdownOverlay"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#5C404040"
-            android:padding="0dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/countdownText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/inter_semibold"
-                android:text="3"
-                android:textColor="#FFFFFF"
-                android:textSize="@dimen/ms_countdown_text" />
-
-            <!-- Image to show after countdown -->
-            <ImageView
-                android:id="@+id/afterCountdownImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="After countdown image"
-                android:src="@drawable/go_online"
-                android:visibility="gone" />
-
-        </FrameLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

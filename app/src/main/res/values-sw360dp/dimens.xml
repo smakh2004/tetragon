@@ -11,6 +11,8 @@
     <dimen name="ms_timer_icon">21dp</dimen>
 
     <dimen name="ms_avatar_lift">6dp</dimen>
+    <dimen name="ms_center_avatar_lift">-20dp</dimen>
+    <dimen name="ms_top_bar_height">150dp</dimen>
 
     <!-- Body -->
     <dimen name="ms_flag">56dp</dimen>

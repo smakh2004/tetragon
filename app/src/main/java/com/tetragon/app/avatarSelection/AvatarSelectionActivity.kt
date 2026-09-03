@@ -55,7 +55,7 @@ class AvatarSelectionActivity : BaseActivity() {
     ).map { Color.parseColor(it) }
 
     private val clothColors = listOf(
-        "#E53935", "#FB8C00", "#FDD835", "#43A047", "#00ACC1", "#1E88E5", "#8E24AA", "#EC407A", "#6D4C41", "#546E7A", "#FFFFFF", "#212121"
+        "#E53935", "#FB8C00", "#FDD835", "#43A047", "#00ACC1", "#1E88E5", "#8E24AA", "#EC407A", "#6D4C41", "#546E7A", "#F5F5F5", "#212121"
     ).map { Color.parseColor(it) }
 
     private val capColors = clothColors

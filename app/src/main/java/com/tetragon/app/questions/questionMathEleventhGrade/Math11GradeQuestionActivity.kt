@@ -3,6 +3,7 @@ package com.tetragon.app.questions.questionMathEleventhGrade
 import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
@@ -35,6 +36,11 @@ class Math11GradeQuestionActivity : BaseActivity() {
     var isCorrectAnswerShowing: Boolean = false
     private var correctAnswersCount = 0
 
+    // ---- Lesson stats for the result screen ----
+    private var lessonCorrectAnswers = 0
+    private var lessonAnswerAttempts = 0
+    private var lessonStartElapsed: Long = 0L
+
     private val viewModel: ConnectivityViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -48,6 +54,8 @@ class Math11GradeQuestionActivity : BaseActivity() {
         Rive.init(this)
         binding = ActivityMath11GradeQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        lessonStartElapsed = SystemClock.elapsedRealtime()
 
         binding.exitBtn.setOnClickListener { showQuitBottomSheet() }
         onBackPressedDispatcher.addCallback(this) { showQuitBottomSheet() }
@@ -66,6 +74,13 @@ class Math11GradeQuestionActivity : BaseActivity() {
 
     fun handleCorrectAnswer() {
         correctAnswersCount++
+        lessonCorrectAnswers++
+        lessonAnswerAttempts++
+    }
+
+    /** Call this from the question fragments on a wrong answer, otherwise accuracy stays at 100%. */
+    fun handleIncorrectAnswer() {
+        lessonAnswerAttempts++
     }
 
     fun checkAndTriggerMilestone(): Boolean {
@@ -156,12 +171,21 @@ class Math11GradeQuestionActivity : BaseActivity() {
         return newProgress >= progressBar.max
     }
 
+    /** Correct answers as a percentage of every answer attempt in this lesson. */
+    private fun lessonAccuracy(): Int =
+        if (lessonAnswerAttempts <= 0) 0
+        else ((lessonCorrectAnswers * 100f) / lessonAnswerAttempts).toInt().coerceIn(0, 100)
+
     fun navigateToXpGained() {
+        val elapsedSeconds = (SystemClock.elapsedRealtime() - lessonStartElapsed) / 1000
+
         val intent = Intent(this, XpGainedActivity::class.java).apply {
             putExtra(SubjectConstants.EXTRA_XP, totalXp)
             putExtra(SubjectConstants.EXTRA_TOPIC, selectedTopic.name)
             putExtra(SubjectConstants.EXTRA_GRADE, 11)
             putExtra(SubjectConstants.EXTRA_SUBJECT, SubjectConstants.SUBJECT_MATH)
+            putExtra(XpGainedActivity.EXTRA_ACCURACY, lessonAccuracy())
+            putExtra(XpGainedActivity.EXTRA_TIME_SECONDS, elapsedSeconds)
         }
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)

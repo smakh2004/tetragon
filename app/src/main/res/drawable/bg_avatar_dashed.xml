@@ -1,0 +1,9 @@
+<!-- bg_avatar_dashed.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="#F1F5F9" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/gray_2"
+        android:dashGap="4dp"
+        android:dashWidth="6dp" />
+</shape>

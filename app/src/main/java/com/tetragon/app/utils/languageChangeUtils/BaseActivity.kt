@@ -2,9 +2,11 @@ package com.tetragon.app.utils.languageChangeUtils
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +15,18 @@ import com.tetragon.app.R
 
 open class BaseActivity : AppCompatActivity() {
 
+    /**
+     * Тёмная подложка для API 28 и ниже, где система не умеет тёмные иконки
+     * в навигационной панели. То же значение использует androidx внутри себя.
+     */
+    private val darkScrim = Color.argb(0x80, 0x1b, 0x1b, 0x1b)
+
+    /**
+     * Экран со светлым фоном (по умолчанию) -> тёмные иконки в панелях.
+     * Экраны с тёмным фоном (например, бой Math Storm) переопределяют это на false.
+     */
+    protected open val lightSystemBars: Boolean = true
+
     override fun attachBaseContext(newBase: Context) {
         val lang = LocaleHelper.getLanguage(newBase)
         val context = LocaleHelper.setLocaleContext(newBase, lang)
@@ -20,7 +34,12 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        val barStyle = if (lightSystemBars) {
+            SystemBarStyle.light(Color.TRANSPARENT, darkScrim)
+        } else {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
         super.onCreate(savedInstanceState)
 
         // Automatically scan for live updates every time any activity enters the foreground

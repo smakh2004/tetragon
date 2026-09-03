@@ -24,46 +24,40 @@ class LanguageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // We do NOT call highlightSelectedLanguage or setContinueButtonEnabled here.
-        // The UI stays neutral, and the button stays disabled until a click occurs.
-
         binding.english.setOnClickListener { onLanguageSelected("en") }
         binding.russian.setOnClickListener { onLanguageSelected("ru") }
         binding.uzbek.setOnClickListener { onLanguageSelected("uz") }
+
+        // If the user already picked a language and came back (or the activity was
+        // recreated), show that choice again and keep Continue usable instead of
+        // resetting the screen to a neutral, blocked state.
+        val registerActivity = activity as? RegisterActivity ?: return
+        val existing = registerActivity.userData.language
+        if (existing.isNotBlank()) {
+            highlightSelectedLanguage(existing)
+            registerActivity.setContinueButtonEnabled(true)
+        }
     }
 
     private fun onLanguageSelected(lang: String) {
         val registerActivity = activity as? RegisterActivity ?: return
 
-        // 1. Persist the selection to SharedPreferences via LocaleHelper
         LocaleHelper.setLocale(requireContext(), lang)
-
-        // 2. Store the chosen language code on the shared UserData model
         registerActivity.userData.language = lang
-
-        // 3. Apply the locale immediately to the live activity Resources so that
-        //    all subsequent getString() calls (header titles, button labels, etc.)
-        //    reflect the new language right away — no activity recreation needed.
         registerActivity.applyLocaleInPlace(lang)
-
-        // 4. Show the visual selection highlight in the UI
         highlightSelectedLanguage(lang)
-
-        // 5. Enable the continue button now that a valid selection has been made
         registerActivity.setContinueButtonEnabled(true)
     }
 
     private fun highlightSelectedLanguage(lang: String) {
         val layouts = listOf(binding.english, binding.russian, binding.uzbek)
 
-        // Reset all items to default state
         layouts.forEach {
             it.setBackgroundResource(R.drawable.custom_background)
             val textView = (it as? ViewGroup)?.getChildAt(1) as? TextView
             textView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color))
         }
 
-        // Apply blue style to the chosen one
         val selected = when (lang) {
             "en" -> binding.english
             "ru" -> binding.russian

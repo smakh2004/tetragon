@@ -2,6 +2,7 @@ package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumb
 
 import android.content.ClipData
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Point
 import android.media.AudioAttributes
@@ -22,12 +23,19 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import android.widget.*
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import app.rive.runtime.kotlin.RiveAnimationView
 import com.tetragon.app.R
 import com.tetragon.app.questions.questionMathFirstGrade.Math1GradeQuestionActivity
 import com.tetragon.app.questions.questionMathFirstGrade.MathGrade1Type
+import com.tetragon.app.utils.voiceReader.SpokenLine
+import com.tetragon.app.utils.voiceReader.TeacherLipSync
+import com.tetragon.app.utils.voiceReader.TeacherSpeech
+import com.tetragon.app.utils.voiceReader.UzPhrases
+import java.util.Locale
 import kotlin.random.Random
 
 private const val ARG_SKIP_COUNT = "skip_count"
@@ -58,11 +66,19 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
     private lateinit var stateAnswer: TextView
     private lateinit var answer: TextView
 
+    private lateinit var teacherAnimation: RiveAnimationView
+    private lateinit var lipSync: TeacherLipSync
+    private lateinit var speech: TeacherSpeech
+
     private var skipCount: Int = 2
 
     // Expected values: slot 0 = position 2, slot 1 = position 4
     private var correctA = 0
     private var correctB = 0
+
+    // The visible numbers immediately before each blank, needed for the explanation.
+    private var seqV1 = 0
+    private var seqV3 = 0
 
     private var tileValues = listOf<Int>()
     private val tileUsed = BooleanArray(4)
@@ -77,6 +93,18 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
     private var mediaPlayer: MediaPlayer? = null
+
+    /**
+     * Bumped by every interaction that INVALIDATES pending speech so delayed
+     * callbacks can tell they're stale. Placing / removing tiles deliberately does
+     * NOT bump it: the teacher must be allowed to finish reading the question while
+     * the child works on the answer.
+     */
+    private var interactionToken = 0
+
+    private val RIVE_CORRECT = "correct"
+    private val RIVE_INCORRECT = "incorrect"
+    private val RIVE_EXPLAIN = "explain"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +122,66 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
         generateProblem()
         setupCheckButton()
     }
+
+    // ------------------------------------------------------------ speech language
+
+    private fun uiLanguage(): String = resources.configuration.locales[0].language
+
+    private fun isUzbek(): Boolean = uiLanguage() == TeacherSpeech.UZ
+
+    /**
+     * Locale for the TextToSpeech fallback only. Uzbek is spoken from clips, but
+     * if a clip is ever missing the line is read in Russian rather than dropped.
+     */
+    private fun fallbackLocale(): Locale =
+        if (isUzbek()) Locale("ru") else resources.configuration.locales[0]
+
+    /** Text for the TTS fallback, rendered in [fallbackLocale]. */
+    private fun spokenText(@StringRes id: Int, vararg args: Any): String {
+        if (!isUzbek()) return getString(id, *args)
+        val conf = Configuration(resources.configuration)
+        conf.setLocale(Locale("ru"))
+        return requireContext().createConfigurationContext(conf).getString(id, *args)
+    }
+
+    // ---------------------------------------------------------------- the lines
+
+    private fun questionLine(): SpokenLine = SpokenLine(
+        text = spokenText(R.string.count_by, skipCount),
+        clips = UzPhrases.countBy(skipCount)
+    )
+
+    private fun tryAgainLine(): SpokenLine = SpokenLine(
+        text = spokenText(R.string.teacher_try_again),
+        clips = UzPhrases.tryAgain()
+    )
+
+    private fun solutionLine(): SpokenLine = SpokenLine(
+        text = spokenText(R.string.solution_count_by, *explanationArgs()),
+        clips = UzPhrases.countBySolution(skipCount, correctA, correctB)
+    )
+
+    // ------------------------------------------------------------------ tokens
+
+    private fun newInteraction(): Int {
+        interactionToken++
+        return interactionToken
+    }
+
+    private fun isStale(token: Int) = token != interactionToken
+
+    private fun cancelSpeechAndSound() {
+        stopSound()
+        speech.stop()
+    }
+
+    private fun repeatQuestion() {
+        newInteraction()
+        cancelSpeechAndSound()
+        speech.speak(questionLine())
+    }
+
+    // ------------------------------------------------------------------- setup
 
     private fun initViews(view: View) {
         instructionText = view.findViewById(R.id.instructionText)
@@ -124,6 +212,12 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
         seeEnabledButton = activity.findViewById(R.id.see_enabled_btn)
         stateAnswer = activity.findViewById(R.id.stateAnswer)
         answer = activity.findViewById(R.id.answer)
+
+        teacherAnimation = view.findViewById(R.id.teacherAnimation)
+        lipSync = TeacherLipSync(teacherAnimation, language = uiLanguage())
+        lipSync.prepare()
+        speech = TeacherSpeech(requireContext(), lipSync, uiLanguage(), fallbackLocale())
+        teacherAnimation.setOnClickListener { repeatQuestion() }
     }
 
     private fun setupInstructionText() {
@@ -142,15 +236,18 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
     }
 
     private fun generateProblem() {
+        newInteraction()
+        lipSync.clearBooleans()
+
         val startMultiplier = Random.nextInt(1, 4)
-        val v1 = skipCount * startMultiplier
+        seqV1 = skipCount * startMultiplier
         correctA = skipCount * (startMultiplier + 1)
-        val v3 = skipCount * (startMultiplier + 2)
+        seqV3 = skipCount * (startMultiplier + 2)
         correctB = skipCount * (startMultiplier + 3)
         val v5 = skipCount * (startMultiplier + 4)
 
-        tvSeq1.text = "$v1, "        // comma after the first number
-        tvSeq3.text = ", $v3, "
+        tvSeq1.text = "$seqV1, "
+        tvSeq3.text = ", $seqV3, "
         tvSeq5.text = ", $v5"
 
         val wrongSet = mutableSetOf<Int>()
@@ -160,7 +257,7 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
             val offset = Random.nextInt(1, 4) * skipCount
             val cand = if (Random.nextBoolean()) correctB + offset else correctA - offset
             if (cand > 0 && cand != correctA && cand != correctB &&
-                cand != v1 && cand != v3 && cand != v5
+                cand != seqV1 && cand != seqV3 && cand != v5
             ) wrongSet.add(cand)
         }
         while (wrongSet.size < 2) wrongSet.add(correctB + skipCount * (wrongSet.size + 5))
@@ -187,6 +284,8 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
         disableCheckButton()
         checkBtn.text = getString(R.string.btn_check)
         setupInitialButtonState()
+
+        repeatQuestion()
     }
 
     // ---- Drag & drop -------------------------------------------------------
@@ -205,6 +304,10 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
                 if (isAnswerChecked || tileUsed[index]) return@setOnTouchListener false
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
+                        // NOTE: the teacher is deliberately NOT hushed here. The question
+                        // line must be allowed to finish while the child moves tiles;
+                        // only the check button interrupts it.
+
                         // 1. Try standard view haptics first
                         val performed = v.performHapticFeedback(
                             HapticFeedbackConstants.KEYBOARD_TAP,
@@ -359,6 +462,8 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
         val tileIndex = slotTileIndex[slotIndex]
         if (tileIndex == -1) return
 
+        // The teacher keeps talking here on purpose — see the note in ACTION_DOWN.
+
         restoreTile(tileIndex)
         slotValue[slotIndex] = null
         slotTileIndex[slotIndex] = -1
@@ -404,6 +509,9 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
 
     private fun setupCheckButton() {
         checkBtn.setOnClickListener {
+            newInteraction()
+            cancelSpeechAndSound()
+
             val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
             val circleState = requireActivity().findViewById<ImageView>(R.id.circleState)
 
@@ -443,6 +551,8 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
 
         if (allRight) {
             playSound(R.raw.correct)
+            lipSync.fireTrigger(RIVE_CORRECT)
+
             activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
 
@@ -454,7 +564,17 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
             checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState)
         } else {
-            playSound(R.raw.wrong)
+            // Queued behind the buzzer, so it must verify the token before speaking:
+            // tapping See solution meanwhile must cancel it.
+            val token = interactionToken
+            playSound(R.raw.wrong) {
+                if (isStale(token)) return@playSound
+                speech.speak(
+                    tryAgainLine(),
+                    onStarted = { if (!isStale(token)) lipSync.setBoolean(RIVE_INCORRECT, true) },
+                    onFinished = { lipSync.setBoolean(RIVE_INCORRECT, false) }
+                )
+            }
             activity.isCorrectAnswerShowing = false
             activity.handleIncorrectAnswer()
 
@@ -492,11 +612,19 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
         applyButtonColors(R.color.red_1, R.color.red_2, R.color.red_4)
     }
 
+    private fun explanationArgs() =
+        arrayOf<Any>(skipCount, seqV1, correctA, seqV3, correctB)
+
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
+            // Invalidates the queued try-again line and kills the buzzer.
+            val token = newInteraction()
+            cancelSpeechAndSound()
+            lipSync.clearBooleans()
+
             seeBtn.visibility = View.GONE
             stateAnswer.text = getString(R.string.state_solution)
-            answer.text = getString(R.string.label_answer, "$correctA, $correctB")
+            answer.text = getString(R.string.solution_count_by, *explanationArgs())
             answer.visibility = View.VISIBLE
             checkBtn.text = getString(R.string.btn_continue)
 
@@ -509,6 +637,12 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
             isIncorrectAttempt = false
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+
+            speech.speak(
+                solutionLine(),
+                onStarted = { if (!isStale(token)) lipSync.setBoolean(RIVE_EXPLAIN, true) },
+                onFinished = { lipSync.setBoolean(RIVE_EXPLAIN, false) }
+            )
         }
     }
 
@@ -540,6 +674,10 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
     }
 
     private fun resetForTryAgain() {
+        newInteraction()
+        cancelSpeechAndSound()
+        lipSync.clearBooleans()
+
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
 
@@ -567,6 +705,10 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
     }
 
     private fun resetUIForNext() {
+        newInteraction()
+        cancelSpeechAndSound()
+        lipSync.clearBooleans()
+
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
@@ -579,17 +721,34 @@ class UiCountByDragFragment : Fragment(R.layout.fragment_ui_count_by_drag) {
         setupInitialButtonState()
     }
 
-    private fun playSound(soundResId: Int) {
-        mediaPlayer?.release()
+    /** [onComplete] runs on the main thread once the clip finishes playing. */
+    private fun playSound(soundResId: Int, onComplete: (() -> Unit)? = null) {
+        stopSound()
         mediaPlayer = MediaPlayer.create(requireContext(), soundResId)
-        mediaPlayer?.setOnCompletionListener { it.release() }
+        mediaPlayer?.setOnCompletionListener { player ->
+            player.release()
+            mediaPlayer = null
+            if (isAdded) onComplete?.invoke()
+        }
         mediaPlayer?.start()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaPlayer?.release()
+    /** Stops the clip without firing its completion callback. */
+    private fun stopSound() {
+        mediaPlayer?.let { player ->
+            player.setOnCompletionListener(null)
+            runCatching { if (player.isPlaying) player.stop() }
+            player.release()
+        }
         mediaPlayer = null
+    }
+
+    override fun onDestroyView() {
+        newInteraction()
+        stopSound()
+        speech.release()
+        lipSync.release()
+        super.onDestroyView()
     }
 
     /** Drag shadow that draws the button cap centered under the finger. */

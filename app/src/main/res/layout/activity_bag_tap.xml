@@ -8,27 +8,27 @@
     android:background="@color/white"
     android:clipChildren="false"
     android:clipToPadding="false"
-    tools:context=".reward.BagTapActivity"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    tools:context=".reward.BagTapActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         android:clipChildren="false"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/rewardStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="120dp"
+            android:elevation="2dp"
             android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
             android:text="@string/tap_to_open_bag"
             android:textColor="@color/text_color"
             android:textSize="24sp"
-            android:gravity="center"
-            android:elevation="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/bag"
             app:layout_constraintEnd_toEndOf="@+id/bag"
             app:layout_constraintStart_toStartOf="@+id/bag" />
@@ -38,15 +38,14 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:maxWidth="700dp"
-            app:layout_constraintWidth_max="700dp"
-            app:layout_constraintDimensionRatio="H, 1:1.8"
             app:layout_constraintBottom_toTopOf="@+id/continue_btn_container"
+            app:layout_constraintDimensionRatio="H, 1:1.8"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="700dp"
             app:riveAutoPlay="true"
-            app:riveResource="@raw/bag"
-            app:riveStateMachine="State Machine 1" />
+            app:riveResource="@raw/bag" />
 
         <FrameLayout
             android:id="@+id/continue_btn_container"
@@ -64,12 +63,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="invisible">
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/custom_button"
                     android:backgroundTint="@color/black_2"
                     android:translationY="5dp" />
+
                 <Button
                     android:id="@+id/continue_enabled_btn"
                     android:layout_width="match_parent"
@@ -88,12 +89,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="visible">
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/custom_button"
                     android:backgroundTint="@color/gray_2"
                     android:translationY="5dp" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
@@ -107,4 +110,22 @@
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- COIN COUNTER ANIMATION — hidden until bag tap occurs -->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/coinAnimationView"
+        android:layout_width="310dp"
+        android:layout_height="320dp"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riveAlignment="TOP_RIGHT"
+        app:riveArtboard="Artboard 2"
+        app:riveAutoPlay="false"
+        app:riveFit="COVER"
+        app:riveResource="@raw/coin_animation"
+        app:riveStateMachine="State Machine 1" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

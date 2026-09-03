@@ -5,20 +5,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
     tools:context=".questions.questionMathFirstGrade.firstTopicCountingNumbers.hard.UiCountByNumberFragment">
+
+    <!-- Teacher character -->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/teacherAnimation"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="-28dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintDimensionRatio="H,11:11"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.55"
+        app:riveAlignment="BOTTOM_CENTER"
+        app:riveFit="CONTAIN"
+        app:riveResource="@raw/teacher_animation"
+        app:riveStateMachine="State Machine 1" />
 
     <TextView
         android:id="@+id/instructionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-28dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Count by 2:"
+        android:textColor="@color/text_color"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@id/teacherAnimation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/teacherAnimation"
+        app:layout_constraintTop_toTopOf="@id/teacherAnimation" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/headerBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/inter_semibold"
-        android:text="Count by 2s"
-        android:textColor="@color/text_color"
-        android:textSize="24sp"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="teacherAnimation,instructionText" />
+
+    <View
+        android:id="@+id/headerDivider"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="@color/gray_2"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/headerBarrier" />
 
     <LinearLayout
         android:id="@+id/problemRow"
@@ -29,7 +65,7 @@
         app:layout_constraintBottom_toTopOf="@+id/option1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/instructionText">
+        app:layout_constraintTop_toBottomOf="@id/headerDivider">
 
         <TextView
             android:id="@+id/tvSeqElement1"
@@ -100,10 +136,12 @@
         android:id="@+id/option1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/option_selected"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/option2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -123,10 +161,12 @@
         android:id="@+id/option2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/custom_background"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/option3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -146,10 +186,12 @@
         android:id="@+id/option3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
         android:background="@drawable/custom_background"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">

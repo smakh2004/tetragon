@@ -77,10 +77,9 @@
             android:id="@+id/constraintLayout6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
             android:background="@drawable/custom_background"
             android:padding="6dp"
-            app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
@@ -112,57 +111,6 @@
                     android:textSize="16sp" />
 
             </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/chatContainer"
-            android:layout_width="70dp"
-            android:layout_height="48dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <View
-                android:id="@+id/pillBackground"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/custom_background"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginStart="2dp"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="2.5dp"
-                android:clickable="false"
-                android:focusable="false"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:cardPreventCornerOverlap="false"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <app.rive.runtime.kotlin.RiveAnimationView
-                    android:id="@+id/chat_mr_square_rive"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginBottom="-6dp"
-                    android:layout_gravity="bottom"
-                    android:clickable="false"
-                    android:focusable="false"
-                    app:riveAutoPlay="true"
-                    app:riveResource="@raw/mr_square_chat"
-                    app:riveStateMachine="State Machine 1" />
-
-            </androidx.cardview.widget.CardView>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,140 +5,63 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="@color/white"
-    android:clipChildren="false"
-    android:clipToPadding="false"
+    android:fitsSystemWindows="true"
     tools:context=".questions.StreakGainedActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/topBarContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <!-- RIVE STREAK ANIMATION VIEW -->
-        <!-- Capped with constraintWidth_max / constraintHeight_max so it doesn't -->
-        <!-- balloon on tablets/large screens; constrainedWidth lets the max win -->
-        <!-- over match_parent-derived width, and it stays centered via bias. -->
-        <app.rive.runtime.kotlin.RiveAnimationView
-            android:id="@+id/streak_rive_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="-60dp"
-            android:layout_marginTop="-100dp"
-            android:layout_marginEnd="-60dp"
-            app:layout_constrainedWidth="true"
-            app:layout_constrainedHeight="true"
-            app:layout_constraintWidth_max="480dp"
-            app:layout_constraintHeight_max="480dp"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:riveAutoPlay="true"
-            app:riveResource="@raw/streak"
-            app:riveStateMachine="State Machine 1"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- 2. MR SQUARE ANIMATION (Rendered over the streak canvas) -->
-    <!-- Same cap applied here; layout_width is no longer match_parent so it -->
-    <!-- can't grow past the max and collide with the streak animation above. -->
+    <!-- STREAK ANIMATION — fills the whole screen -->
     <app.rive.runtime.kotlin.RiveAnimationView
-        android:id="@+id/streak_mr_square"
+        android:id="@+id/streak_rive_view"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="-60dp"
-        android:layout_marginEnd="-60dp"
-        android:alpha="0"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintWidth_max="560dp"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riveAlignment="CENTER"
         app:riveAutoPlay="true"
-        app:riveResource="@raw/streak_gained_mr_square"
+        app:riveFit="COVER"
+        app:riveResource="@raw/streak"
         app:riveStateMachine="State Machine 1" />
 
-    <!-- 3. CONTINUE BUTTON CONTAINER (Rendered on top of everything) -->
-    <!-- Added layout translationZ elevation and padding bottom to stand out cleanly -->
+    <!-- CONTINUE BUTTON — revealed after the animation has played.
+         INVISIBLE (not GONE) so the animation keeps its size. -->
     <FrameLayout
         android:id="@+id/continue_btn_container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
         android:alpha="0"
-        android:translationZ="10dp"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingBottom="5dp"
+        android:translationZ="10dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- ENABLED CONTINUE BUTTON -->
-        <FrameLayout
-            android:id="@+id/continue_enabled_btn_container"
+        <View
+            android:id="@+id/continue_enabled_button_background"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="visible">
+            android:layout_height="48dp"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="@color/black_2"
+            android:translationY="5dp" />
 
-            <View
-                android:id="@+id/continue_enabled_button_background"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/custom_button"
-                android:backgroundTint="@color/black_2"
-                android:translationY="5dp" />
-
-            <Button
-                android:id="@+id/continue_enabled_btn"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/custom_button"
-                android:fontFamily="@font/inter_semibold"
-                android:stateListAnimator="@drawable/button_animator"
-                android:text="@string/continue_text"
-                android:textColor="@color/white"
-                android:textSize="17sp"
-                app:backgroundTint="@color/black_3" />
-        </FrameLayout>
-
-        <!-- DISABLED CONTINUE BUTTON -->
-        <FrameLayout
-            android:id="@+id/continue_disabled_btn_container"
+        <Button
+            android:id="@+id/continue_enabled_btn"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="invisible">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/custom_button"
-                android:backgroundTint="@color/gray_2"
-                android:translationY="5dp" />
-
-            <TextView
-                android:id="@+id/check_disabled_btn"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center"
-                android:text="@string/continue_text"
-                android:textColor="@color/gray_1"
-                android:textSize="17sp"
-                android:translationY="5dp" />
-        </FrameLayout>
+            android:layout_height="48dp"
+            android:background="@drawable/custom_button"
+            android:fontFamily="@font/inter_semibold"
+            android:stateListAnimator="@drawable/button_animator"
+            android:text="@string/continue_text"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            app:backgroundTint="@color/black_3" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

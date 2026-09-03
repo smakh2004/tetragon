@@ -3,13 +3,11 @@ package com.tetragon.app
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,6 +22,7 @@ import com.tetragon.app.questions.StreakManager
 import com.tetragon.app.ui.LoginActivity
 import com.tetragon.app.ui.WelcomeActivity
 import com.tetragon.app.utils.AppUpdateManager
+import com.tetragon.app.utils.applySystemBarsPadding
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import com.tetragon.app.utils.registrationUtils.DeviceUtils
 import com.tetragon.app.gameModel.GradeManager
@@ -33,6 +32,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -44,6 +44,13 @@ class MainActivity : BaseActivity() {
     private var sessionListener: ListenerRegistration? = null
     private var updateListener: ListenerRegistration? = null
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+
+    companion object {
+        private const val TAG = "MonthlyReset"
+
+        /** Only the top 3 are rewarded, and the prize scales with the place. */
+        private const val PODIUM_SIZE = 3
+    }
 
     private val viewModel: ConnectivityViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
@@ -57,7 +64,8 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        // enableEdgeToEdge() вызывается в BaseActivity со стилями системных панелей —
+        // повторный вызов здесь сбрасывал бы их на дефолтные.
         super.onCreate(savedInstanceState)
 
         try {
@@ -69,11 +77,15 @@ class MainActivity : BaseActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-            insets
-        }
+        // Корень забирает статус-бар и боковые вырезы, но НЕ низ:
+        // нижний инсет уходит на саму навигацию, чтобы её белый фон
+        // продолжался под системной панелью.
+        binding.root.applySystemBarsPadding(bottom = false)
+        binding.bottomNavigationView.applySystemBarsPadding(
+            left = false,
+            top = false,
+            right = false
+        )
 
         if (savedInstanceState == null) {
             replaceFragment(HomeFragment())
@@ -133,12 +145,21 @@ class MainActivity : BaseActivity() {
 
         metaRef.get().addOnSuccessListener { metaDoc ->
             if (!metaDoc.exists()) {
-                metaRef.set(mapOf("lastMonth" to monthKey, "winnerEmails" to emptyList<String>()))
+                metaRef.set(
+                    mapOf(
+                        "lastMonth" to monthKey,
+                        "winnerEmails" to emptyList<String>(),
+                        "podium" to emptyList<Map<String, Any>>()
+                    )
+                ).addOnFailureListener { e ->
+                    Log.e(TAG, "cannot create system/leaderboard", e)
+                }
                 return@addOnSuccessListener
             }
 
             val lastMonth = metaDoc.getString("lastMonth") ?: ""
             val savedWinners = metaDoc.get("winnerEmails") as? List<String> ?: emptyList()
+            Log.d(TAG, "lastMonth=$lastMonth currentMonth=$monthKey")
 
             // CASE 1: The month flipped. This device forces a total data sweep across all users
             if (lastMonth != monthKey) {
@@ -146,35 +167,81 @@ class MainActivity : BaseActivity() {
                     .orderBy("monthlyXP", Query.Direction.DESCENDING)
                     .limit(10).get().addOnSuccessListener { topSnapshot ->
 
-                        val docs = topSnapshot.documents
-                        val maxXP = docs.firstOrNull()?.getLong("monthlyXP") ?: 0L
+                        // Top 3 in order — index 0 is 1st place, 1 is 2nd, 2 is 3rd.
+                        // Captured BEFORE the wipe, because afterwards every monthlyXP is 0
+                        // and the reward screen would have no names or avatars left to show.
+                        val podiumDocs = topSnapshot.documents
+                            .filter { (it.getLong("monthlyXP") ?: 0L) > 0L }
+                            .take(PODIUM_SIZE)
 
-                        val winnerEmails = if (maxXP > 0) {
-                            docs.filter { it.getLong("monthlyXP") == maxXP }.mapNotNull { it.getString("email") }
-                        } else {
-                            emptyList()
+                        val podium = podiumDocs.mapIndexed { index, doc ->
+                            mapOf(
+                                "rank" to (index + 1).toLong(),
+                                "uid" to doc.id,
+                                "email" to (doc.getString("email") ?: ""),
+                                "firstName" to (doc.getString("firstName") ?: ""),
+                                "monthlyXP" to (doc.getLong("monthlyXP") ?: 0L),
+                                "avatarConfig" to (doc.get("avatarConfig") ?: emptyMap<String, Any>())
+                            )
                         }
+
+                        val winnerEmails = podium
+                            .mapNotNull { it["email"] as? String }
+                            .filter { it.isNotEmpty() }
 
                         // Wipe entire database system in paginated blocks before saving the confirmation metadata
                         wipeAllUsersXpStepByStep(null, monthKey) {
                             val globalUpdate = mapOf(
                                 "lastMonth" to monthKey,
-                                "winnerEmails" to winnerEmails
+                                "winnerEmails" to winnerEmails,
+                                "podium" to podium
                             )
 
-                            metaRef.set(globalUpdate).addOnSuccessListener {
-                                if (winnerEmails.contains(currentUserEmail)) {
-                                    claimReward(metaRef, currentUserEmail, winnerEmails)
+                            // MERGE, not a plain set(): a full overwrite would drop
+                            // appVersionCode, which the security rules refuse to let the
+                            // client touch — and BaseActivity depends on it.
+                            metaRef.set(globalUpdate, SetOptions.merge())
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "month finalized, winners=$winnerEmails")
+                                    val rank = winnerEmails.indexOf(currentUserEmail) + 1
+                                    if (rank > 0) {
+                                        claimReward(metaRef, currentUserEmail, winnerEmails, rank)
+                                    }
                                 }
-                            }
+                                .addOnFailureListener { e ->
+                                    Log.e(TAG, "cannot write system/leaderboard", e)
+                                }
                         }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "top-10 query failed", e)
                     }
             }
             // CASE 2: The global configurations are set, evaluate destination logic directly
             else if (savedWinners.contains(currentUserEmail)) {
-                claimReward(metaRef, currentUserEmail, savedWinners)
+                // winnerEmails shrinks as people claim, so the place comes from the
+                // podium snapshot, which is never modified.
+                val rank = rankFromPodium(metaDoc, currentUserEmail)
+                    ?: (savedWinners.indexOf(currentUserEmail) + 1)
+                claimReward(metaRef, currentUserEmail, savedWinners, rank)
+            }
+        }.addOnFailureListener { e ->
+            Log.e(TAG, "cannot read system/leaderboard", e)
+        }
+    }
+
+    /** Finds the user's finishing place (1, 2 or 3) in the stored podium snapshot. */
+    private fun rankFromPodium(metaDoc: DocumentSnapshot, email: String): Int? {
+        val podium = (metaDoc.get("podium") as? List<*>)
+            ?.mapNotNull { it as? Map<*, *> }
+            ?: return null
+
+        podium.forEachIndexed { index, entry ->
+            if ((entry["email"] as? String) == email) {
+                return (entry["rank"] as? Number)?.toInt() ?: (index + 1)
             }
         }
+        return null
     }
 
     // Paginated client processor sweeps database elements step-by-step
@@ -207,26 +274,37 @@ class MainActivity : BaseActivity() {
                 val lastDoc = snapshot.documents.last()
                 // Recurse to handle next 200 documents
                 wipeAllUsersXpStepByStep(lastDoc, currentMonthKey, onComplete)
-            }.addOnFailureListener {
-                // Fallback escape safety structure
+            }.addOnFailureListener { e ->
+                // Fallback escape safety structure — the reward flow must still run
+                Log.w(TAG, "XP wipe batch rejected", e)
                 onComplete()
             }
-        }.addOnFailureListener {
+        }.addOnFailureListener { e ->
+            Log.w(TAG, "wipe query failed", e)
             onComplete()
         }
     }
 
-    private fun claimReward(metaRef: com.google.firebase.firestore.DocumentReference, email: String, currentWinners: List<String>) {
+    private fun claimReward(
+        metaRef: com.google.firebase.firestore.DocumentReference,
+        email: String,
+        currentWinners: List<String>,
+        rank: Int
+    ) {
         val updatedWinners = currentWinners.toMutableList()
         updatedWinners.remove(email)
 
         metaRef.update("winnerEmails", updatedWinners).addOnSuccessListener {
+            Log.d(TAG, "launching reward screen, rank=$rank")
             val intent = Intent(this, MonthlyRewardActivity::class.java).apply {
+                putExtra(MonthlyRewardActivity.EXTRA_WINNER_RANK, rank)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
             finish()
+        }.addOnFailureListener { e ->
+            Log.e(TAG, "cannot update winnerEmails", e)
         }
     }
 

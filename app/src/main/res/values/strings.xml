@@ -101,9 +101,9 @@
     <string name="grade_label_format">%1$s - GRADE %2$d</string>
     <string name="timer_format">%1$02dm %2$02ds</string>
     <string name="leaderboard">LEADERBOARD</string>
-    <string name="get_a_reward_at_the_end_of_the_month">Get a reward at the end of the month</string>
+    <string name="get_a_reward_at_the_end_of_the_month">The top 3 students will receive a reward at the end of the month</string>
     <string name="days_left_singular">1 DAY LEFT</string>
-    <string name="days_left_plural">%1$d DAYS LEFT</string>
+    <string name="days_left_plural">%1$d DAYS</string>
     <string name="rank_status_format">You are in %1$d-place</string>
     <string name="start_gaining_xp">Start to gain XP!</string>
     <string name="math_games">MINI GAMES</string>
@@ -626,6 +626,7 @@
     <string name="solution_apples_correct">Awesome! You showed exactly %1$d apples.</string>
     <string name="solution_apples_explanation">Look! Here are the %1$d apples on the screen.</string>
 
+    <string name="question_show_apple">Show %1$d apple</string>
     <string name="question_show_apples">Show %1$d apples</string>
     <string name="apple">APPLE</string>
 
@@ -770,4 +771,63 @@
     <string name="math_storm_label" translatable="false">MathStorm</string>
 
     <string name="xp_gain">+%1$d XP</string>
+    <string name="ms_score_label">score:</string>
+
+    <string name="teacher_try_again">Don\'t worry, try again! Or tap See solution and I\'ll explain it.</string>
+
+    <string name="solution_count_by">Counting by %1$d: %2$d + %1$d = %3$d, then %4$d + %1$d = %5$d.</string>
+
+    <string name="explain_connect_numbers">Start from the smallest number and add 1 to each number along the path until you reach %1$d.</string>
+
+    <string name="rive_lesson">Lesson</string>
+    <string name="rive_complete">complete!</string>
+    <string name="rive_lesson_complete">Lesson complete!</string>
+    <string name="rive_lesson_complete_description">Lesson Complete! Great job!</string>
+
+    <string name="rive_total_xp">Total XP</string>
+    <string name="rive_accuracy">Accuracy</string>
+    <string name="rive_time">Time</string>
+
+    <string-array name="rive_lesson_complete_titles">
+        <item>Lesson Complete!</item>
+        <item>You Did It!</item>
+        <item>Lesson Finished!</item>
+        <item>Mission Complete!</item>
+        <item>Level Up!</item>
+    </string-array>
+
+    <string-array name="rive_lesson_complete_descriptions">
+        <item>Great job! Keep it up!</item>
+        <item>Awesome work! Keep going!</item>
+        <item>Well done! Keep learning!</item>
+        <item>Fantastic work! Keep going!</item>
+        <item>Excellent work! You did great!</item>
+    </string-array>
+
+    <string name="place_format">%1$d-place</string>
+
+    <string name="you_got_1st_place">You got the 1-st place</string>
+    <string name="you_got_2nd_place">You got the 2-nd place</string>
+    <string name="you_got_3rd_place">You got the 3-rd place</string>
+
+    <string name="added_coins_format">+%1$d coins</string>
+    <string name="reward_continue">Continue</string>
+
+    <string name="streak_motivation">Can you keep a perfect streak\nfor another week?</string>
+
+    <plurals name="day_streak">
+        <item quantity="one">day streak</item>
+        <item quantity="other">days streak</item>
+    </plurals>
+
+    <string name="math_storm_title">Math Storm</string>
+    <string name="math_storm_subtitle">Solve as much problems as you can!</string>
+    <string name="record_caps">RECORD</string>
+    <string name="wins_caps">WINS</string>
+    <string name="loses_caps">LOSES</string>
+    <string name="join">JOIN</string>
+    <string name="searching_dots">Searching…</string>
+    <string name="play_online_50_xp">CREATE GAME +50 XP</string>
+    <string name="solo_game_30_xp">SOLO GAME +30 XP</string>
+    <string name="no_open_rooms">No open games right now.\nCreate one and wait for a rival!</string>
 </resources>

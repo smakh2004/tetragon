@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:fitsSystemWindows="true"
     tools:context=".ui.uiSettings.DeleteAccountActivity">
 
     <!-- MAIN CONTENT -->
@@ -21,8 +22,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true">
+            android:layout_height="match_parent">
 
             <!-- TOP BAR -->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -59,16 +59,20 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- WARNING TEXT
+                 Was layout_width="0dp" with only a start constraint, which collapses to
+                 zero width — the whole warning was invisible. Added the end constraint
+                 and dropped the leftover layout_weight (no effect in ConstraintLayout). -->
             <TextView
                 android:id="@+id/currentPlan"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/inter_semibold"
                 android:gravity="start"
                 android:text="@string/deleting_your_account_will_permanently_remove_your_profile_settings_and_all_your_data_this_action_cannot_be_undone"
                 android:textColor="@color/text_color"
                 android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/topBar" />
 
@@ -77,9 +81,9 @@
                 android:id="@+id/passwordInputContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/input_container"
                 android:orientation="vertical"
-                android:layout_marginTop="10dp"
                 android:padding="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -102,15 +106,14 @@
                     android:textSize="20sp" />
             </LinearLayout>
 
-
             <!-- DELETE BUTTON -->
             <FrameLayout
                 android:id="@+id/delete_btn_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:layout_marginBottom="10dp"
                 android:paddingBottom="5dp"
                 app:layout_constraintBottom_toTopOf="@+id/cancelButton"
                 app:layout_constraintEnd_toEndOf="parent"

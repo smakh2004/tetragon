@@ -1,5 +1,6 @@
 package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.easy
 
+import android.content.res.Configuration
 import android.graphics.Typeface
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -20,6 +22,11 @@ import app.rive.runtime.kotlin.RiveAnimationView
 import com.tetragon.app.R
 import com.tetragon.app.questions.questionMathFirstGrade.Math1GradeQuestionActivity
 import com.tetragon.app.questions.questionMathFirstGrade.MathGrade1Type
+import com.tetragon.app.utils.voiceReader.SpokenLine
+import com.tetragon.app.utils.voiceReader.TeacherLipSync
+import com.tetragon.app.utils.voiceReader.TeacherSpeech
+import com.tetragon.app.utils.voiceReader.UzPhrases
+import java.util.Locale
 
 class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
 
@@ -57,8 +64,18 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
     private var isInitialized = false
     private var mediaPlayer: MediaPlayer? = null
 
+    private var interactionToken = 0
+
     private val STATE_MACHINE = "State Machine 1"
     private val RIVE_INPUT_APPLES = "apples"
+
+    private val RIVE_CORRECT = "correct"
+    private val RIVE_INCORRECT = "incorrect"
+    private val RIVE_EXPLAIN = "explain"
+
+    private lateinit var teacherAnimation: RiveAnimationView
+    private lateinit var lipSync: TeacherLipSync
+    private lateinit var speech: TeacherSpeech
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,6 +89,65 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
             }
         }
     }
+
+    // ------------------------------------------------------------ speech language
+
+    private fun uiLanguage(): String = resources.configuration.locales[0].language
+
+    private fun isUzbek(): Boolean = uiLanguage() == TeacherSpeech.UZ
+
+    /**
+     * Locale for the TextToSpeech fallback only. Uzbek is spoken from clips, but
+     * if a clip is ever missing the line is read in Russian rather than dropped.
+     */
+    private fun fallbackLocale(): Locale =
+        if (isUzbek()) Locale("ru") else resources.configuration.locales[0]
+
+    /** Text for the TTS fallback, rendered in [fallbackLocale]. */
+    private fun spokenText(@StringRes id: Int, vararg args: Any): String {
+        if (!isUzbek()) return getString(id, *args)
+        val conf = Configuration(resources.configuration)
+        conf.setLocale(Locale("ru"))
+        return requireContext().createConfigurationContext(conf).getString(id, *args)
+    }
+
+    @StringRes
+    private fun getQuestionStringRes(count: Int): Int {
+        return if (count == 1) R.string.question_show_apple else R.string.question_show_apples
+    }
+
+    // ---------------------------------------------------------------- the lines
+
+    private fun questionLine(): SpokenLine = SpokenLine(
+        text = spokenText(getQuestionStringRes(targetApplesCount), targetApplesCount),
+        clips = UzPhrases.showApples(targetApplesCount)
+    )
+
+    private fun tryAgainLine(): SpokenLine = SpokenLine(
+        text = spokenText(R.string.teacher_try_again),
+        clips = UzPhrases.tryAgain()
+    )
+
+    private fun solutionLine(): SpokenLine = SpokenLine(
+        text = spokenText(R.string.solution_apples_explanation, targetApplesCount),
+        clips = UzPhrases.applesSolution(targetApplesCount)
+    )
+
+    // ------------------------------------------------------------------ tokens
+
+    private fun newInteraction(): Int {
+        interactionToken++
+        return interactionToken
+    }
+
+    private fun isStale(token: Int) = token != interactionToken
+
+    private fun cancelSpeechAndSound() {
+        stopSound()
+        speech.stop()
+    }
+
+    // ------------------------------------------------------------------- setup
 
     private fun initViews(view: View) {
         addEnabledContainer = view.findViewById(R.id.add_enabled_container)
@@ -101,6 +177,12 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
         stateContainer = activity.findViewById(R.id.stateContainer)
         circleState = activity.findViewById(R.id.circleState)
 
+        teacherAnimation = view.findViewById(R.id.teacherAnimation)
+        lipSync = TeacherLipSync(teacherAnimation, language = uiLanguage())
+        lipSync.prepare()
+        speech = TeacherSpeech(requireContext(), lipSync, uiLanguage(), fallbackLocale())
+        teacherAnimation.setOnClickListener { repeatQuestion() }
+
         val labelText = getString(R.string.apple)
         addBtnLabel.text = labelText
         addBtnDisabledText.text = labelText
@@ -111,6 +193,9 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
         minusBtn.setOnClickListener { changeAppleCount(-1) }
 
         checkBtn.setOnClickListener {
+            newInteraction()
+            cancelSpeechAndSound()
+
             if (!isAnswerChecked) {
                 checkAnswer()
             } else if (isIncorrectAttempt) {
@@ -137,8 +222,17 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
         disableCheckButton()
     }
 
+    private fun repeatQuestion() {
+        newInteraction()
+        cancelSpeechAndSound()
+        speech.speak(questionLine())
+    }
+
     private fun changeAppleCount(delta: Int) {
         if (isAnswerChecked) return
+        newInteraction()
+        cancelSpeechAndSound()
+
         val newValue = (currentApplesCount + delta).coerceIn(0, 10)
         if (newValue == currentApplesCount) return
 
@@ -171,7 +265,8 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
         targetApplesCount = (1..10).random()
 
         val countStr = targetApplesCount.toString()
-        val baseText = getString(R.string.question_show_apples, targetApplesCount)
+        val stringRes = getQuestionStringRes(targetApplesCount)
+        val baseText = getString(stringRes, targetApplesCount)
 
         val spannable = SpannableString(baseText)
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_2)
@@ -190,6 +285,7 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
 
         questionText.text = spannable
         resetFragmentState()
+        repeatQuestion()
     }
 
     private fun checkAnswer() {
@@ -200,6 +296,8 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
 
         if (currentApplesCount == targetApplesCount) {
             playSound(R.raw.correct)
+            lipSync.fireTrigger(RIVE_CORRECT)
+
             activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
 
@@ -212,7 +310,15 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
             checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState()
         } else {
-            playSound(R.raw.wrong)
+            val token = interactionToken
+            playSound(R.raw.wrong) {
+                if (isStale(token)) return@playSound
+                speech.speak(
+                    tryAgainLine(),
+                    onStarted = { if (!isStale(token)) lipSync.setBoolean(RIVE_INCORRECT, true) },
+                    onFinished = { lipSync.setBoolean(RIVE_INCORRECT, false) }
+                )
+            }
             isIncorrectAttempt = true
             activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
@@ -244,6 +350,10 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
 
     private fun setupSeeSolution() {
         seeEnabledButton.setOnClickListener {
+            val token = newInteraction()
+            cancelSpeechAndSound()
+            lipSync.clearBooleans()
+
             seeBtn.visibility = View.GONE
             stateAnswer.text = getString(R.string.state_solution)
 
@@ -253,6 +363,12 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
 
             riveAnimation.setNumberState(STATE_MACHINE, RIVE_INPUT_APPLES, targetApplesCount.toFloat())
+
+            speech.speak(
+                solutionLine(),
+                onStarted = { if (!isStale(token)) lipSync.setBoolean(RIVE_EXPLAIN, true) },
+                onFinished = { lipSync.setBoolean(RIVE_EXPLAIN, false) }
+            )
 
             checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_3)
             checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.black_2)
@@ -266,11 +382,13 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
     }
 
     private fun resetFragmentState() {
+        newInteraction()
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
         currentApplesCount = 0
         riveAnimation.setNumberState(STATE_MACHINE, RIVE_INPUT_APPLES, 0f)
+        lipSync.clearBooleans()
 
         disableCheckButton()
         stateContainer.visibility = View.INVISIBLE
@@ -284,6 +402,10 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
     }
 
     private fun resetForTryAgain() {
+        newInteraction()
+        cancelSpeechAndSound()
+        lipSync.clearBooleans()
+
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
 
@@ -302,6 +424,10 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
     }
 
     private fun resetUIForNext() {
+        newInteraction()
+        cancelSpeechAndSound()
+        lipSync.clearBooleans()
+
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
@@ -338,16 +464,31 @@ class UiAppleCountFragment : Fragment(R.layout.fragment_ui_apple_count) {
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), bg))
     }
 
-    private fun playSound(resId: Int) {
-        mediaPlayer?.release()
+    private fun playSound(resId: Int, onComplete: (() -> Unit)? = null) {
+        stopSound()
         mediaPlayer = MediaPlayer.create(requireContext(), resId)
-        mediaPlayer?.setOnCompletionListener { it.release() }
+        mediaPlayer?.setOnCompletionListener { player ->
+            player.release()
+            mediaPlayer = null
+            if (isAdded) onComplete?.invoke()
+        }
         mediaPlayer?.start()
     }
 
-    override fun onDestroyView() {
-        mediaPlayer?.release()
+    private fun stopSound() {
+        mediaPlayer?.let { player ->
+            player.setOnCompletionListener(null)
+            runCatching { if (player.isPlaying) player.stop() }
+            player.release()
+        }
         mediaPlayer = null
+    }
+
+    override fun onDestroyView() {
+        newInteraction()
+        stopSound()
+        speech.release()
+        lipSync.release()
         super.onDestroyView()
     }
 }

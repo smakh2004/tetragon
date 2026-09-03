@@ -2,12 +2,10 @@ package com.tetragon.app.questions
 
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.view.animation.DecelerateInterpolator
 import app.rive.runtime.kotlin.core.Rive
-import app.rive.runtime.kotlin.core.PlayableInstance
 import app.rive.runtime.kotlin.core.ViewModelInstance
-import app.rive.runtime.kotlin.controllers.RiveFileController
 import com.tetragon.app.R
 import com.tetragon.app.databinding.ActivityStreakGainedBinding
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
@@ -20,51 +18,194 @@ import java.util.concurrent.TimeUnit
 
 class StreakGainedActivity : BaseActivity() {
 
+    companion object {
+        private const val MAX_RIVE_ATTEMPTS = 60
+        private const val RIVE_RETRY_DELAY_MS = 50L
+
+        /** How long the animation plays alone before the continue button appears. */
+        private const val CONTINUE_BTN_DELAY_MS = 4500L
+        private const val CONTINUE_BTN_FADE_MS = 200L
+
+        private const val RIVE_VIEW_MODEL = "ViewModel1"
+
+        // ViewModel1 properties
+        private const val PROP_STREAK_COUNT = "streakCount"     // Number
+        private const val PROP_DAY_STREAK = "dayStreak"         // String ("day streak")
+        private const val PROP_MOTIVATION = "motivationText"    // String
+
+        // ViewModel1 — weekday labels (String), left to right
+        private const val PROP_MO = "mo"
+        private const val PROP_TU = "tu"
+        private const val PROP_WE = "we"
+        private const val PROP_TH = "th"
+        private const val PROP_FR = "fr"
+        private const val PROP_SA = "sa"
+        private const val PROP_SU = "su"
+    }
+
     private lateinit var binding: ActivityStreakGainedBinding
     private var mediaPlayer: MediaPlayer? = null
 
-    private val auth by lazy { FirebaseAuth.getInstance() }
-    private val db by lazy { FirebaseFirestore.getInstance() }
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    private val STATE_MACHINE = "State Machine 1"
-    private val VIEW_MODEL_NAME = "ViewModel1" // Matches your Rive Data ViewModel name
-    private var isRiveInitialized = false
+    // ---------------- Rive (ViewModel1) ----------------
+    private var streakVmi: ViewModelInstance? = null
 
-    // Retain the ViewModelInstance reference for direct updates
-    private var viewModelInstance: ViewModelInstance? = null
+    /** The streak read from Firestore. Flushed into Rive once the view model binds. */
     private var pendingStreak: Long? = null
 
-    private val INTRO_HOLD_DURATION_MS = 4500L
-    private val INTRO_MOVE_DURATION_MS = 600L
-    private val INTRO_FADE_DURATION_MS = 500L
-    private val INTRO_ENLARGE_SCALE = 1.1f
+    // ---------------- Delayed continue button ----------------
+    private var showContinueRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Rive.init(this)
+
         binding = ActivityStreakGainedBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Hold the artboard still until ViewModel1 is populated and bound. Without this the
+        // state machine can advance past its entry transition using the property defaults.
+        runCatching { binding.streakRiveView.pause() }
+
         playStreakSound()
-        setupIntroAnimation()
 
-        binding.streakRiveView.registerListener(object : RiveFileController.Listener {
-            override fun notifyPlay(animation: PlayableInstance) {
-                if (!isRiveInitialized) {
-                    val file = binding.streakRiveView.controller.file
-                    if (file != null) {
-                        setupRiveDefaultLayout(file)
-                        isRiveInitialized = true
-                    }
+        // bind the Rive view model as early as possible so the values have a target
+        bindStreakRive()
+        loadStreakFromFirestore()
+        scheduleContinueButton()
+
+        binding.continueEnabledBtn.setOnClickListener {
+            finish()
+        }
+    }
+
+    // =====================================================
+    // 🔹 CONTINUE BUTTON REVEAL
+    // =====================================================
+
+    private fun scheduleContinueButton() {
+        val container = binding.continueBtnContainer
+        container.visibility = View.INVISIBLE
+        container.alpha = 0f
+
+        val reveal = Runnable {
+            if (isFinishing || isDestroyed) return@Runnable
+            container.visibility = View.VISIBLE
+            container.animate()
+                .alpha(1f)
+                .setDuration(CONTINUE_BTN_FADE_MS)
+                .start()
+        }
+        showContinueRunnable = reveal
+        container.postDelayed(reveal, CONTINUE_BTN_DELAY_MS)
+    }
+
+    // =====================================================
+    // 🔹 RIVE DATA BINDING (ViewModel1)
+    // =====================================================
+
+    /**
+     * Binds ViewModel1 to the streak artboard (the .riv itself is declared in the layout
+     * XML). Retries while the file is still loading.
+     *
+     * Order matters: the instance is filled with every value we already know and only then
+     * attached to the artboard and state machines, so the state machine cannot pick a branch
+     * from the property defaults. Playback starts afterwards.
+     */
+    private fun bindStreakRive(attempt: Int = 0) {
+        binding.streakRiveView.post {
+            if (isFinishing || isDestroyed) return@post
+
+            val riveController = binding.streakRiveView.controller
+            val file = riveController.file
+            val stateMachine = riveController.stateMachines.firstOrNull()
+
+            if (file == null || stateMachine == null) {
+                if (attempt < MAX_RIVE_ATTEMPTS) {
+                    binding.streakRiveView.postDelayed(
+                        { bindStreakRive(attempt + 1) },
+                        RIVE_RETRY_DELAY_MS
+                    )
                 }
+                return@post
             }
-            override fun notifyPause(animation: PlayableInstance) {}
-            override fun notifyStop(animation: PlayableInstance) {}
-            override fun notifyLoop(animation: PlayableInstance) {}
-            override fun notifyStateChanged(stateMachineName: String, stateName: String) {}
-        })
 
+            try {
+                if (streakVmi == null) {
+                    val vm = file.getViewModelByName(RIVE_VIEW_MODEL) ?: return@post
+                    val root = vm.createDefaultInstance()
+
+                    // 1. Populate the instance while nothing is observing it yet.
+                    streakVmi = root
+                    applyStreakValues()
+
+                    // 2. Only now hand the filled instance to the artboard / state machines.
+                    riveController.activeArtboard?.viewModelInstance = root
+                    riveController.stateMachines.forEach { it.viewModelInstance = root }
+                } else {
+                    applyStreakValues()
+                }
+
+                // 3. Release the artboard now that it has real values to read.
+                runCatching { binding.streakRiveView.play() }
+
+            } catch (e: Exception) {
+                Log.e("StreakGained", "Error binding Rive view model: ${e.message}")
+                runCatching { binding.streakRiveView.play() }
+            }
+        }
+    }
+
+    /** Writes every known value into ViewModel1. */
+    private fun applyStreakValues() {
+        val streak = pendingStreak ?: 1L
+
+        setRiveNumber(PROP_STREAK_COUNT, streak.toFloat())
+        setRiveText(PROP_DAY_STREAK, resources.getQuantityString(R.plurals.day_streak, streak.toInt()))
+        setRiveText(PROP_MOTIVATION, getString(R.string.streak_motivation))
+
+        applyWeekLabels()
+    }
+
+    /** Localized weekday labels for the Mo–Su row (en / ru / uz via resources). */
+    private fun applyWeekLabels() {
+        setRiveText(PROP_MO, getString(R.string.mo))
+        setRiveText(PROP_TU, getString(R.string.tu))
+        setRiveText(PROP_WE, getString(R.string.we))
+        setRiveText(PROP_TH, getString(R.string.th))
+        setRiveText(PROP_FR, getString(R.string.fr))
+        setRiveText(PROP_SA, getString(R.string.sa))
+        setRiveText(PROP_SU, getString(R.string.su))
+    }
+
+    private fun setRiveText(property: String, value: String) {
+        val instance = streakVmi ?: return
+        runCatching { instance.getStringProperty(property)?.value = value }
+    }
+
+    private fun setRiveNumber(property: String, value: Float) {
+        val instance = streakVmi ?: return
+        runCatching { instance.getNumberProperty(property)?.value = value }
+    }
+
+    private fun pushStreak(streak: Long) {
+        pendingStreak = streak
+        setRiveNumber(PROP_STREAK_COUNT, streak.toFloat())
+        setRiveText(PROP_DAY_STREAK, resources.getQuantityString(R.plurals.day_streak, streak.toInt()))
+    }
+
+    // =====================================================
+    // 🔹 FIRESTORE STREAK
+    // =====================================================
+
+    /**
+     * Reads the user doc, works out the new streak, writes it back,
+     * then pushes that value into Rive.
+     */
+    private fun loadStreakFromFirestore() {
         val user = auth.currentUser ?: return
         val userDoc = db.collection("users").document(user.uid)
 
@@ -107,14 +248,15 @@ class StreakGainedActivity : BaseActivity() {
                 )
             )
 
-            // Feed updated data & bound streak count into Rive
-            applyLiveDataToRive(newStreak, updatedVisited)
-        }
-
-        binding.continueEnabledBtn.setOnClickListener {
-            finish()
+            pushStreak(newStreak)
+        }.addOnFailureListener { e ->
+            Log.e("StreakGained", "Error loading streak: ${e.message}")
         }
     }
+
+    // =====================================================
+    // 🔹 SOUND
+    // =====================================================
 
     private fun playStreakSound() {
         try {
@@ -130,154 +272,9 @@ class StreakGainedActivity : BaseActivity() {
         }
     }
 
-    private fun setupIntroAnimation() {
-        binding.continueEnabledBtn.isEnabled = false
-
-        binding.root.post {
-            val screenCenterY = binding.main.height / 2f
-            val viewCenterY = binding.streakRiveView.top + binding.streakRiveView.height / 2f
-            val offsetY = screenCenterY - viewCenterY
-
-            binding.streakRiveView.apply {
-                translationY = offsetY
-                scaleX = INTRO_ENLARGE_SCALE
-                scaleY = INTRO_ENLARGE_SCALE
-            }
-
-            binding.root.postDelayed({ playIntroAnimation() }, INTRO_HOLD_DURATION_MS)
-        }
-    }
-
-    private fun playIntroAnimation() {
-        binding.streakRiveView.animate()
-            .translationY(0f)
-            .scaleX(1f)
-            .scaleY(1f)
-            .setDuration(INTRO_MOVE_DURATION_MS)
-            .setInterpolator(DecelerateInterpolator())
-            .start()
-
-        binding.streakMrSquare.animate()
-            .alpha(1f)
-            .setDuration(INTRO_FADE_DURATION_MS)
-            .setStartDelay(150L)
-            .start()
-
-        binding.continueBtnContainer.apply {
-            visibility = View.VISIBLE
-            animate()
-                .alpha(1f)
-                .setDuration(INTRO_FADE_DURATION_MS)
-                .setStartDelay(200L)
-                .withEndAction { binding.continueEnabledBtn.isEnabled = true }
-                .start()
-        }
-    }
-
-    private fun setupRiveDefaultLayout(file: app.rive.runtime.kotlin.core.File) {
-        try {
-            val vm = file.getViewModelByName(VIEW_MODEL_NAME) ?: return
-            val instance = vm.createDefaultInstance()
-            viewModelInstance = instance
-
-            // Assign ViewModelInstance to the state machine controller
-            binding.streakRiveView.controller.stateMachines.firstOrNull()?.viewModelInstance = instance
-
-            // Fill the 7 label slots so TODAY always sits in the "Th" slot (position 4)
-            applyRotatedWeekLabels(instance)
-
-            // Apply pending streak count if Firestore already returned before Rive initialized
-            pendingStreak?.let { streak ->
-                bindStreakCountToViewModel(streak)
-                pendingStreak = null
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    /**
-     * The Rive ViewModel exposes 7 string slots named in fixed visual order:
-     * "Mo","Tu","We","Th","Fr","Sa","Su". These are POSITIONS, not weekdays.
-     * The 4th slot ("Th") represents TODAY, with the 3 previous days to its left
-     * and the 3 upcoming days to its right. This fills each slot with the correct
-     * localized weekday label based on the current date.
-     */
-    private fun applyRotatedWeekLabels(instance: ViewModelInstance) {
-        // Slot property names in their left-to-right visual order.
-        val slotNames = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        val todaySlot = slotNames.indexOf("Th") // = 3, the slot that is "today"
-
-        // Localized short labels, indexed Monday(0)..Sunday(6).
-        val dayLabels = listOf(
-            getString(R.string.mo),
-            getString(R.string.tu),
-            getString(R.string.we),
-            getString(R.string.th),
-            getString(R.string.fr),
-            getString(R.string.sa),
-            getString(R.string.su)
-        )
-
-        // Today as a Monday(0)..Sunday(6) index.
-        val dow = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) // 1=Sun..7=Sat
-        val todayIndex = (dow + 5) % 7
-
-        slotNames.forEachIndexed { slot, propName ->
-            val offset = slot - todaySlot                      // -3..+3 relative to today
-            val dayIndex = ((todayIndex + offset) % 7 + 7) % 7 // safe positive modulo
-            instance.getStringProperty(propName)?.value = dayLabels[dayIndex]
-        }
-    }
-
-    private fun applyLiveDataToRive(newStreak: Long, visitedDays: Map<String, Boolean>) {
-        try {
-            val allInputs = listOf("4", "1,4", "2,4", "3,4", "1,2,4", "1,3,4", "2,3,4", "1,2,3,4")
-
-            val todayMidnight = getLocalMidnight()
-            val day3AgoKey = dateFormat.format((todayMidnight.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -3) }.time)
-            val day2AgoKey = dateFormat.format((todayMidnight.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -2) }.time)
-            val day1AgoKey = dateFormat.format((todayMidnight.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -1) }.time)
-
-            val is1Active = visitedDays[day3AgoKey] == true
-            val is2Active = visitedDays[day2AgoKey] == true
-            val is3Active = visitedDays[day1AgoKey] == true
-
-            val activeKey = when {
-                newStreak >= 4L || (is1Active && is2Active && is3Active) -> "1,2,3,4"
-                is2Active && is3Active -> "2,3,4"
-                is1Active && is3Active -> "1,3,4"
-                is1Active && is2Active -> "1,2,4"
-                is3Active || newStreak == 2L -> "3,4"
-                is2Active -> "2,4"
-                is1Active -> "1,4"
-                else -> "4"
-            }
-
-            allInputs.forEach { inputName ->
-                binding.streakRiveView.setBooleanState(STATE_MACHINE, inputName, inputName == activeKey)
-            }
-
-            // Bind StreakCount to the ViewModel
-            if (viewModelInstance != null) {
-                bindStreakCountToViewModel(newStreak)
-            } else {
-                pendingStreak = newStreak
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    /**
-     * Binds the new streak count directly to the 'StreakCount' property
-     * inside Rive's ViewModelInstance.
-     */
-    private fun bindStreakCountToViewModel(streak: Long) {
-        viewModelInstance?.getNumberProperty("StreakCount")?.let { prop ->
-            prop.value = streak.toFloat()
-        }
-    }
+    // =====================================================
+    // 🔹 DATE HELPERS
+    // =====================================================
 
     private fun getLocalMidnight(): Calendar = getLocalMidnight(Calendar.getInstance())
 
@@ -290,7 +287,12 @@ class StreakGainedActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        showContinueRunnable?.let { binding.continueBtnContainer.removeCallbacks(it) }
+        showContinueRunnable = null
+        binding.continueBtnContainer.animate().cancel()
+
+        streakVmi = null
+
         mediaPlayer?.let {
             if (it.isPlaying) {
                 it.stop()
@@ -298,5 +300,6 @@ class StreakGainedActivity : BaseActivity() {
             it.release()
             mediaPlayer = null
         }
+        super.onDestroy()
     }
 }

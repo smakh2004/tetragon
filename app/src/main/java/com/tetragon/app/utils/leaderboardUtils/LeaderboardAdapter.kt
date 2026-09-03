@@ -14,6 +14,8 @@ import com.tetragon.app.R
 class LeaderboardAdapter(
     private val users: List<LeaderboardUser>,
     private val currentUserEmail: String?,
+    /** Rank shown for item 0. The leaderboard list starts at 4th place. */
+    private val rankOffset: Int = 1,
     private val onUserClick: (LeaderboardUser) -> Unit
 ) : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>() {
 
@@ -38,7 +40,7 @@ class LeaderboardAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = users[position]
-        val rank = position + 1
+        val rank = position + rankOffset
         val ctx = holder.itemView.context
 
         holder.nameText.text = user.firstName
@@ -106,7 +108,7 @@ class LeaderboardAdapter(
                     }
                 }
 
-                // >>> ADD HERE: per-part colors <
+                // >>> ADD HERE: per-part colors
                 val colorProps = listOf("skinColor", "hairColor", "glassColor", "capColor", "mustacheColor", "clothColor")
                 colorProps.forEach { propName ->
                     (config[propName] as? String)?.let { hex ->

@@ -13,133 +13,45 @@
         android:layout_height="match_parent"
         android:background="@color/white">
 
-        <LinearLayout
-            android:id="@+id/headerTextContainer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
-            android:orientation="vertical"
-            android:visibility="visible"
-            app:layout_constraintEnd_toStartOf="@+id/leaderboardImage"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/titleLeaderboard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
-                android:text="@string/leaderboard"
-                android:textColor="@color/blue_2"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/rewardText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/inter_semibold"
-                android:text="@string/get_a_reward_at_the_end_of_the_month"
-                android:textColor="@color/gray_1"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/monthText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/custom_background"
-                android:backgroundTint="@color/blue_2"
-                android:fontFamily="@font/inter_semibold"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="6dp"
-                android:textSize="14sp"
-                android:text="DECEMBER"
-                android:textColor="@color/white" />
-
-            <LinearLayout
-                android:id="@+id/daysContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <app.rive.runtime.kotlin.RiveAnimationView
-                    android:id="@+id/ivClockIcon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:riveAutoPlay="true"
-                    app:riveResource="@raw/timer_leaderboard"
-                    app:riveStateMachine="State Machine 1" />
-
-                <TextView
-                    android:id="@+id/daysText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:fontFamily="@font/inter_semibold"
-                    tools:text="24h 00m 00s"
-                    android:textColor="@color/blue_2"
-                    android:textSize="15sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/leaderboardImage"
-            android:layout_width="160dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="16dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_leaderboard"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@id/headerTextContainer"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/headerTextContainer" />
-
-        <TextView
-            android:id="@+id/positionText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/inter_semibold"
-            android:text="@string/loading"
-            android:textColor="@color/text_color"
-            android:textSize="20sp"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerTextContainer" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/leaderboardCard"
+        <!-- TOP BLOCK: ENTIRELY RIVE — fixed, never scrolls -->
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/leaderboardRive"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="16dp"
-            android:visibility="visible"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
+            app:layout_constraintDimensionRatio="H,47:40"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:riveAlignment="TOP_CENTER"
+            app:riveAutoPlay="true"
+            app:riveFit="COVER"
+            app:riveResource="@raw/leaderboard"
+            app:riveStateMachine="State Machine 1" />
+
+        <!-- DIVIDER between the Rive block and the list -->
+        <View
+            android:id="@+id/leaderboardDivider"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:background="@color/gray_2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/leaderboardRive" />
+
+        <!-- LIST: full width, scrolls under the Rive block -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/leaderboardRecycler"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:clipToPadding="false"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/positionText"
-            app:strokeColor="@color/gray_2"
-            app:strokeWidth="2dp">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/leaderboardRecycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                tools:listitem="@layout/item_leaderboard" />
-
-        </com.google.android.material.card.MaterialCardView>
+            app:layout_constraintTop_toBottomOf="@id/leaderboardDivider"
+            tools:listitem="@layout/item_leaderboard" />
 
         <LinearLayout
             android:id="@+id/loadingLayout"

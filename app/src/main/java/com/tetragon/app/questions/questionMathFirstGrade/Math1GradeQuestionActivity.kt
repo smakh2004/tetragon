@@ -6,6 +6,7 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
@@ -111,6 +112,12 @@ class Math1GradeQuestionActivity : BaseActivity() {
     private var isOnSecondChance = false
     private var progressIncrementCount = 0
 
+    // ---- Lesson stats for the result screen ----
+    // correctAnswersCount is reset at every milestone, so accuracy needs its own counters.
+    private var lessonCorrectAnswers = 0
+    private var lessonAnswerAttempts = 0
+    private var lessonStartElapsed: Long = 0L
+
     // Tracking variables for custom structural Layout progress layout logic
     private var currentLogicalProgress = 0
     private val maxProgress = 12
@@ -135,6 +142,9 @@ class Math1GradeQuestionActivity : BaseActivity() {
         Rive.init(this)
         binding = ActivityQuestionQctivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // lesson timer (elapsedRealtime is immune to clock changes)
+        lessonStartElapsed = SystemClock.elapsedRealtime()
 
         // Force the background track container frame to natively clip its children's overshoots
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -168,6 +178,9 @@ class Math1GradeQuestionActivity : BaseActivity() {
         streakAnswersCount++
         consecutiveCorrectAtLevel++
         isOnSecondChance = false
+
+        lessonCorrectAnswers++
+        lessonAnswerAttempts++
 
         if (consecutiveCorrectAtLevel >= 3) {
             val oldComplexity = currentComplexity
@@ -213,6 +226,9 @@ class Math1GradeQuestionActivity : BaseActivity() {
     fun handleIncorrectAnswer() {
         consecutiveCorrectAtLevel = 0
         streakAnswersCount = 0
+
+        lessonAnswerAttempts++
+
         if (!isOnSecondChance) {
             isOnSecondChance = true
         } else {
@@ -604,12 +620,21 @@ class Math1GradeQuestionActivity : BaseActivity() {
         return currentLogicalProgress >= maxProgress
     }
 
+    /** Correct answers as a percentage of every answer attempt in this lesson. */
+    private fun lessonAccuracy(): Int =
+        if (lessonAnswerAttempts <= 0) 0
+        else ((lessonCorrectAnswers * 100f) / lessonAnswerAttempts).toInt().coerceIn(0, 100)
+
     fun navigateToXpGained() {
+        val elapsedSeconds = (SystemClock.elapsedRealtime() - lessonStartElapsed) / 1000
+
         val intent = Intent(this, XpGainedActivity::class.java).apply {
             putExtra(SubjectConstants.EXTRA_XP, totalXp)
             putExtra(SubjectConstants.EXTRA_TOPIC, selectedTopic.name)
             putExtra(SubjectConstants.EXTRA_GRADE, 1)
             putExtra(SubjectConstants.EXTRA_SUBJECT, SubjectConstants.SUBJECT_MATH)
+            putExtra(XpGainedActivity.EXTRA_ACCURACY, lessonAccuracy())
+            putExtra(XpGainedActivity.EXTRA_TIME_SECONDS, elapsedSeconds)
         }
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)

@@ -32,7 +32,6 @@ import com.tetragon.app.questions.questionPhysicsEleventhGrade.Physics11GradeFra
 import com.tetragon.app.questions.questionPhysicsNinthGrade.Physics9GradeFragment
 import com.tetragon.app.questions.questionPhysicsSevenGrade.Physics7GradeFragment
 import com.tetragon.app.questions.questionPhysicsTenthGrade.Physics10GradeFragment
-import com.tetragon.app.aiChatBot.ChatActivity
 import com.tetragon.app.starsBuy.StarsActivity
 import com.tetragon.app.streakCalendar.StreakCalendarActivity
 import com.tetragon.app.ui.NaturalSciencesActivity
@@ -50,9 +49,7 @@ class HomeFragment : Fragment() {
     private lateinit var topicNameDisplay: TextView
     private lateinit var classBtn: FrameLayout
     private lateinit var streakContainer: ConstraintLayout
-    private lateinit var chatContainer: ConstraintLayout
     private lateinit var starsContainer: ConstraintLayout
-    private lateinit var chatMrSquareRive: View // Add reference variable here
 
     private lateinit var starCountText: TextView
     private lateinit var starIcon: ImageView
@@ -83,8 +80,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        chatContainer = view.findViewById(R.id.chatContainer)
-        chatMrSquareRive = view.findViewById(R.id.chat_mr_square_rive) // Initialize reference
         starsContainer = view.findViewById(R.id.constraintLayout2)
         streakContainer = view.findViewById(R.id.constraintLayout6)
         streakNumberTextView = view.findViewById(R.id.streakNumber)
@@ -112,15 +107,6 @@ class HomeFragment : Fragment() {
 
         classBtn.setOnClickListener {
             startActivity(Intent(requireContext(), NaturalSciencesActivity::class.java))
-        }
-
-        // DOUBLE-CLICK SECURITY ASSURANCE: Both container bounds and head asset launch ChatActivity
-        chatContainer.setOnClickListener {
-            startActivity(Intent(requireContext(), ChatActivity::class.java))
-        }
-
-        chatMrSquareRive.setOnClickListener {
-            startActivity(Intent(requireContext(), ChatActivity::class.java))
         }
 
         if (savedInstanceState == null) {

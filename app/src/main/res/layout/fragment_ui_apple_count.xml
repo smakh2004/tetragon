@@ -6,19 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".questions.questionMathFirstGrade.firstTopicCountingNumbers.easy.UiAppleCountFragment">
 
+    <!-- Teacher character: reads the question out loud (mouth viseme via ViewModel1) -->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/teacherAnimation"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.55"
+        app:layout_constraintDimensionRatio="H,11:11"
+        android:layout_marginStart="-28dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riveAlignment="BOTTOM_CENTER"
+        app:riveFit="CONTAIN"
+        app:riveResource="@raw/teacher_animation"
+        app:riveStateMachine="State Machine 1" />
+
     <TextView
         android:id="@+id/questionText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="-28dp"
         android:layout_marginEnd="16dp"
         android:fontFamily="@font/inter_semibold"
         android:text="Show 5 apples"
         android:textColor="@color/text_color"
-        android:textSize="24sp"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@id/teacherAnimation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/teacherAnimation"
+        app:layout_constraintTop_toTopOf="@id/teacherAnimation" />
+
+    <!-- Whichever of the two is taller pushes the apples down -->
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/headerBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="teacherAnimation,questionText" />
+
+    <View
+        android:id="@+id/headerDivider"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="@color/gray_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/headerBarrier" />
 
     <app.rive.runtime.kotlin.RiveAnimationView
         android:id="@+id/appleCountAnimation"
@@ -26,7 +62,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/questionText"
+        app:layout_constraintTop_toBottomOf="@id/headerBarrier"
         app:layout_constraintWidth_max="420dp"
         app:riveAlignment="CENTER"
         app:riveFit="CONTAIN"

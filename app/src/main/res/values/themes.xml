@@ -2,26 +2,29 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Base.Theme.Tetragon" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@color/white</item>
-        <item name="android:navigationBarColor">@color/white</item>
+        <!-- statusBarColor / navigationBarColor убраны:
+             на API 35+ они игнорируются системой и вызывают предупреждение Play Console.
+             Цвет под системными панелями теперь даёт windowBackground. -->
         <item name="android:windowLightStatusBar">true</item>
 
         <item name="android:windowBackground">@color/white</item>
         <item name="android:colorBackground">@color/white</item>
 
         <item name="android:windowIsTranslucent">false</item>
+
+        <!-- на API 35+ система сама рисует полосы поверх контента,
+             принудительное "непрозрачное" поведение отключаем -->
+        <item name="android:enforceStatusBarContrast" tools:targetApi="29">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
     </style>
 
     <style name="Theme.Tetragon" parent="Base.Theme.Tetragon" />
 
     <style name="Theme.Tetragon.Splash" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@color/white</item>
-        <item name="android:navigationBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>
 
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowBackground">@color/white</item>
-
     </style>
 
 </resources>

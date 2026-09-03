@@ -107,158 +107,80 @@
                 android:clipToPadding="false"
                 android:padding="16dp">
 
-                <!-- TOP SECTION: CLOSE BUTTON & CAPSULE -->
+                <!-- TOP BAR: ENTIRELY RIVE (timer + score + avatar), FIT_WIDTH -->
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/topBarRive"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="-45dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:riveAlignment="TOP_CENTER"
+                    app:riveAutoPlay="true"
+                    app:riveFit="LAYOUT"
+                    app:riveResource="@raw/top_bar_math_storm"
+                    app:riveStateMachine="State Machine 1" />
+
+
+                <!-- CLOSE BUTTON -->
                 <ImageView
                     android:id="@+id/signFlag"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:contentDescription="Close button"
-                    android:src="@drawable/sign_flag"
+                    android:padding="4dp"
+                    android:src="@drawable/exit_btn"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/topBarContainer"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/signFlag">
-
-                    <!-- CAPSULE BACKGROUND CARD -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/timerMistakeBar"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:background="@drawable/top_bar_background"
-                        android:clipChildren="false"
-                        android:clipToPadding="false"
-                        android:paddingHorizontal="16dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <!-- TIMER (LEFT) -->
-                        <LinearLayout
-                            android:id="@+id/timerContainer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <ImageView
-                                android:id="@+id/clockIcon"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_clock" />
-
-                            <TextView
-                                android:id="@+id/timerText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:fontFamily="@font/inter_semibold"
-                                android:includeFontPadding="false"
-                                android:text="3:30"
-                                android:textColor="#f0565d"
-                                android:textSize="22sp" />
-                        </LinearLayout>
-
-                        <!-- MISTAKES (RIGHT) -->
-                        <LinearLayout
-                            android:id="@+id/mistakesContainer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <ImageView
-                                android:id="@+id/mistake1"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_marginEnd="6dp"
-                                android:src="@drawable/wrong_circle" />
-
-                            <ImageView
-                                android:id="@+id/mistake2"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_marginEnd="6dp"
-                                android:src="@drawable/circle_empty" />
-
-                            <ImageView
-                                android:id="@+id/mistake3"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/circle_empty" />
-                        </LinearLayout>
-
-                        <!-- HIDDEN SCORE TEXT -->
-                        <TextView
-                            android:id="@+id/scoreText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            tools:ignore="MissingConstraints" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- ENLARGED AVATAR OVERLAY -->
-                    <app.rive.runtime.kotlin.RiveAnimationView
-                        android:id="@+id/playerAvatar"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:translationY="-24dp"
-                        app:layout_constraintBottom_toBottomOf="@id/timerMistakeBar"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/timerMistakeBar"
-                        app:riveAlignment="CENTER"
-                        app:riveAutoPlay="true"
-                        app:riveFit="CONTAIN"
-                        app:riveResource="@raw/avatar_math_storm_realtime"
-                        app:riveStateMachine="State Machine 1" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- GENERATED PROBLEM ROW -->
                 <LinearLayout
                     android:id="@+id/problemRow"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:gravity="center"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toTopOf="@+id/inputContainer"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/topBarContainer">
+                    app:layout_constraintTop_toBottomOf="@+id/topBarRive">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/problemText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_semibold"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
                         android:text=""
                         android:textColor="#64748b"
-                        android:textSize="44sp" />
+                        android:textSize="44sp"
+                        app:autoSizeMaxTextSize="44sp"
+                        app:autoSizeMinTextSize="22sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:autoSizeTextType="uniform" />
 
-                    <ImageView
-                        android:id="@+id/problemImage"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                    <!-- ANSWER BOX: the typed answer lives inside this blue box.
+                         wrap_content + minWidth/minHeight makes it grow with the digits. -->
+                    <TextView
+                        android:id="@+id/answerBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:contentDescription="problem image"
-                        android:src="@drawable/answer_blue_box"
+                        android:background="@drawable/answer_blue_box"
+                        android:fontFamily="@font/inter_semibold"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:minHeight="56dp"
+                        android:minWidth="56dp"
+                        android:paddingHorizontal="12dp"
+                        android:text=""
+                        android:textColor="@color/text_color"
+                        android:textSize="34sp"
                         android:visibility="invisible" />
 
                 </LinearLayout>

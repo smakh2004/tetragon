@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#20000000">
+
+    <!-- Normal background state -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF" />
+            <stroke android:width="2dp" android:color="@color/gray_2" />
+            <corners android:radius="23dp" />
+        </shape>
+    </item>
+
+    <!-- Mask that forces the ripple to match the circular corners -->
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF" />
+            <corners android:radius="23dp" />
+        </shape>
+    </item>
+
+</ripple>

@@ -40,6 +40,10 @@ class BillingHelper(
     }
 
     private fun setupBillingClient() {
+        val pendingPurchasesParams = PendingPurchasesParams.newBuilder()
+            .enableOneTimeProducts()
+            .build()
+
         billingClient = BillingClient.newBuilder(context)
             .setListener { billingResult, purchases ->
                 when (billingResult.responseCode) {
@@ -64,7 +68,7 @@ class BillingHelper(
                     }
                 }
             }
-            .enablePendingPurchases()
+            .enablePendingPurchases(pendingPurchasesParams)
             .build()
 
         startConnection()
@@ -134,10 +138,10 @@ class BillingHelper(
             .setProductList(products)
             .build()
 
-        billingClient.queryProductDetailsAsync(params) { billingResult, detailsList ->
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
             if (isReleased) return@queryProductDetailsAsync
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                productDetailsList = detailsList
+                productDetailsList = productDetailsResult.productDetailsList
                 mainScope.launch { checkInitCompletion() }
             } else {
                 val rawError = context.getString(

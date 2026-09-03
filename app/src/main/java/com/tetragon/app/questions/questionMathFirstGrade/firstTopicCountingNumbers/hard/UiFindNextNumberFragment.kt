@@ -1,5 +1,6 @@
 package com.tetragon.app.questions.questionMathFirstGrade.firstTopicCountingNumbers.hard
 
+import android.content.res.Configuration
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.Spannable
@@ -11,11 +12,18 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import app.rive.runtime.kotlin.RiveAnimationView
 import com.tetragon.app.R
 import com.tetragon.app.questions.questionMathFirstGrade.Math1GradeQuestionActivity
 import com.tetragon.app.questions.questionMathFirstGrade.MathGrade1Type
+import com.tetragon.app.utils.voiceReader.SpokenLine
+import com.tetragon.app.utils.voiceReader.TeacherLipSync
+import com.tetragon.app.utils.voiceReader.TeacherSpeech
+import com.tetragon.app.utils.voiceReader.UzPhrases
+import java.util.Locale
 import kotlin.random.Random
 
 class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number) {
@@ -31,15 +39,98 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
     private lateinit var answer: TextView
 
     private var correctAnswer = 0
+    private var baseNumber = 0
+    private var isAskNext = true
     private var selectedOptionIndex: Int? = null
     private var isAnswerChecked = false
     private var isIncorrectAttempt = false
     private var isFirstAttempt = true
+    private var isInitialized = false
     private var mediaPlayer: MediaPlayer? = null
+
+    private var interactionToken = 0
+
+    private val RIVE_CORRECT = "correct"
+    private val RIVE_INCORRECT = "incorrect"
+    private val RIVE_EXPLAIN = "explain"
+
+    private lateinit var teacherAnimation: RiveAnimationView
+    private lateinit var lipSync: TeacherLipSync
+    private lateinit var speech: TeacherSpeech
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initViews(view)
+        setupInitialButtonState()
 
+        if (!isInitialized) {
+            teacherAnimation.post {
+                generateProblem()
+                isInitialized = true
+            }
+        }
+    }
+
+    // ------------------------------------------------------------ speech language
+
+    private fun uiLanguage(): String = resources.configuration.locales[0].language
+
+    private fun isUzbek(): Boolean = uiLanguage() == TeacherSpeech.UZ
+
+    /**
+     * Locale for the TextToSpeech fallback only. Uzbek is spoken from clips, but
+     * if a clip is ever missing the line is read in Russian rather than dropped.
+     */
+    private fun fallbackLocale(): Locale =
+        if (isUzbek()) Locale("ru") else resources.configuration.locales[0]
+
+    /** Text for the TTS fallback, rendered in [fallbackLocale]. */
+    private fun spokenText(@StringRes id: Int, vararg args: Any): String {
+        if (!isUzbek()) return getString(id, *args)
+        val conf = Configuration(resources.configuration)
+        conf.setLocale(Locale("ru"))
+        return requireContext().createConfigurationContext(conf).getString(id, *args)
+    }
+
+    // ---------------------------------------------------------------- the lines
+
+    @StringRes
+    private fun questionStringRes(): Int =
+        if (isAskNext) R.string.question_next_after else R.string.question_before
+
+    private fun questionLine(): SpokenLine = SpokenLine(
+        text = spokenText(questionStringRes(), baseNumber.toString()),
+        clips = if (isAskNext) UzPhrases.nextAfter(baseNumber)
+        else UzPhrases.numberBefore(baseNumber)
+    )
+
+    private fun tryAgainLine(): SpokenLine = SpokenLine(
+        text = spokenText(R.string.teacher_try_again),
+        clips = UzPhrases.tryAgain()
+    )
+
+    private fun answerLine(): SpokenLine = SpokenLine(
+        text = spokenText(R.string.label_answer, correctAnswer.toString()),
+        clips = UzPhrases.answerIs(correctAnswer)
+    )
+
+    // ------------------------------------------------------------------ tokens
+
+    private fun newInteraction(): Int {
+        interactionToken++
+        return interactionToken
+    }
+
+    private fun isStale(token: Int) = token != interactionToken
+
+    private fun cancelSpeechAndSound() {
+        stopSound()
+        speech.stop()
+    }
+
+    // ------------------------------------------------------------------- setup
+
+    private fun initViews(view: View) {
         questionText = view.findViewById(R.id.questionText)
 
         options = listOf(
@@ -48,7 +139,7 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
             view.findViewById(R.id.option3)
         )
 
-        val activity = requireActivity()
+        val activity = requireActivity() as Math1GradeQuestionActivity
         checkBtn = activity.findViewById(R.id.check_enabled_btn)
         checkBtnBack = activity.findViewById(R.id.check_enabled_button_background)
         btnBack = activity.findViewById(R.id.btnBackground)
@@ -57,50 +148,53 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
         stateAnswer = activity.findViewById(R.id.stateAnswer)
         answer = activity.findViewById(R.id.answer)
 
-        setupInitialButtonState()
-        generateProblem()
+        teacherAnimation = view.findViewById(R.id.teacherAnimation)
+        lipSync = TeacherLipSync(teacherAnimation, language = uiLanguage())
+        lipSync.prepare()
+        speech = TeacherSpeech(requireContext(), lipSync, uiLanguage(), fallbackLocale())
+        teacherAnimation.setOnClickListener { repeatQuestion() }
+
         setupOptionClicks()
         setupCheckButton()
-    }
-
-    private fun playSound(soundResId: Int) {
-        mediaPlayer?.release()
-        mediaPlayer = MediaPlayer.create(requireContext(), soundResId)
-        mediaPlayer?.setOnCompletionListener { it.release() }
-        mediaPlayer?.start()
     }
 
     private fun setupInitialButtonState() {
         btnBack.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
         checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
-        checkBtn.isEnabled = false
+        disableCheckButton()
+    }
+
+    private fun repeatQuestion() {
+        newInteraction()
+        cancelSpeechAndSound()
+        speech.speak(questionLine())
     }
 
     private fun generateProblem() {
-        val number = Random.nextInt(2, 10)
-        val askNext = Random.nextBoolean()
+        newInteraction()
+        baseNumber = Random.nextInt(2, 10)
+        isAskNext = Random.nextBoolean()
 
-        val question: String
         val wordsToHighlight = mutableListOf<String>()
-        wordsToHighlight.add(number.toString())
+        wordsToHighlight.add(baseNumber.toString())
 
-        if (askNext) {
-            correctAnswer = number + 1
-            question = getString(R.string.question_next_after, number.toString())
-            // Highlight logical keywords if they exist in the current language
+        if (isAskNext) {
+            correctAnswer = baseNumber + 1
             wordsToHighlight.add("next")
             wordsToHighlight.add("after")
             wordsToHighlight.add("следующее")
             wordsToHighlight.add("после")
+            wordsToHighlight.add("keyingi")
         } else {
-            correctAnswer = number - 1
-            question = getString(R.string.question_before, number.toString())
+            correctAnswer = baseNumber - 1
             wordsToHighlight.add("before")
             wordsToHighlight.add("предыдущее")
             wordsToHighlight.add("перед")
+            wordsToHighlight.add("oldingi")
         }
 
+        val question = getString(questionStringRes(), baseNumber.toString())
         val spannable = SpannableString(question)
         val color = ContextCompat.getColor(requireContext(), R.color.blue_2)
 
@@ -135,21 +229,20 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
         isAnswerChecked = false
         isIncorrectAttempt = false
         isFirstAttempt = true
+        lipSync.clearBooleans()
         seeBtn.visibility = View.GONE
 
-        checkBtn.isEnabled = false
-        checkBtn.text = getString(R.string.btn_check)
-
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
-
+        disableCheckButton()
         setupInitialButtonState()
+        repeatQuestion()
     }
 
     private fun setupOptionClicks() {
         options.forEachIndexed { index, layout ->
             layout.setOnClickListener {
                 if (isAnswerChecked) return@setOnClickListener
+                newInteraction()
+                cancelSpeechAndSound()
                 selectedOptionIndex = index
                 highlightSelectedOption(index)
                 enableCheckButton()
@@ -170,10 +263,22 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
         checkBtn.isEnabled = true
         requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.VISIBLE
         requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.INVISIBLE
+        checkBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_2)
+        checkBtnBack.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blue_1)
+    }
+
+    private fun disableCheckButton() {
+        checkBtn.isEnabled = false
+        checkBtn.text = getString(R.string.btn_check)
+        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
+        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
     }
 
     private fun setupCheckButton() {
         checkBtn.setOnClickListener {
+            newInteraction()
+            cancelSpeechAndSound()
+
             val stateContainer = requireActivity().findViewById<FrameLayout>(R.id.stateContainer)
             val circleState = requireActivity().findViewById<ImageView>(R.id.circleState)
 
@@ -187,7 +292,7 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
                     if (checkBtn.text == getString(R.string.btn_finish)) {
                         activity.navigateToXpGained()
                     } else {
-                        resetUIForNext() // always reset first
+                        resetUIForNext()
                         val isMilestoneActive = activity.checkAndTriggerMilestone()
                         if (!isMilestoneActive) {
                             activity.showRandomQuestion()
@@ -208,6 +313,7 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
 
         if (chosen == correctAnswer) {
             playSound(R.raw.correct)
+            lipSync.fireTrigger(RIVE_CORRECT)
             activity.isCorrectAnswerShowing = true
             activity.playSuccessAnimation()
 
@@ -221,7 +327,15 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
             checkBtn.text = if (isFinished) getString(R.string.btn_finish) else getString(R.string.btn_continue)
             showCorrectState(stateContainer, circleState, index)
         } else {
-            playSound(R.raw.wrong)
+            val token = interactionToken
+            playSound(R.raw.wrong) {
+                if (isStale(token)) return@playSound
+                speech.speak(
+                    tryAgainLine(),
+                    onStarted = { if (!isStale(token)) lipSync.setBoolean(RIVE_INCORRECT, true) },
+                    onFinished = { lipSync.setBoolean(RIVE_INCORRECT, false) }
+                )
+            }
             isIncorrectAttempt = true
             activity.handleIncorrectAnswer()
             checkBtn.text = getString(R.string.btn_try_again)
@@ -237,6 +351,7 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
         options[index].setBackgroundResource(R.drawable.option_correct)
         stateAnswer.text = getString(R.string.state_correct)
         answer.text = getString(R.string.label_answer, correctAnswer.toString())
+        answer.visibility = View.VISIBLE
         applyButtonColors(R.color.green_1, R.color.green_2, R.color.green_4)
     }
 
@@ -253,6 +368,10 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
 
     private fun setupSeeSolution(stateContainer: FrameLayout, circleState: ImageView) {
         seeEnabledButton.setOnClickListener {
+            val token = newInteraction()
+            cancelSpeechAndSound()
+            lipSync.clearBooleans()
+
             seeBtn.visibility = View.GONE
             stateAnswer.text = getString(R.string.state_solution)
             answer.text = getString(R.string.label_answer, correctAnswer.toString())
@@ -261,8 +380,10 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
             circleState.setImageResource(R.drawable.solution_lamp_icon)
             isAnswerChecked = true
             isIncorrectAttempt = false
+
             applyButtonColors(R.color.black_3, R.color.black_2, R.color.gray_2)
             stateContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray_2))
+
             options.forEach { layout ->
                 val tv = layout.getChildAt(0) as TextView
                 layout.setBackgroundResource(
@@ -270,6 +391,12 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
                     else R.drawable.custom_background
                 )
             }
+
+            speech.speak(
+                answerLine(),
+                onStarted = { if (!isStale(token)) lipSync.setBoolean(RIVE_EXPLAIN, true) },
+                onFinished = { lipSync.setBoolean(RIVE_EXPLAIN, false) }
+            )
         }
     }
 
@@ -280,17 +407,20 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
     }
 
     private fun resetForTryAgain() {
+        newInteraction()
+        cancelSpeechAndSound()
+        lipSync.clearBooleans()
+
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         isAnswerChecked = false
         isIncorrectAttempt = false
         selectedOptionIndex = null
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
-        checkBtn.text = getString(R.string.btn_check)
-        checkBtn.isEnabled = false
-        requireActivity().findViewById<FrameLayout>(R.id.check_enabled_btn_container).visibility = View.INVISIBLE
-        requireActivity().findViewById<FrameLayout>(R.id.check_disabled_btn_container).visibility = View.VISIBLE
+
+        disableCheckButton()
         setupInitialButtonState()
+
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         seeBtn.visibility = View.GONE
         stateAnswer.text = ""
@@ -298,22 +428,50 @@ class UiFindNextNumberFragment : Fragment(R.layout.fragment_ui_find_next_number)
     }
 
     private fun resetUIForNext() {
+        newInteraction()
+        cancelSpeechAndSound()
+        lipSync.clearBooleans()
+
         val activity = requireActivity() as Math1GradeQuestionActivity
         activity.isResultCurrentlyVisible = false
         activity.hideSuccessAnimation()
+
         requireActivity().findViewById<FrameLayout>(R.id.stateContainer).visibility = View.INVISIBLE
         stateAnswer.text = ""
         answer.text = ""
         answer.visibility = View.VISIBLE
         seeBtn.visibility = View.GONE
-        checkBtn.text = getString(R.string.btn_check)
+
+        disableCheckButton()
         setupInitialButtonState()
         options.forEach { it.setBackgroundResource(R.drawable.custom_background) }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaPlayer?.release()
+    private fun playSound(resId: Int, onComplete: (() -> Unit)? = null) {
+        stopSound()
+        mediaPlayer = MediaPlayer.create(requireContext(), resId)
+        mediaPlayer?.setOnCompletionListener { player ->
+            player.release()
+            mediaPlayer = null
+            if (isAdded) onComplete?.invoke()
+        }
+        mediaPlayer?.start()
+    }
+
+    private fun stopSound() {
+        mediaPlayer?.let { player ->
+            player.setOnCompletionListener(null)
+            runCatching { if (player.isPlaying) player.stop() }
+            player.release()
+        }
         mediaPlayer = null
+    }
+
+    override fun onDestroyView() {
+        newInteraction()
+        stopSound()
+        speech.release()
+        lipSync.release()
+        super.onDestroyView()
     }
 }

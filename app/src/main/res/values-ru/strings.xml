@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tetragon</string>
     <string name="login_text">ВОЙТИ</string>
     <string name="start_text">НАЧАТЬ</string>
@@ -103,9 +103,9 @@
     <string name="grade_label_format">%1$s - %2$d КЛАСС</string>
     <string name="timer_format">%1$02dм %2$02dс</string>
     <string name="leaderboard">ТАБЛИЦА ЛИДЕРОВ</string>
-    <string name="get_a_reward_at_the_end_of_the_month">Получите награду в конце месяца</string>
+    <string name="get_a_reward_at_the_end_of_the_month">В конце месяца 3 лучших ученика получат награду</string>
     <string name="days_left_singular">ОСТАЛСЯ 1 ДЕНЬ</string>
-    <string name="days_left_plural">ОСТАЛОСЬ %1$d ДНЕЙ</string>
+    <string name="days_left_plural">%1$d ДНЕЙ</string>
     <string name="rank_status_format">Вы на %1$d-м месте</string>
     <string name="start_gaining_xp">Начните набирать ОЧКИ!</string>
     <string name="math_games">МИНИ ИГРЫ</string>
@@ -623,7 +623,8 @@
     <string name="solution_apples_correct">Отлично! Ты показал ровно %1$d яблок.</string>
     <string name="solution_apples_explanation">Посмотри! Вот %1$d яблок на экране.</string>
 
-    <string name="question_show_apples">Покажи %1$d яблок(а)</string>
+    <string name="question_show_apple">Покажи %1$d яблоко</string>
+    <string name="question_show_apples">Покажи %1$d яблок</string>
 
     <string name="apple">ЯБЛОКА</string>
 
@@ -769,4 +770,65 @@
     <string name="you_draw">Ничья</string>
 
     <string name="xp_gain">+%1$d XP</string>
+    <string name="ms_score_label">счёт:</string>
+
+    <string name="teacher_try_again">Не переживай, попробуй ещё раз! Или нажми «Посмотреть решение», и я всё объясню.</string>
+
+    <string name="solution_count_by">Считаем по %1$d: %2$d + %1$d = %3$d, потом %4$d + %1$d = %5$d.</string>
+
+    <string name="explain_connect_numbers">Начните с самого маленького числа и прибавляйте по 1 к каждому следующему числу, пока не дойдёте до %1$d.</string>
+
+    <string name="rive_lesson">Урок</string>
+    <string name="rive_complete">завершён!</string>
+    <string name="rive_lesson_complete">Урок завершён!</string>
+    <string name="rive_lesson_complete_description">Урок завершён! Отличная работа!</string>
+
+    <string name="rive_total_xp">Всего XP</string>
+    <string name="rive_accuracy">Точность</string>
+    <string name="rive_time">Время</string>
+
+    <string-array name="rive_lesson_complete_titles">
+        <item>Урок пройден!</item>
+        <item>У тебя получилось!</item>
+        <item>Урок завершён!</item>
+        <item>Задание выполнено!</item>
+        <item>Новый уровень!</item>
+    </string-array>
+
+    <string-array name="rive_lesson_complete_descriptions">
+        <item>Отлично! Так держать!</item>
+        <item>Классная работа! Продолжай!</item>
+        <item>Молодец! Учись дальше!</item>
+        <item>Потрясающая работа! Продолжай!</item>
+        <item>Превосходно! Ты справился!</item>
+    </string-array>
+
+    <string name="place_format">%1$d-место</string>
+
+    <string name="you_got_1st_place">Вы заняли 1-е место</string>
+    <string name="you_got_2nd_place">Вы заняли 2-е место</string>
+    <string name="you_got_3rd_place">Вы заняли 3-е место</string>
+
+    <string name="added_coins_format">+%1$d монет</string>
+    <string name="reward_continue">Продолжить</string>
+
+    <string name="streak_motivation">Сможешь удержать идеальную серию\nещё одну неделю?</string>
+
+    <plurals name="day_streak" tools:ignore="ImpliedQuantity">
+        <item quantity="one">день подряд</item>
+        <item quantity="few">дня подряд</item>
+        <item quantity="many">дней подряд</item>
+        <item quantity="other">дня подряд</item>
+    </plurals>
+
+    <string name="math_storm_title">Mатематик Шторм</string>
+    <string name="math_storm_subtitle">Решите как можно больше примеров!</string>
+    <string name="record_caps">РЕКОРД</string>
+    <string name="wins_caps">ПОБЕДЫ</string>
+    <string name="loses_caps">ПОРАЖЕНИЯ</string>
+    <string name="join">ПРИСОЕДИНИТЬСЯ</string>
+    <string name="searching_dots">Поиск…</string>
+    <string name="play_online_50_xp">СОЗДАТЬ ИГРУ +50 XP</string>
+    <string name="solo_game_30_xp">ОДИНОЧНАЯ ИГРА +30 XP</string>
+    <string name="no_open_rooms">Сейчас нет открытых игр.\nСоздайте игру и ждите соперника!</string>
 </resources>

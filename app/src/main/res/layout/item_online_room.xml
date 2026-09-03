@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingTop="5dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="5dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/roomCard"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/bg_room_card"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!-- ============ VERSUS BLOCK (avatar + sword + empty slot) ============ -->
+        <FrameLayout
+            android:id="@+id/roomVersusContainer"
+            android:layout_width="114dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="14dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- OWNER AVATAR -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/roomAvatarContainer"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="start|center_vertical"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="0dp">
+
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/roomAvatarRive"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_gravity="center"
+                    app:riveAlignment="CENTER"
+                    app:riveAutoPlay="true"
+                    app:riveFit="COVER"
+                    app:riveResource="@raw/static_avatar"
+                    app:riveStateMachine="State Machine 1" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- EMPTY OPPONENT SLOT -->
+            <FrameLayout
+                android:id="@+id/roomOpponentPlaceholder"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="54dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:cardBackgroundColor="#F4F7FA"
+                    app:cardCornerRadius="30dp"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:id="@+id/roomOpponentSilhouette"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="2dp"
+                        android:paddingTop="2dp"
+                        android:paddingRight="2dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_empty_player" />
+                </androidx.cardview.widget.CardView>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_avatar_dashed_ring" />
+            </FrameLayout>
+
+            <!-- SWORDS -->
+            <ImageView
+                android:id="@+id/roomSwordsIcon"
+                android:layout_width="46dp"
+                android:layout_height="58dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="34dp"
+                android:src="@drawable/ic_swords" />
+        </FrameLayout>
+
+        <!-- ============ JOIN / CANCEL BUTTON ============ -->
+        <TextView
+            android:id="@+id/roomActionBtn"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="18dp"
+            android:background="@drawable/bg_join_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
+            android:letterSpacing="0.03"
+            android:text="@string/join"
+            android:textColor="@color/blue_2"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/roomVersusContainer"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

@@ -34,6 +34,11 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
     private var myListener: ListenerRegistration? = null
     private var gameStarted = false
 
+    companion object {
+        /** The match is already found when we get here — this is just the "VS" beat. */
+        private const val START_DELAY_MS = 3000L
+    }
+
     private val viewModel: ConnectivityViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -53,17 +58,13 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
         binding = ActivityOnlineWaitingRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Searching now happens in MiniGamesFragment — this screen only shows the match.
+        binding.searchingContainer.visibility = View.GONE
+        binding.cancelButton.visibility = View.GONE
+        binding.mySection.visibility = View.VISIBLE
+        binding.opponentSection.visibility = View.VISIBLE
+
         observeConnectivity()
-
-        binding.cancelButton.setOnClickListener {
-            cleanupRoomIfOwner()
-            finish()
-            overridePendingTransition(
-                R.anim.slide_in_left,
-                R.anim.slide_out_right
-            )
-        }
-
         observeGame()
     }
 
@@ -73,43 +74,36 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
             val myUID = OnlineGameData.myID
             val opponentUID = if (myUID == model.player1) model.player2 else model.player1
 
-            // 1. OPPONENT STATE MANAGEMENT
+            // 1. OPPONENT AVATAR
             if (opponentUID.isNotEmpty()) {
-                binding.searchingContainer.visibility = View.GONE
-                binding.mySection.visibility = View.VISIBLE
-                binding.opponentSection.visibility = View.VISIBLE
-
                 opponentListener?.remove()
                 opponentListener = db.collection("users").document(opponentUID)
                     .addSnapshotListener { snapshot, _ ->
-                        val opponentName = snapshot?.getString("firstName") ?: getString(R.string.opponent_caps)
+                        val opponentName =
+                            snapshot?.getString("firstName") ?: getString(R.string.opponent_caps)
                         val opponentConfig = snapshot?.get("avatarConfig") as? Map<*, *>
-
-                        applyAvatarConfigToRive(binding.opponentPlayerIconImage, opponentConfig, opponentName)
+                        applyAvatarConfigToRive(
+                            binding.opponentPlayerIconImage,
+                            opponentConfig,
+                            opponentName
+                        )
                     }
-            } else {
-                opponentListener?.remove()
-                binding.searchingContainer.visibility = View.VISIBLE
-                binding.opponentSection.visibility = View.GONE
-                binding.mySection.visibility = View.GONE
             }
 
-            // 2. MY AVATAR DATA FETCH
+            // 2. MY AVATAR
             if (myUID.isNotEmpty()) {
                 myListener?.remove()
                 myListener = db.collection("users").document(myUID)
                     .addSnapshotListener { snapshot, _ ->
                         val myName = snapshot?.getString("firstName") ?: getString(R.string.you_caps)
                         val myConfig = snapshot?.get("avatarConfig") as? Map<*, *>
-
                         applyAvatarConfigToRive(binding.myPlayerIconImage, myConfig, myName)
                     }
             }
 
-            // 3. MATCH JOINED: HIDE CANCEL BUTTON & DELAY 3 SECONDS
-            if (!gameStarted && model.gameStatus == GameStatus.JOINED) {
+            // 3. START — the room is already JOINED when this screen opens
+            if (!gameStarted && model.gameStatus == GameStatus.JOINED && opponentUID.isNotEmpty()) {
                 gameStarted = true
-                binding.cancelButton.visibility = View.GONE
                 decreaseAttemptOnline()
                 startGameWithDelay()
             }
@@ -117,7 +111,11 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
         OnlineGameData.fetchGameModel()
     }
 
-    private fun applyAvatarConfigToRive(riveView: RiveAnimationView, config: Map<*, *>?, firstName: String) {
+    private fun applyAvatarConfigToRive(
+        riveView: RiveAnimationView,
+        config: Map<*, *>?,
+        firstName: String
+    ) {
         riveView.post {
             try {
                 val file = riveView.controller.file ?: return@post
@@ -125,10 +123,8 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
                 val vmi = vm.createDefaultInstance()
                 riveView.controller.stateMachines.firstOrNull()?.viewModelInstance = vmi
 
-                // Assign First Name Text Property inside Rive State Machine
                 vmi.getStringProperty("firstName")?.value = firstName
 
-                // Number Properties (Force face = 9f for both players)
                 val numberKeys = listOf("face", "hair", "glasses", "hat", "mustache", "body")
                 numberKeys.forEach { key ->
                     val num = if (key == "face") {
@@ -139,11 +135,9 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
                     vmi.getNumberProperty(key)?.value = num
                 }
 
-                // Hat Boolean
                 val hatValue = (config?.get("hat") as? Number)?.toInt() ?: 1
                 vmi.getBooleanProperty("hatOn")?.value = (hatValue > 1)
 
-                // Color Properties
                 val colorKeys = listOf(
                     "skinColor", "hairColor", "glassColor",
                     "capColor", "mustacheColor", "clothColor", "backgroundColor"
@@ -188,7 +182,7 @@ class OnlineWaitingRoomMathStormActivity : BaseActivity() {
                 R.anim.slide_out_left
             )
             finish()
-        }, 5000)
+        }, START_DELAY_MS)
     }
 
     private fun cleanupRoomIfOwner() {

@@ -13,6 +13,7 @@ import com.tetragon.app.R
 import com.tetragon.app.connectivityCheck.AndroidConnectivityObserver
 import com.tetragon.app.connectivityCheck.ConnectivityViewModel
 import com.tetragon.app.databinding.ActivityWelcomeBinding
+import com.tetragon.app.utils.applySystemBarsPadding
 import com.tetragon.app.utils.languageChangeUtils.BaseActivity
 import kotlinx.coroutines.launch
 
@@ -34,6 +35,10 @@ class WelcomeActivity : BaseActivity() {
         Rive.init(this)
         binding = ActivityWelcomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Экран без нижней навигации — корень забирает все четыре стороны,
+        // иначе кнопка LOG IN уезжает под системную панель.
+        binding.root.applySystemBarsPadding()
 
         // Capture language state from the global application context configuration
         currentLanguageCode = applicationContext.resources.configuration.locales[0]?.language

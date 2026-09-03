@@ -127,6 +127,10 @@ class ShopFragment : Fragment() {
     }
 
     private fun setupBillingClient() {
+        val pendingPurchasesParams = PendingPurchasesParams.newBuilder()
+            .enableOneTimeProducts()
+            .build()
+
         billingClient = BillingClient.newBuilder(requireContext())
             .setListener { billingResult, purchases ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
@@ -137,7 +141,7 @@ class ShopFragment : Fragment() {
                     Toast.makeText(context, billingResult.debugMessage, Toast.LENGTH_SHORT).show()
                 }
             }
-            .enablePendingPurchases()
+            .enablePendingPurchases(pendingPurchasesParams)
             .build()
 
         connectToGooglePlay()
@@ -178,8 +182,10 @@ class ShopFragment : Fragment() {
 
         val params = QueryProductDetailsParams.newBuilder().setProductList(productList).build()
 
-        billingClient.queryProductDetailsAsync(params) { _, detailsList ->
-            inAppProductDetailsList = detailsList
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                inAppProductDetailsList = productDetailsResult.productDetailsList
+            }
         }
     }
 

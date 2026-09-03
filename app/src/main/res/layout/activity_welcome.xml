@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:fitsSystemWindows="true"
     tools:context=".ui.WelcomeActivity">
 
     <LinearLayout
@@ -299,7 +298,7 @@
                 android:background="@drawable/custom_button"
                 android:fontFamily="@font/inter_semibold"
                 android:stateListAnimator="@drawable/button_animator"
-                android:text="LOG IN"
+                android:text="@string/login_text"
                 android:textColor="@color/white"
                 android:textSize="17sp"
                 app:backgroundTint="@color/black_3" />
@@ -324,7 +323,7 @@
                 android:layout_height="48dp"
                 android:fontFamily="@font/inter_semibold"
                 android:gravity="center"
-                android:text="LOG IN"
+                android:text="@string/login_text"
                 android:textColor="@color/gray_1"
                 android:textSize="17sp"
                 android:translationY="5dp" />
